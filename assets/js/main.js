@@ -13,24 +13,49 @@
   // Mobile navigation
   var toggle = document.querySelector(".nav-toggle");
   if (toggle) {
+    var nav = document.getElementById("site-nav");
+    var compact = window.matchMedia("(max-width: 1180px)");
+    function syncMenu() {
+      var open = document.body.classList.contains("nav-open");
+      nav.inert = compact.matches && !open;
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+    compact.addEventListener("change", function () {
+      document.body.classList.remove("nav-open");
+      syncMenu();
+    });
+    syncMenu();
     toggle.addEventListener("click", function () {
       var open = document.body.classList.toggle("nav-open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      syncMenu();
     });
     document.querySelectorAll(".nav a").forEach(function (a) {
       a.addEventListener("click", function () {
         document.body.classList.remove("nav-open");
         toggle.setAttribute("aria-expanded", "false");
+        syncMenu();
       });
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && document.body.classList.contains("nav-open")) {
         document.body.classList.remove("nav-open");
         toggle.setAttribute("aria-expanded", "false");
+        syncMenu();
         toggle.focus();
       }
     });
   }
+
+  document.querySelectorAll("[data-topic]").forEach(function (link) {
+    link.addEventListener("click", function () {
+      var topic = document.getElementById("f-topic");
+      if (topic) topic.value = link.getAttribute("data-topic");
+      var name = document.getElementById("f-name");
+      if (name) name.focus({ preventScroll: true });
+    });
+  });
 
   // Reveal on scroll + animated counters
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -84,6 +109,8 @@
         var next = null;
         if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
         if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+        if (e.key === "Home") next = tabs[0];
+        if (e.key === "End") next = tabs[tabs.length - 1];
         if (next) { e.preventDefault(); select(next); next.focus(); }
       });
     });
@@ -131,6 +158,14 @@
     lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
     document.addEventListener("keydown", function (e) {
       if (!lb.classList.contains("open")) return;
+      if (e.key === "Tab") {
+        var buttons = lb.querySelectorAll("button");
+        if (e.shiftKey && document.activeElement === buttons[0]) {
+          e.preventDefault(); buttons[buttons.length - 1].focus();
+        } else if (!e.shiftKey && document.activeElement === buttons[buttons.length - 1]) {
+          e.preventDefault(); buttons[0].focus();
+        }
+      }
       if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") show(idx - 1);
       if (e.key === "ArrowRight") show(idx + 1);
@@ -173,7 +208,7 @@
     ticking = true;
     requestAnimationFrame(function () {
       var y = window.scrollY;
-      if (header) header.classList.toggle("hide", phone.matches && y > lastY && y > 240);
+      if (header) header.classList.toggle("hide", phone.matches && !document.body.classList.contains("nav-open") && !header.contains(document.activeElement) && y > lastY && y > 240);
       lastY = y;
       ticking = false;
     });
@@ -205,16 +240,14 @@
     empty.className = "course-empty";
     empty.textContent = "No course matches that search. Try another word, or contact us and ask.";
     tabs.appendChild(empty);
-    function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
     q.addEventListener("input", function () {
       var term = q.value.trim();
-      var re = term ? new RegExp(esc(term), "i") : null;
       var total = 0;
       tabs.classList.toggle("searching", !!term);
       tabs.querySelectorAll(".program-panel").forEach(function (panel) {
         var hits = 0;
         panel.querySelectorAll(".course-list li").forEach(function (li) {
-          var match = !re || re.test(li.textContent);
+          var match = !term || li.textContent.toLowerCase().includes(term.toLowerCase());
           li.classList.toggle("hidden", !match);
           if (match) hits++;
         });

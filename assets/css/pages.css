@@ -1,0 +1,154 @@
+/* Page composition and readable, consistent content surfaces. */
+ :root {
+ --olive: #59732b; --radius-lg: 24px;
+ --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+ --font-display: "Manrope", system-ui, "Segoe UI", sans-serif;
+ --font-label: "DM Sans", system-ui, sans-serif;
+}
+body { letter-spacing: 0; line-height: 1.7; }
+h1, h2, h3, h4 { font-weight: 700; letter-spacing: -.035em; font-variation-settings: normal; }
+h1, h2 { text-wrap: balance; }
+h2 { font-size: clamp(1.8rem, 3.5vw, 3rem); line-height: 1.2; }
+p { text-wrap: pretty; }
+.hero h1 em, .quote-band blockquote p, .pull { font-family: "Fraunces", Georgia, serif; }
+.eyebrow { font-size: .74rem; letter-spacing: .12em; line-height: 1.5; }
+.brand-name { letter-spacing: -.02em; font-weight: 800; }
+.brand-sub { letter-spacing: .025em; }
+
+::selection { background: #dbe7ba; color: #17251d; }
+main { overflow: clip; }
+.page-hero { background: #17251d; padding: clamp(52px, 7vw, 92px) 0; min-height: 0; display: flex; align-items: center; }
+.page-hero .wrap { position: relative; }
+.page-hero .bg { left: 52%; z-index: -1; }
+.page-hero .bg img { opacity: .88; }
+.page-hero::before { z-index: 0; background: linear-gradient(90deg, #17251d 35%, rgba(23,37,29,.94) 49%, rgba(23,37,29,.12) 78%); }
+.page-hero h1 { font-size: clamp(2.4rem, 4.5vw, 4rem); max-width: 15ch; }
+.page-hero .lead { max-width: 49%; font-size: 1.08rem; }
+.page-hero .eyebrow { color: #dceab1; }
+.page-hero .crumbs { margin-bottom: 18px; }
+.hero h1 { max-width: 15ch; font-size: clamp(2.6rem, 5.4vw, 4.9rem); }
+.hero::before { background: linear-gradient(90deg,rgba(12,30,20,.9),rgba(12,30,20,.45) 65%,rgba(12,30,20,.1)),linear-gradient(0deg,rgba(12,30,20,.7),transparent 65%); }
+.hero .lead { max-width: 50ch; }
+.page-links { background: white; border-bottom: 1px solid var(--line); }
+.page-links .wrap { display: flex; align-items: center; gap: 10px; padding-top: 18px; padding-bottom: 18px; overflow-x: auto; scrollbar-width: thin; }
+.page-links-label { font: 700 .75rem var(--font-label); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; color: var(--muted); margin-right: 8px; }
+.page-links a { flex: none; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: .82rem; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); text-decoration: none; }
+.page-links a:hover, .page-links a[aria-current="location"] { color: var(--olive-deep); border-color: #aec58c; background: var(--olive-soft); }
+[data-page="index"] .page-links { margin-top: 32px; }
+.section { padding: clamp(54px, 7vw, 96px) 0; }
+.section-head .lead { line-height: 1.75; }
+.section-head.center .lead { margin-left: auto; margin-right: auto; }
+.grid > *, .split > *, .contact-grid > * { min-width: 0; }
+.card { border-top: 3px solid #a9bb7b; box-shadow: 0 4px 18px rgba(23,37,29,.025); }
+.card.red { border-top-color: #c96761; }
+.card.navy { border-top-color: #8998c7; }
+.card h3 { font-size: clamp(1.3rem, 1.7vw, 1.7rem); line-height: 1.22; }
+.img-card { border: 1px solid var(--line); box-shadow: none; }
+.img-card .body { gap: 8px; }
+.stat { padding: 30px 24px; }
+.stats-grid { gap: 0; }
+.prose { font-size: 1.06rem; line-height: 1.85; }
+.prose h2 { margin-top: 1.7em; font-size: clamp(1.9rem, 3vw, 2.7rem); }
+.prose h2:first-child { margin-top: 0; }
+.prose figure { margin: 36px 0; }
+.prose figcaption { padding: 12px 0; font-size: .85rem; line-height: 1.55; }
+.toc { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: white; }
+.toc a { border-radius: 8px; line-height: 1.5; }
+.program-tabs { gap: 10px; padding-bottom: 8px; }
+.program-tabs button { border-radius: 10px; text-align: left; min-height: 48px; }
+.program-box header { background: #f2f5ed; padding: 28px; }
+.program-box header h3 { font-size: 1.5rem; line-height: 1.25; }
+.course-list { padding: 12px; gap: 4px; }
+.course-list li { padding: 16px; border: 0; border-radius: 10px; line-height: 1.5; }
+.course-list li:nth-child(4n+1), .course-list li:nth-child(4n+2) { background: #f8f9f5; }
+.course-list li.hidden { display: none; }
+.course-count { color: var(--olive-deep); font-weight: 600; }
+.course-empty { border: 1px dashed var(--line); border-radius: 16px; padding: 26px; }
+.form { border: 1px solid var(--line); }
+.field input, .field select, .field textarea { background: #fafbf8; border-radius: 10px; min-height: 50px; }
+.field textarea { min-height: 160px; }
+.way { gap: 8px; }
+.way .btn { margin-top: auto; }
+.story { border-left: 4px solid var(--olive); }
+.timeline li { padding-bottom: 34px; }
+.timeline h4 { line-height: 1.5; }
+.book { box-shadow: 0 5px 20px rgba(23,37,29,.04); }
+.cta::before { background: linear-gradient(100deg,rgba(23,49,28,.97),rgba(23,49,28,.88) 50%,rgba(23,49,28,.4)); }
+.site-footer { border-top: 5px solid #829c46; }
+body.nav-open .site-header { transform: none; }
+@media (min-width: 1181px) { .nav a { padding-left: 9px; padding-right: 9px; font-size: .88rem; } }
+@media (max-width: 1180px) { .nav { max-height: calc(100dvh - var(--header-h) - 80px); overflow-y: auto; } }
+@media (max-width: 760px) {
+ .page-hero { padding: 28px 0 36px; min-height: 0; align-items: flex-start; }
+ .page-hero .bg { left: 0; }
+ .page-hero::before { background: linear-gradient(0deg,rgba(14,32,21,.98),rgba(14,32,21,.9) 48%,rgba(14,32,21,.3)); }
+ .page-hero h1 { font-size: clamp(2rem, 7.8vw, 2.75rem); line-height: 1.17; max-width: 22ch; margin-bottom: 16px; }
+ .page-hero .lead { max-width: 100%; font-size: 1rem; }
+ .page-hero .crumbs { margin: 0 0 16px; font-size: .8rem; }
+ .page-hero .eyebrow { margin-bottom: 12px; }
+ .page-links .wrap { gap: 8px; padding-top: 12px; padding-bottom: 12px; }
+ .page-links-label { display: none; }
+ .page-links a { max-width: 210px; }
+ .course-list { gap: 0; }
+ .course-list li:nth-child(n) { background: transparent; }
+ .course-list li:nth-child(odd) { background: #f8f9f5; }
+ .program-tabs { flex-wrap: nowrap; overflow-x: auto; }
+ .program-tabs button { flex: 0 0 auto; max-width: 230px; white-space: normal; }
+ .course-count { display: block; font-size: .76rem; min-width: 55px; }
+ .hero h1 { font-size: clamp(2.2rem, 8.8vw, 3.2rem); line-height: 1.13; margin-bottom: 18px; }
+ .hero { min-height: 0; align-items: flex-start; }
+ .hero .wrap { padding-top: 32px; padding-bottom: 86px; }
+ .hero-badge { flex-wrap: wrap; gap: 6px 10px; margin-bottom: 20px; font-size: .78rem; line-height: 1.4; }
+ .hero-badge b { font-size: .68rem; }
+ .hero .lead, .page-hero .lead { font-size: 1rem; line-height: 1.65; }
+ .hero .lead { margin-bottom: 24px; }
+ .section { padding: 40px 0; }
+ .section-sm { padding: 28px 0; }
+ h2 { font-size: clamp(1.65rem, 6.3vw, 2rem); line-height: 1.25; }
+ .prose h2 { font-size: clamp(1.6rem, 6vw, 1.95rem); }
+ .card h3 { font-size: 1.2rem; }
+ .btn { font-size: .92rem; padding: 13px 20px; }
+ .fact-list div { padding: 18px 20px; }
+ .fact-list dt { font-size: .7rem; letter-spacing: .08em; }
+ .fact-list dd { font-size: .95rem; line-height: 1.55; }
+ [data-page="phica"] .page-hero { padding-bottom: 80px; }
+ .gallery { columns: 2; }
+ .prose { font-size: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .hero-media img { animation: none; } }
+/* A usable course directory and menu when scripting is unavailable. */
+.no-js .program-panel { display: block; margin-bottom: 24px; }
+.no-js .program-tabs, .no-js .course-search { display: none; }
+[data-page="phica"] .page-links { margin-top: 24px; }
+@media (max-width: 1180px) {
+ .no-js .site-header { position: relative; }
+ .no-js .site-header .wrap { height: auto; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+ .no-js .nav-toggle { display: none; }
+ .no-js .nav { position: static; flex-direction: row; flex-wrap: wrap; visibility: visible; opacity: 1; transform: none; max-height: none; box-shadow: none; padding: 8px 0; }
+}
+
+/* Put the graduation announcement at the beginning of the home page. */
+.graduation-announcement { background: #edf2e3; color: #233b25; border-bottom: 1px solid #cdd9bd; }
+.graduation-announcement .wrap { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
+.announcement-year { flex: none; background: var(--red); color: white; border-radius: 6px; padding: 5px 10px; font-size: .71rem; line-height: 1.4; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.graduation-announcement p { margin: 0; font-size: .9rem; font-weight: 600; }
+.graduation-announcement a { font-size: .8rem; font-weight: 700; white-space: nowrap; }
+[data-page="index"] .hero { min-height: 0; align-items: center; }
+[data-page="index"] .hero .wrap { padding-top: clamp(40px, 6vw, 84px); padding-bottom: clamp(88px, 9vw, 120px); }
+[data-page="index"] .hero h1 { max-width: 16ch; margin-bottom: 20px; }
+[data-page="index"] .hero .lead { max-width: 48ch; line-height: 1.65; }
+[data-page="index"] .hero-media img { object-position: center 36%; animation: none; }
+[data-page="index"] .hero::before { background: linear-gradient(90deg,rgba(12,30,20,.94),rgba(12,30,20,.68) 50%,rgba(12,30,20,.18)),linear-gradient(0deg,rgba(12,30,20,.68),transparent 70%); }
+@media (max-width: 760px) {
+ .graduation-announcement .wrap { justify-content: flex-start; flex-wrap: wrap; gap: 6px 10px; padding-top: 10px; padding-bottom: 10px; }
+ .graduation-announcement p { font-size: .8rem; }
+ .graduation-announcement a { font-size: .75rem; }
+ .announcement-year { font-size: .65rem; padding: 4px 8px; }
+ [data-page="index"] .hero .wrap { padding-top: 28px; padding-bottom: 84px; }
+ [data-page="index"] .hero h1 { font-size: clamp(2.1rem, 8.5vw, 3.1rem); line-height: 1.15; max-width: 18ch; margin-bottom: 18px; }
+ [data-page="index"] .hero .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 22px; }
+ [data-page="index"] .hero .btn-row { gap: 10px; }
+ [data-page="index"] .hero .btn { min-height: 48px; }
+ [data-page="index"] .hero-media img { object-position: 58% center; }
+ [data-page="index"] .hero::before { background: linear-gradient(90deg,rgba(12,30,20,.87),rgba(12,30,20,.66)),linear-gradient(0deg,rgba(12,30,20,.5),transparent); }
+}

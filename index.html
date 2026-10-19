@@ -19,10 +19,11 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,500;1,500&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261019c">
 </head>
-<body>
+<body data-page="index">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="topbar">
@@ -59,13 +60,15 @@
   </header>
 
   <main id="main">
+    <aside class="graduation-announcement" aria-label="Graduation announcement">
+      <div class="wrap"><span class="announcement-year">Class of 2026</span><p>Congratulations, graduates!</p><a href="impact.html#gallery">View photos <span aria-hidden="true">↗</span></a></div>
+    </aside>
 
     <section class="hero">
       <div class="hero-media"><img src="assets/img/graduates-2026.jpg" alt="TIME Inc. Class of 2026 graduates in caps and gowns with their dean" fetchpriority="high"></div>
       <div class="wrap">
-        <div class="hero-badge"><b>Class of 2026</b> Congratulations, graduates!</div>
         <h1>Empowering people, <em>one life at a TIME.</em></h1>
-        <p class="lead">We train teachers, equip schools and stand with women, children and families in Liberia's hardest-to-reach towns and villages, because education can change the direction of a life.</p>
+        <p class="lead">We train teachers, equip schools and stand with women, children and families in Liberia's hardest-to-reach towns and villages. Education can change the direction of a life.</p>
         <div class="btn-row">
           <a class="btn btn-primary" href="programs.html">Explore Our Programs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           <a class="btn btn-outline-light" href="about.html">Read Our Story</a>
@@ -83,6 +86,8 @@
         </div>
       </div>
     </section>
+    <nav class="page-links" aria-label="Explore this page"><div class="wrap"><span class="page-links-label">On this page</span><a href="#section-1">Our story</a><a href="#section-2">What we do</a><a href="#section-3">Programs</a><a href="#section-4">Phìtìa Academy</a><a href="#section-5">Community stories</a><a href="#section-6">Our founder</a><a href="#section-7">Get involved</a></div></nav>
+
 
     <section class="trust" aria-label="Recognition">
       <div class="wrap">
@@ -94,12 +99,12 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="section-1">
       <div class="wrap split">
         <div class="reveal">
           <span class="eyebrow">Who we are</span>
           <h2>Born in a classroom, built on compassion.</h2>
-          <p class="lead">The Technical Institute for Many Empowerment (TIME) Inc. began when a teacher stopped to ask <em>why</em> his students were falling behind, and listened to the answers.</p>
+          <p class="lead">The Technical Institute for Many Empowerment (TIME) Inc. began when a teacher stopped to ask <em>why</em> his students were falling behind and listened to the answers.</p>
           <p>Behind the missed assignments and empty seats were stories of poverty, survival and a deep desire to stay in school. Dr. Philip V. Saywrayne, III and his wife, Mrs. Tibeh E. Gbassagee-Saywrayne, began helping quietly from their own limited resources. In January 2021 that personal commitment became TIME Inc.: a registered Liberian institution for teacher education, skills training and humanitarian service.</p>
           <p>Today we are an <strong>accredited supplementary teacher-training institution</strong> under the Bureau of Teacher Education, Ministry of Education, and we still go on foot when that's what it takes to reach a village school.</p>
           <a class="btn btn-ghost" href="about.html">Our full story <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -112,7 +117,7 @@
       </div>
     </section>
 
-    <section class="section bg-white">
+    <section class="section bg-white" id="section-2">
       <div class="wrap">
         <div class="section-head center reveal">
           <span class="eyebrow">What we do</span>
@@ -158,11 +163,11 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="section-3">
       <div class="wrap split reverse">
         <div class="reveal">
           <span class="eyebrow">Programs</span>
-          <h2>Training teachers who know what they're doing, and why.</h2>
+          <h2>Training teachers with skill, purpose and confidence.</h2>
           <p class="lead">Our purpose is not simply to issue certificates. It is to develop educators who make a real difference in the lives of their learners.</p>
           <ul class="check-list">
             <li><strong>"C" Certificate in Elementary Education</strong>: Mathematics &amp; Science, Language Arts &amp; Social Studies, Early Childhood, Geography &amp; Government</li>
@@ -181,7 +186,7 @@
       </div>
     </section>
 
-    <section class="section phica-band">
+    <section class="section phica-band" id="section-4">
       <div class="wrap split">
         <div class="reveal">
           <img class="phica-crest" src="assets/img/phica-logo.jpg" alt="Phìtìa Academy crest: We shape the mind that will shape the future" loading="lazy" style="margin-bottom:28px">
@@ -197,7 +202,7 @@
       </div>
     </section>
 
-    <section class="section bg-white">
+    <section class="section bg-white" id="section-5">
       <div class="wrap">
         <div class="section-head reveal">
           <span class="eyebrow">Stories from the field</span>
@@ -235,7 +240,7 @@
       </div>
     </section>
 
-    <section class="section">
+    <section class="section" id="section-6">
       <div class="wrap split">
         <div class="reveal">
           <img class="photo" src="assets/img/founder-portrait.jpg" alt="Portrait of Dr. Philip V. Saywrayne, III" loading="lazy" style="aspect-ratio:4/5;object-position:center 20%">
@@ -243,20 +248,20 @@
         <div class="reveal">
           <span class="eyebrow">Meet our Executive Director</span>
           <h2>Dr. Philip V. Saywrayne, III</h2>
-          <p class="lead">Award-winning author, educator, researcher and academic administrator, and the teacher whose students' stories started it all.</p>
+          <p class="lead">An award-winning author, educator, researcher and academic administrator whose commitment to his students inspired TIME Inc.</p>
           <p>Chairman of the School of Education at Cuttington University's School of Graduate and Professional Studies, former Vice President for Academic Affairs at Carver Christian University, author of 12 books, and manager of Liberia's pioneering School Leadership Project.</p>
           <a class="btn btn-ghost" href="founder.html">Full biography <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         </div>
       </div>
     </section>
 
-    <section class="section-sm">
+    <section class="section-sm" id="section-7">
       <div class="wrap">
         <div class="cta reveal">
           <div class="bg"><img src="assets/img/children-books.jpg" alt="" loading="lazy"></div>
           <span class="eyebrow light">Stand with us</span>
           <h2>Every child deserves a fair chance to learn.</h2>
-          <p>Books, benches, chalkboards, trained teachers, a scholarship for a child who would otherwise leave school. Whatever you give goes straight into classrooms and communities across Liberia.</p>
+          <p>Your support provides books, benches, chalkboards, teacher training and scholarships for children at risk of leaving school. Every contribution helps classrooms and communities across Liberia.</p>
           <div class="btn-row">
             <a class="btn btn-light" href="contact.html#support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg> Support TIME Inc.</a>
             <a class="btn btn-outline-light" href="https://wa.me/231888901848" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-2.4-1.5 9 9 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.5-.6.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.5 13.5 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.8 17.9L.1 24l6.3-1.6A11.8 11.8 0 0 0 12 23.8 11.8 11.8 0 0 0 20.4 3.6z"/></svg> Talk to us on WhatsApp</a>

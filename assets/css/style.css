@@ -751,3 +751,53 @@ h4 { font-size: 1.1rem; }
   .action-bar a.primary { background: var(--red); color: var(--white); margin-left: 4px; }
 }
 @media (min-width: 761px) { .swipe-dots { display: none; } }
+
+
+/* 2026 visual refresh: consistent editorial design across every TIME page */
+:root {
+  --paper:#f8f8f3; --sand:#f1f1e7; --ink:#17251d; --ink-2:#36483d;
+  --muted:#58675e; --line:#dce3d9; --olive:#748b32; --olive-deep:#435e25;
+  --olive-soft:#eef3e4; --red:#b92e2b; --red-deep:#94201e;
+  --radius:18px; --radius-lg:30px; --wrap:1280px;
+  --shadow:0 12px 35px rgba(17,38,26,.075);
+  --shadow-lg:0 24px 65px rgba(17,38,26,.14);
+}
+body {line-height:1.7;letter-spacing:-.006em}
+h1,h2,h3,h4 {letter-spacing:-.035em;text-wrap:balance}
+h1 {font-size:clamp(2.75rem,6.4vw,5.8rem);line-height:1.04}
+h2 {font-size:clamp(2.1rem,4.2vw,3.7rem);line-height:1.12}
+.lead {max-width:72ch}
+.section {position:relative}
+.section-head {max-width:850px}
+.site-header {background:rgba(248,248,243,.94);border-bottom:1px solid rgba(67,94,37,.12)}
+.site-header.scrolled {box-shadow:0 12px 35px rgba(23,37,29,.09)}
+.brand img {border-radius:14px;box-shadow:0 3px 15px rgba(0,0,0,.08)}
+.nav a {transition:color .2s ease,background-color .2s ease}
+.nav a:not(.btn):hover {background:rgba(116,139,50,.09)}
+.btn {min-height:48px;box-shadow:none;letter-spacing:.01em}
+.btn-primary {box-shadow:0 12px 28px rgba(185,46,43,.2)}
+.btn:focus-visible,.nav-toggle:focus-visible {outline:3px solid #2b9ad6;outline-offset:4px}
+.card {border-radius:var(--radius-lg);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.card:hover {transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.card img,.gallery img {transition:transform .45s ease}
+.card:hover img,.gallery a:hover img {transform:scale(1.035)}
+.hero {isolation:isolate}
+.hero h1 {max-width:950px;text-shadow:0 3px 30px rgba(0,0,0,.15)}
+.hero .lead {max-width:730px}
+.hero-media img {object-position:center 42%}
+.stats-grid {gap:clamp(16px,2vw,30px)}
+.stat-num {font-variant-numeric:tabular-nums}
+.eyebrow {letter-spacing:.14em}
+.media-stack img {box-shadow:var(--shadow-lg)}
+input,textarea,select {font:inherit}
+input:focus-visible,textarea:focus-visible,select:focus-visible {outline:3px solid #2b9ad6;outline-offset:2px}
+@media (max-width:760px) {
+  h1 {font-size:clamp(2.5rem,10vw,4.1rem)}
+  h2 {font-size:clamp(2rem,8vw,3rem)}
+  .hero .lead {font-size:1.05rem}
+  .card:hover {transform:none}
+  .btn {white-space:normal;text-align:center}
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}

@@ -126,3 +126,29 @@ body.nav-open .site-header { transform: none; }
  .no-js .nav-toggle { display: none; }
  .no-js .nav { position: static; flex-direction: row; flex-wrap: wrap; visibility: visible; opacity: 1; transform: none; max-height: none; box-shadow: none; padding: 8px 0; }
 }
+
+/* Put the graduation announcement at the beginning of the home page. */
+.graduation-announcement { background: #edf2e3; color: #233b25; border-bottom: 1px solid #cdd9bd; }
+.graduation-announcement .wrap { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
+.announcement-year { flex: none; background: var(--red); color: white; border-radius: 6px; padding: 5px 10px; font-size: .71rem; line-height: 1.4; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.graduation-announcement p { margin: 0; font-size: .9rem; font-weight: 600; }
+.graduation-announcement a { font-size: .8rem; font-weight: 700; white-space: nowrap; }
+[data-page="index"] .hero { min-height: 0; align-items: center; }
+[data-page="index"] .hero .wrap { padding-top: clamp(40px, 6vw, 84px); padding-bottom: clamp(88px, 9vw, 120px); }
+[data-page="index"] .hero h1 { max-width: 16ch; margin-bottom: 20px; }
+[data-page="index"] .hero .lead { max-width: 48ch; line-height: 1.65; }
+[data-page="index"] .hero-media img { object-position: center 36%; animation: none; }
+[data-page="index"] .hero::before { background: linear-gradient(90deg,rgba(12,30,20,.94),rgba(12,30,20,.68) 50%,rgba(12,30,20,.18)),linear-gradient(0deg,rgba(12,30,20,.68),transparent 70%); }
+@media (max-width: 760px) {
+ .graduation-announcement .wrap { justify-content: flex-start; flex-wrap: wrap; gap: 6px 10px; padding-top: 10px; padding-bottom: 10px; }
+ .graduation-announcement p { font-size: .8rem; }
+ .graduation-announcement a { font-size: .75rem; }
+ .announcement-year { font-size: .65rem; padding: 4px 8px; }
+ [data-page="index"] .hero .wrap { padding-top: 28px; padding-bottom: 84px; }
+ [data-page="index"] .hero h1 { font-size: clamp(2.1rem, 8.5vw, 3.1rem); line-height: 1.15; max-width: 18ch; margin-bottom: 18px; }
+ [data-page="index"] .hero .lead { font-size: 1rem; line-height: 1.65; margin-bottom: 22px; }
+ [data-page="index"] .hero .btn-row { gap: 10px; }
+ [data-page="index"] .hero .btn { min-height: 48px; }
+ [data-page="index"] .hero-media img { object-position: 58% center; }
+ [data-page="index"] .hero::before { background: linear-gradient(90deg,rgba(12,30,20,.87),rgba(12,30,20,.66)),linear-gradient(0deg,rgba(12,30,20,.5),transparent); }
+}

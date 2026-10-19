@@ -631,3 +631,123 @@ h4 { font-size: 1.1rem; }
 .mb-0 { margin-bottom: 0; }
 .muted { color: var(--muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ==========================================================================
+   Trust strip, course search, mobile action bar, swipe rows
+   ========================================================================== */
+.trust { padding: 36px 0 0; }
+.trust ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 28px; }
+.trust li { display: inline-flex; align-items: center; gap: 10px; font-size: .92rem; color: var(--ink-2); }
+.trust svg { width: 20px; height: 20px; color: var(--olive); flex: none; }
+.trust b { color: var(--ink); }
+
+.course-search {
+  position: relative; display: flex; align-items: center; gap: 12px;
+  background: var(--paper); border: 1px solid #d7d4c6; border-radius: 999px;
+  padding: 6px 8px 6px 18px; margin-bottom: 20px; max-width: 640px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.course-search:focus-within { border-color: var(--olive); box-shadow: 0 0 0 4px rgba(127,140,28,.16); background: var(--white); }
+.course-search svg { width: 20px; height: 20px; color: var(--muted); flex: none; }
+.course-search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 1rem; padding: 10px 0; color: var(--ink); }
+.course-search input:focus { outline: none; }
+.course-count { font-size: .82rem; font-weight: 600; color: var(--olive-deep); background: var(--olive-soft); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+.course-count:empty { display: none; }
+.searching .program-tabs { display: none; }
+.searching .program-panel { display: block; margin-bottom: 16px; animation: none; }
+.searching .program-panel.no-match, .course-list li.hidden { display: none; }
+.course-empty { display: none; padding: 28px; text-align: center; color: var(--muted); background: var(--white); border: 1px dashed var(--line); border-radius: var(--radius-lg); }
+.searching.nothing .course-empty { display: block; }
+
+.action-bar { display: none; }
+
+/* Header hides while scrolling down on phones, returns on scroll up */
+.site-header { transition: border-color .25s ease, box-shadow .25s ease, transform .3s ease; }
+.site-header.hide { transform: translateY(-100%); }
+.nav-open .site-header.hide { transform: none; }
+
+/* ==========================================================================
+   Phone refinements
+   ========================================================================== */
+@media (max-width: 760px) {
+  :root { --header-h: 64px; }
+  body { font-size: 16px; padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+  .topbar { display: none; }
+  .brand img { width: 42px; height: 42px; }
+  .brand-name { font-size: 1.2rem; }
+  .nav-toggle { width: 42px; height: 42px; }
+
+  .section { padding: 56px 0; }
+  .section-sm { padding: 36px 0; }
+  .section-head { margin-bottom: 26px; }
+  .lead { font-size: 1.04rem; }
+  h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+
+  .hero { min-height: auto; }
+  .hero .wrap { padding-top: 120px; }
+  .hero h1 { font-size: clamp(2.3rem, 10.5vw, 3rem); }
+  .hero .btn-row .btn { flex: 1 1 auto; }
+  .hero-badge { padding: 6px 12px 6px 6px; }
+
+  .card { padding: 22px; border-radius: var(--radius); }
+  .card .icon { width: 46px; height: 46px; margin-bottom: 14px; border-radius: 12px; }
+  .card .icon svg { width: 22px; height: 22px; }
+  .card .num { font-size: 2rem; top: 18px; right: 20px; }
+  .img-card .body { padding: 20px; }
+
+  .media-stack { padding: 0 0 28px 18px; }
+  .media-stack .tag { padding: 10px 14px; top: 14px; font-size: .7rem; }
+  .media-stack .tag strong { font-size: 1.45rem; }
+
+  .stat { padding: 20px 16px; }
+  .stat-label { font-size: .84rem; }
+
+  .trust { padding-top: 28px; }
+  .trust ul { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  .quote-band blockquote p { font-size: 1.45rem; }
+  .quote-mark { font-size: 5rem; }
+
+  .gallery { columns: 2; column-gap: 10px; }
+  .gallery figure { margin-bottom: 10px; border-radius: 10px; }
+  .gallery figcaption { font-size: .76rem; padding: 28px 10px 8px; }
+
+  .cta { padding: 32px 22px; }
+  .cta .btn-row .btn { flex: 1 1 100%; }
+
+  .course-search { border-radius: 14px; }
+  .course-count { display: none; }
+
+  /* Card rows become a horizontal swipe on phones */
+  .grid.swipe {
+    display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 82%;
+    gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+    margin: 0 calc(var(--gutter) * -1); padding: 4px var(--gutter) 18px; scroll-padding: 0 var(--gutter);
+    scrollbar-width: none;
+  }
+  .grid.swipe::-webkit-scrollbar { display: none; }
+  .grid.swipe > * { scroll-snap-align: start; }
+  .grid.swipe .reveal, .grid.swipe.reveal { opacity: 1; transform: none; }
+  .swipe-dots { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+  .swipe-dots span { width: 7px; height: 7px; border-radius: 999px; background: var(--line); transition: width .25s ease, background-color .25s ease; }
+  .swipe-dots span.on { width: 20px; background: var(--olive); }
+
+  /* Bottom quick-action bar replaces the floating WhatsApp button */
+  .wa-float { display: none; }
+  .action-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 95;
+    background: rgba(255,255,255,.97); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); box-shadow: 0 -6px 24px rgba(27,28,23,.08);
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+  }
+  .action-bar a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    min-height: 52px; border-radius: 12px; text-decoration: none; color: var(--ink-2); font-size: .74rem; font-weight: 600;
+  }
+  .action-bar a svg { width: 22px; height: 22px; }
+  .action-bar a:nth-child(2) svg { color: #1fa855; }
+  .action-bar a:active { background: var(--sand); }
+  .action-bar a.primary { background: var(--red); color: var(--white); margin-left: 4px; }
+}
+@media (min-width: 761px) { .swipe-dots { display: none; } }

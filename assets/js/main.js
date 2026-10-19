@@ -160,3 +160,69 @@
   // Footer year
   document.querySelectorAll("[data-year]").forEach(function (el) { el.textContent = new Date().getFullYear(); });
 })();
+
+(function () {
+  "use strict";
+
+  // Hide the header while scrolling down on phones; bring it back on scroll up
+  var header = document.querySelector(".site-header");
+  var lastY = window.scrollY, ticking = false;
+  var phone = window.matchMedia("(max-width: 760px)");
+  window.addEventListener("scroll", function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var y = window.scrollY;
+      if (header) header.classList.toggle("hide", phone.matches && y > lastY && y > 240);
+      lastY = y;
+      ticking = false;
+    });
+  }, { passive: true });
+
+  // Position dots under swipeable card rows
+  document.querySelectorAll(".grid.swipe").forEach(function (row) {
+    var cards = row.children;
+    var dots = document.createElement("div");
+    dots.className = "swipe-dots";
+    dots.setAttribute("aria-hidden", "true");
+    for (var i = 0; i < cards.length; i++) dots.appendChild(document.createElement("span"));
+    row.parentNode.insertBefore(dots, row.nextSibling);
+    function update() {
+      var w = cards[0] ? cards[0].getBoundingClientRect().width + 14 : 1;
+      var idx = Math.round(row.scrollLeft / w);
+      for (var j = 0; j < dots.children.length; j++) dots.children[j].classList.toggle("on", j === idx);
+    }
+    row.addEventListener("scroll", update, { passive: true });
+    update();
+  });
+
+  // Live search across every course on the Programs page
+  var q = document.getElementById("course-q");
+  var tabs = document.getElementById("course-tabs");
+  if (q && tabs) {
+    var count = document.querySelector(".course-count");
+    var empty = document.createElement("p");
+    empty.className = "course-empty";
+    empty.textContent = "No course matches that search. Try another word, or contact us and ask.";
+    tabs.appendChild(empty);
+    function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+    q.addEventListener("input", function () {
+      var term = q.value.trim();
+      var re = term ? new RegExp(esc(term), "i") : null;
+      var total = 0;
+      tabs.classList.toggle("searching", !!term);
+      tabs.querySelectorAll(".program-panel").forEach(function (panel) {
+        var hits = 0;
+        panel.querySelectorAll(".course-list li").forEach(function (li) {
+          var match = !re || re.test(li.textContent);
+          li.classList.toggle("hidden", !match);
+          if (match) hits++;
+        });
+        panel.classList.toggle("no-match", !!term && hits === 0);
+        total += hits;
+      });
+      tabs.classList.toggle("nothing", !!term && total === 0);
+      if (count) count.textContent = term ? total + (total === 1 ? " course" : " courses") : "";
+    });
+  }
+})();

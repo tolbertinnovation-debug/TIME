@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tolbertinnovation-debug.github.io/TIME/sitemap.xml

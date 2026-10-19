@@ -1,5 +1,6 @@
 /* Page composition and readable, consistent content surfaces. */
  :root {
+ color-scheme: only light;
  --olive: #59732b; --radius-lg: 24px;
  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
  --font-display: "Manrope", system-ui, "Segoe UI", sans-serif;

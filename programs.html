@@ -18,8 +18,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
 </head>
-<body>
+<body data-page="programs">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="topbar">
@@ -66,8 +67,10 @@
         <p class="lead">Short-term certificate and diploma courses at affordable rates, accredited by the Bureau of Teacher Education, Ministry of Education (MoE), Liberia.</p>
       </div>
     </section>
+    <nav class="page-links" aria-label="Explore this page"><div class="wrap"><span class="page-links-label">On this page</span><a href="#section-1">Why TIME</a><a href="#courses">Browse courses</a><a href="#professional">Class schedules</a><a href="#register">Registration</a><a href="#section-5">Sponsor a teacher</a></div></nav>
 
-    <section class="section">
+
+    <section class="section" id="section-1">
       <div class="wrap">
         <div class="split" style="align-items:start">
           <div class="reveal">
@@ -106,7 +109,7 @@
             <button role="tab" id="t-dip" aria-controls="p-dip" aria-selected="false" tabindex="-1">Diploma Programs</button>
           </div>
 
-          <div class="program-panel active" id="p-elem" role="tabpanel" aria-labelledby="t-elem">
+          <div class="program-panel active" id="p-elem" role="tabpanel" tabindex="0" aria-labelledby="t-elem">
             <div class="program-box">
               <header>
                 <div><h3>Certificate in Elementary Education ("C" Certificate)</h3><p>Prepares elementary teachers in core subject areas and professional pedagogy.</p></div>
@@ -121,7 +124,7 @@
             </div>
           </div>
 
-          <div class="program-panel" id="p-sci" role="tabpanel" aria-labelledby="t-sci">
+          <div class="program-panel" id="p-sci" role="tabpanel" tabindex="0" aria-labelledby="t-sci">
             <div class="program-box">
               <header>
                 <div><h3>"C" Certificate: Lab Training &amp; Elementary Education for Senior High School Science Teachers</h3><p>Hands-on laboratory training and teaching methods for science teachers.</p></div>
@@ -137,7 +140,7 @@
             </div>
           </div>
 
-          <div class="program-panel" id="p-skills" role="tabpanel" aria-labelledby="t-skills">
+          <div class="program-panel" id="p-skills" role="tabpanel" tabindex="0" aria-labelledby="t-skills">
             <div class="program-box">
               <header>
                 <div><h3>Other Skills Areas</h3><p>Foundational academic and administrative skills for teachers, students and school staff.</p></div>
@@ -151,7 +154,7 @@
             </div>
           </div>
 
-          <div class="program-panel" id="p-prof" role="tabpanel" aria-labelledby="t-prof">
+          <div class="program-panel" id="p-prof" role="tabpanel" tabindex="0" aria-labelledby="t-prof">
             <div class="program-box">
               <header>
                 <div><h3>A. Professional Certificate Programs in Other Areas</h3><p>Community health, safety, counseling and ethics for practitioners and community workers.</p></div>
@@ -173,7 +176,7 @@
             </div>
           </div>
 
-          <div class="program-panel" id="p-dip" role="tabpanel" aria-labelledby="t-dip">
+          <div class="program-panel" id="p-dip" role="tabpanel" tabindex="0" aria-labelledby="t-dip">
             <div class="program-box">
               <header>
                 <div><h3>B. Diploma Programs in Other Areas</h3><p>Career-building diplomas in education, finance, leadership, ministry and media.</p></div>
@@ -254,7 +257,7 @@
       </div>
     </section>
 
-    <section class="section-sm">
+    <section class="section-sm" id="section-5">
       <div class="wrap">
         <div class="cta reveal">
           <div class="bg"><img src="assets/img/graduates-2026.jpg" alt="" loading="lazy"></div>

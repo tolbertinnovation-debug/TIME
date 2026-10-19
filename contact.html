@@ -18,8 +18,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
 </head>
-<body>
+<body data-page="contact">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <div class="topbar">
@@ -66,6 +67,8 @@
         <p class="lead">Register for a course, partner with us, volunteer or support a child's education. We'd love to hear from you.</p>
       </div>
     </section>
+    <nav class="page-links" aria-label="Explore this page"><div class="wrap"><span class="page-links-label">On this page</span><a href="#support">Ways to help</a><a href="#contact">Contact details</a></div></nav>
+
 
     <section class="section" id="support">
       <div class="wrap">
@@ -85,13 +88,13 @@
             <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 14h2a2 2 0 0 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16"/><path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.8-2.8l-4.2 3.9"/><path d="m2 15 6 6"/></svg></div>
             <h3>Volunteer</h3>
             <p>Join outreach trips, teach a class, mentor students or lend professional skills in health, finance, media or education.</p>
-            <a class="btn btn-ghost" href="#contact-form">Join our team</a>
+            <a class="btn btn-ghost" href="#contact-form" data-topic="Volunteering">Join our team</a>
           </div>
           <div class="way reveal">
             <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.9-3.9a3 3 0 0 0-4.2 0l-.9.9a1 1 0 1 1-3-3l2.8-2.8a5.8 5.8 0 0 1 7.1-.9l.5.3a4 4 0 0 0 2.8.5L21 4"/><path d="m21 3 1 11h-2M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3M3 4h8"/></svg></div>
             <h3>Partner</h3>
             <p>Churches, schools, NGOs, businesses and development partners: help us scale teacher training and community outreach.</p>
-            <a class="btn btn-ghost" href="#contact-form">Become a partner</a>
+            <a class="btn btn-ghost" href="#contact-form" data-topic="Becoming a partner">Become a partner</a>
           </div>
         </div>
       </div>
@@ -129,8 +132,8 @@
               </select>
             </div>
             <div class="field"><label for="f-msg">Message *</label><textarea id="f-msg" name="message" required></textarea></div>
-            <button class="btn btn-primary" type="submit">Send message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-            <p class="form-note form-status" role="status" aria-live="polite"></p>
+            <button class="btn btn-primary" type="submit">Prepare email <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            <p class="form-note form-status" role="status" aria-live="polite">This form opens your email app with a prepared message. Send it from there to contact TIME.</p>
           </form>
         </div>
       </div>

@@ -1,9 +1,8 @@
 (function () {
   "use strict";
   var root = document.documentElement;
-  var system = window.matchMedia("(prefers-color-scheme: dark)");
   var choice = null;
-  try { choice = localStorage.getItem("time-theme"); } catch (e) { /* Storage can be disabled. */ }
+  try { choice = sessionStorage.getItem("time-theme-session"); } catch (e) { /* Storage can be disabled. */ }
   if (choice !== "light" && choice !== "dark") choice = null;
   function apply(theme) {
     root.setAttribute("data-theme", theme);
@@ -17,16 +16,14 @@
       button.querySelector(".theme-label").textContent = dark ? "Light" : "Dark";
     });
   }
-  apply(choice || (system.matches ? "dark" : "light"));
-  system.addEventListener("change", function () {
-    if (!choice) apply(system.matches ? "dark" : "light");
-  });
+  // Start new visits in light mode; keep manual choices while browsing this tab.
+  apply(choice || "light");
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".theme-toggle").forEach(function (button) {
       button.hidden = false;
       button.addEventListener("click", function () {
         choice = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-        try { localStorage.setItem("time-theme", choice); } catch (e) { /* Keep the current-page choice. */ }
+        try { sessionStorage.setItem("time-theme-session", choice); } catch (e) { /* Keep the current-page choice. */ }
         apply(choice);
       });
     });

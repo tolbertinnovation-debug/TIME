@@ -67,3 +67,11 @@ Migration `003_lecturer_lessons.sql` adds a private lessons table. Lecturer over
 Lecturers and administrators can create, edit, publish, or unpublish lessons. Lessons support plain text (40,000 characters), up to 10 HTTPS resource links (reading, PDF, slides, video), and one PDF/text attachment up to 2 MB. Editing keeps an existing attachment unless explicitly replaced or removed. Slides and video are external links, not uploaded/hosted media. Drafts are visible to authorized staff only. Students open published lessons from the Lecturer lessons button on an approved course card. Authenticated attachment downloads require the same course access as the lesson. Existing public study guides remain separate.
 
 Validation: 70 automated checks, real SQL planning on the development database, development Function deployment, and mobile/dashboard/editor visual review with synthetic preview data. Production authenticated user interaction remains a user-session check.
+
+## Student dashboard, calendar, and announcements
+
+Students now have an overview of approved courses, pending enrolments, assignments still to submit, upcoming classes, and recent grades/feedback. A monthly calendar combines their published assignment deadlines and authorized class dates, with course/date filters and an agenda. Times use Africa/Monrovia. Calendar events come from existing private assignment/session responses; it does not create dates or sync external calendars.
+
+Migration `004_course_announcements.sql` adds private course notices. Assigned lecturers and administrators can draft, publish, edit, and unpublish announcements. Students see published notices only for approved course enrolments, including recent notices on their dashboard. Notices appear inside the application and are refreshed with the workspace; no email, push, or background notification delivery is implemented.
+
+Validation: 79 automated checks covering role/course boundaries, drafts, calendar month/leap dates, submission status, and dashboard controls; real SQL planning on the development database; development deployment; mobile dashboard and calendar visual review with synthetic preview records. Production authenticated interaction remains a user-session check.

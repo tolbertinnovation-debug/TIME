@@ -37,3 +37,9 @@ Run `npm ci` in `backend/`, then `npm test` and `npm run build`. The build bundl
 
 ## Operational next steps
 Set up production-branded SMTP and verify real email-code delivery with TIME before a cohort-wide launch. Cross-site cookie restrictions may affect browser sign-in; test on the students’ actual devices. Consider a same-site custom frontend/auth domain deployment when hosting permissions are available. Review data retention, storage usage, access logs, and backups for the expected cohort size. Uploads are private database attachments in this release, rather than an object-storage service or malware-scanned document system. Do not upload sensitive clinical records.
+
+## Separate role portals
+
+`account.html` is the workspace selector. `student-login.html` supports open student registration; `lecturer-login.html` supports registration for administrator approval and approved lecturer sign-in; `admin-login.html` offers sign-in only. Lecturer registrants retain the default student role until an administrator assigns teaching access. There is no public administrator promotion endpoint.
+
+All portals use the same existing identity service. The selected page never changes a role: after verification, `/me` supplies the database role. A mismatched portal shows a link to the approved workspace. Staff tools appear first in lecturer/admin dashboards; lecturers see their assigned courses. API authorization remains independent of UI routing. Existing account links continue to work through the selector.

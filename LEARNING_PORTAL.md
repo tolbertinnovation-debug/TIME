@@ -45,3 +45,5 @@ Set up production-branded SMTP and verify real email-code delivery with TIME bef
 All portals use the same existing identity service. The selected page never changes a role: after verification, `/me` supplies the database role. A mismatched portal shows a link to the approved workspace. Staff tools appear first in lecturer/admin dashboards; lecturers see their assigned courses. API authorization remains independent of UI routing. Existing account links continue to work through the selector.
 
 Email verification displays a persistent success screen after the authentication service accepts a code. Continue explicitly reloads the current session while bypassing the Neon SDK session cache and server cookie cache. Verification does not grant lecturer or administrator permissions. Invalid codes leave the verification form open with an error.
+
+Signed-in screens hide all role login links. Opening `account.html` with a verified session routes to the database-approved workspace. Signed-out users retain the role selector. A wrong portal shows only the approved workspace link and sign-out controls; it never grants another role.

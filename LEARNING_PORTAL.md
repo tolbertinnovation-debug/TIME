@@ -47,3 +47,5 @@ All portals use the same existing identity service. The selected page never chan
 Email verification displays a persistent success screen after the authentication service accepts a code. Continue explicitly reloads the current session while bypassing the Neon SDK session cache and server cookie cache. Verification does not grant lecturer or administrator permissions. Invalid codes leave the verification form open with an error.
 
 Signed-in screens hide all role login links. Opening `account.html` with a verified session routes to the database-approved workspace. Signed-out users retain the role selector. A wrong portal shows only the approved workspace link and sign-out controls; it never grants another role.
+
+After successful student or lecturer registration, the verification page automatically requests an email-verification code once. It displays delivery-request status and a Resend code button. Normal reloads do not automatically send another email. While a request is in flight, the button is disabled. Failed delivery requests preserve the created account and show retry instructions. Only the most recent code should be used.

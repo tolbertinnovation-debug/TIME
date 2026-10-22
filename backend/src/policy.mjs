@@ -22,3 +22,5 @@ export function cleanWorkspace(raw){
  if(typeof raw.last==='string'&&/^[a-z-]+:[0-5]$/.test(raw.last)&&courseIds.has(raw.last.split(':')[0]))out.last=raw.last;
  if(Buffer.byteLength(JSON.stringify(out))>600000)throw new HttpError(413,'Workspace is larger than 600 KB. Download a local backup instead.');return out;
 }
+
+export function createCourseValidator(catalogue){const ids=new Set(catalogue.map(c=>c.id));return id=>{if(!ids.has(id))throw new HttpError(400,'Unknown course.');return id;};}

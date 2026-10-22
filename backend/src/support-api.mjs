@@ -2,7 +2,7 @@ import {HttpError,requireUUID,requireCourse,text} from './policy.mjs';
 export const supportCategories=['account','coursework','classes','technical','other'];
 const statuses=['open','in-progress','resolved'];
 const offsetOf=url=>Math.max(0,Math.min(100000,Math.floor(Number(url.searchParams.get('offset'))||0)));
-export async function handleSupport({path,request,url,body,query,member,identity,audit,json}){
+export async function handleSupport({path,request,url,body,query,member,identity,requireCourse:validateCourse=requireCourse,audit,json}){
  if(!/^\/support(\/|$)/.test(path))return null;
  const admin=member.role==='admin';
  if(path==='/support'&&request.method==='GET'){
@@ -13,7 +13,7 @@ export async function handleSupport({path,request,url,body,query,member,identity
  if(path==='/support'&&request.method==='POST'){
   const b=await body();if(!b||typeof b!=='object')throw new HttpError(400,'Enter your request details.');
   const title=text(b.title,1,160,'Subject'),content=text(b.content,1,4000,'Message');if(!supportCategories.includes(b.category))throw new HttpError(400,'Choose a support category.');
-  const course=b.courseId||null;if(course)requireCourse(course);
+  const course=b.courseId||null;if(course)validateCourse(course);
   const r=await query(`WITH created AS (INSERT INTO time_learning.support_tickets(requester_id,title,category,course_id) VALUES($1,$2,$3,$4) RETURNING id), message AS (INSERT INTO time_learning.support_messages(ticket_id,author_id,content,staff_reply) SELECT id,$1,$5,false FROM created) SELECT id FROM created`,[identity,title,b.category,course,content]);await audit('support.create',r.rows[0].id);return json({ticket:r.rows[0]},201);
  }
  if(path==='/support/overview'&&request.method==='GET'){

@@ -1,10 +1,11 @@
+import {handleCatalogue,contentAudience,keepAudience} from './catalogue-api.mjs';
 import {handleSupport} from './support-api.mjs';
 import {handleAdminOperations} from './admin-operations.mjs';
 import {handleAttendance} from './attendance-api.mjs';
 import {handleAnnouncements} from './announcements-api.mjs';
 import {handleTeaching} from './teaching-api.mjs';
 import {handleAdmin} from './admin-api.mjs';
-import {HttpError,requireCourse,requireUUID,text,canTeach,canReadSubmission,validDate,checkFile,cleanWorkspace} from './policy.mjs';
+import {HttpError,createCourseValidator,requireCourse,requireUUID,text,canTeach,canReadSubmission,validDate,checkFile,cleanWorkspace} from './policy.mjs';
 const ORIGIN='https://tolbertinnovation-debug.github.io';
 const MAX=2900000;
 export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
@@ -17,7 +18,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    if(origin&&!allowedOrigins.includes(origin))throw new HttpError(403,'This origin is not permitted.');
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
    const url=new URL(request.url),path=url.pathname;
-   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:8});
+   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:9});
    const authorization=request.headers.get('authorization');
    if(!authorization?.startsWith('Bearer '))throw new HttpError(401,'Sign in to continue.');
    let identity;try{identity=await verify(authorization.slice(7));requireUUID(identity);}catch{throw new HttpError(401,'Your session has expired. Sign in again.');}
@@ -30,6 +31,8 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    const member=(await query('SELECT user_id, role, suspended FROM time_learning.members WHERE user_id=$1',[identity])).rows[0];
    if(member.suspended)throw new HttpError(403,'Your learning account is suspended. Contact TIME.');
    const teaching=(await query('SELECT course_id FROM time_learning.teaching WHERE user_id=$1 AND active',[identity])).rows.map(x=>x.course_id);
+   const catalogue=(await query('SELECT id,code,title,lecturer,description,archived FROM time_learning.courses ORDER BY title LIMIT 501')).rows;
+   const requireCourse=createCourseValidator(catalogue),catalogueIds=new Set(catalogue.map(c=>c.id));
    const teaches=course=>canTeach(member,course,teaching);
    const requireTeacher=course=>{if(!teaches(course))throw new HttpError(403,'Lecturer access to this course is required.');};
    const audit=async(action,id)=>query('INSERT INTO time_learning.audit(actor,action,resource_id) VALUES($1,$2,$3)',[identity,action,id]);
@@ -40,18 +43,19 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
     while(true){const {done,value}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>MAX){await reader.cancel();throw new HttpError(413,'Request is too large.');}chunks.push(value);}
     try{return JSON.parse(Buffer.concat(chunks).toString());}catch{throw new HttpError(400,'Request data is not valid JSON.');}
    };
-   const supportResponse=await handleSupport({path,request,url,body,query,member,identity,audit,json});if(supportResponse)return supportResponse;
-   const operationsResponse=await handleAdminOperations({path,request,url,body,query,member,identity,audit,json,headers});if(operationsResponse)return operationsResponse;
-   const adminResponse=await handleAdmin({path,request,url,body,query,member,identity,audit,json});if(adminResponse)return adminResponse;
-   const teachingResponse=await handleTeaching({path,request,url,body,query,member,identity,teaching,teaches,audit,json,headers});if(teachingResponse)return teachingResponse;
-   const announcementResponse=await handleAnnouncements({path,request,url,body,query,member,identity,teaching,teaches,audit,json});if(announcementResponse)return announcementResponse;
-   const attendanceResponse=await handleAttendance({path,request,url,body,query,member,identity,teaches,audit,json});if(attendanceResponse)return attendanceResponse;
+   const catalogueResponse=await handleCatalogue({path,request,body,query,member,identity,teaching,catalogue,audit,json});if(catalogueResponse)return catalogueResponse;
+   const supportResponse=await handleSupport({path,request,url,body,query,member,identity,requireCourse,audit,json});if(supportResponse)return supportResponse;
+   const operationsResponse=await handleAdminOperations({path,request,url,body,query,member,identity,requireCourse,audit,json,headers});if(operationsResponse)return operationsResponse;
+   const adminResponse=await handleAdmin({path,request,url,body,query,member,identity,requireCourse,audit,json});if(adminResponse)return adminResponse;
+   const teachingResponse=await handleTeaching({path,request,url,body,query,member,identity,teaching,teaches,requireCourse,courseIds:catalogueIds,audit,json,headers});if(teachingResponse)return teachingResponse;
+   const announcementResponse=await handleAnnouncements({path,request,url,body,query,member,identity,teaching,teaches,requireCourse,courseIds:catalogueIds,audit,json});if(announcementResponse)return announcementResponse;
+   const attendanceResponse=await handleAttendance({path,request,url,body,query,member,identity,teaches,requireCourse,courseIds:catalogueIds,audit,json});if(attendanceResponse)return attendanceResponse;
    if(path==='/me'&&request.method==='GET'){
-    const enrollments=(await query('SELECT course_id,joined_at,status,cohort FROM time_learning.enrollments WHERE user_id=$1 ORDER BY joined_at',[identity])).rows;
+    const enrollments=(await query('SELECT course_id,joined_at,status,cohort,cohort_id FROM time_learning.enrollments WHERE user_id=$1 ORDER BY joined_at',[identity])).rows;
     return json({user:{id:user.id,name:user.name,email:user.email},role:member.role,teaching,enrollments});
    }
    if(path==='/enroll'&&request.method==='POST'){
-    const b=await body();requireCourse(b.courseId);if(member.role!=='student')throw new HttpError(403,'Student access is required to request enrollment.');
+    const b=await body();requireCourse(b.courseId);if(catalogue.find(c=>c.id===b.courseId)?.archived)throw new HttpError(409,'This course is archived and is not accepting enrolment requests.');if(member.role!=='student')throw new HttpError(403,'Student access is required to request enrollment.');
     await query("INSERT INTO time_learning.enrollments(user_id,course_id,status) VALUES($1,$2,'pending') ON CONFLICT(user_id,course_id) DO UPDATE SET status='pending' WHERE time_learning.enrollments.status='declined'",[identity,b.courseId]);await audit('course.request',b.courseId);return json({ok:true});
    }
    if(path==='/workspace'&&request.method==='GET'){
@@ -62,23 +66,23 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
     await query('INSERT INTO time_learning.workspace(user_id,data) VALUES($1,$2::jsonb) ON CONFLICT(user_id) DO UPDATE SET data=excluded.data,updated_at=now()',[identity,JSON.stringify(data)]);return json({ok:true});
    }
    if(path==='/assignments'&&request.method==='GET'){
-    const rows=await query(`SELECT a.id,a.course_id,a.title,a.instructions,a.due_at,a.published,a.created_at,s.id AS submission_id,s.submitted_at,s.updated_at,s.score,s.feedback,s.graded_at,s.file_name
+    const rows=await query(`SELECT a.id,a.course_id,a.title,a.instructions,a.due_at,a.published,a.created_at,a.cohort_id,s.id AS submission_id,s.submitted_at,s.updated_at,s.score,s.feedback,s.graded_at,s.file_name
      FROM time_learning.assignments a LEFT JOIN time_learning.submissions s ON s.assignment_id=a.id AND s.student_id=$1
-     WHERE ($2='admin' OR a.course_id=ANY($3::text[]) OR (a.published AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$1 AND e.course_id=a.course_id AND e.status='approved'))) ORDER BY a.created_at DESC LIMIT 200`,[identity,member.role,member.role==='lecturer'?teaching:[]]);return json({assignments:rows.rows});
+     WHERE ($2='admin' OR a.course_id=ANY($3::text[]) OR (a.published AND $2='student' AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$1 AND e.course_id=a.course_id AND e.status='approved' AND (a.cohort_id IS NULL OR a.cohort_id=e.cohort_id)))) ORDER BY a.created_at DESC LIMIT 200`,[identity,member.role,member.role==='lecturer'?teaching:[]]);return json({assignments:rows.rows});
    }
    if(path==='/assignments'&&request.method==='POST'){
-    const b=await body();requireCourse(b.courseId);requireTeacher(b.courseId);
-    const r=await query('INSERT INTO time_learning.assignments(course_id,title,instructions,due_at,published,created_by) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',[b.courseId,text(b.title,1,160,'Title'),text(b.instructions,1,12000,'Instructions'),validDate(b.dueAt),b.published===true,identity]);await audit('assignment.create',r.rows[0].id);return json({assignment:r.rows[0]},201);
+    const b=await body();requireCourse(b.courseId);requireTeacher(b.courseId);const cohort=await contentAudience(query,b.courseId,b.cohortId);
+    const r=await query('INSERT INTO time_learning.assignments(course_id,title,instructions,due_at,published,created_by,cohort_id) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',[b.courseId,text(b.title,1,160,'Title'),text(b.instructions,1,12000,'Instructions'),validDate(b.dueAt),b.published===true,identity,cohort]);await audit('assignment.create',r.rows[0].id);return json({assignment:r.rows[0]},201);
    }
    const assignmentMatch=path.match(/^\/assignments\/([^/]+)$/);
    if(assignmentMatch&&request.method==='PUT'){
-    const id=requireUUID(assignmentMatch[1]);const a=(await query('SELECT course_id FROM time_learning.assignments WHERE id=$1',[id])).rows[0];if(!a)throw new HttpError(404,'Assignment not found.');requireTeacher(a.course_id);
-    const b=await body();await query('UPDATE time_learning.assignments SET title=$2,instructions=$3,due_at=$4,published=$5 WHERE id=$1',[id,text(b.title,1,160,'Title'),text(b.instructions,1,12000,'Instructions'),validDate(b.dueAt),b.published===true]);await audit('assignment.update',id);return json({ok:true});
+    const id=requireUUID(assignmentMatch[1]);const a=(await query('SELECT course_id,cohort_id FROM time_learning.assignments WHERE id=$1',[id])).rows[0];if(!a)throw new HttpError(404,'Assignment not found.');requireTeacher(a.course_id);
+    const b=await body();keepAudience(b,a);await query('UPDATE time_learning.assignments SET title=$2,instructions=$3,due_at=$4,published=$5 WHERE id=$1',[id,text(b.title,1,160,'Title'),text(b.instructions,1,12000,'Instructions'),validDate(b.dueAt),b.published===true]);await audit('assignment.update',id);return json({ok:true});
    }
    const submitMatch=path.match(/^\/assignments\/([^/]+)\/submit$/);
    if(submitMatch&&request.method==='POST'){
     const id=requireUUID(submitMatch[1]);
-    const a=(await query(`SELECT a.* FROM time_learning.assignments a JOIN time_learning.enrollments e ON e.course_id=a.course_id AND e.user_id=$2 AND e.status='approved' WHERE a.id=$1 AND a.published`,[id,identity])).rows[0];
+    const a=(await query(`SELECT a.* FROM time_learning.assignments a JOIN time_learning.enrollments e ON e.course_id=a.course_id AND e.user_id=$2 AND e.status='approved' AND (a.cohort_id IS NULL OR a.cohort_id=e.cohort_id) WHERE a.id=$1 AND a.published`,[id,identity])).rows[0];
     if(!a)throw new HttpError(404,'Assignment is not available in your joined courses.');
     if(a.due_at&&Date.now()>new Date(a.due_at).getTime())throw new HttpError(409,'The submission deadline has passed. Contact your lecturer.');
     const existing=(await query('SELECT id,graded_at FROM time_learning.submissions WHERE assignment_id=$1 AND student_id=$2',[id,identity])).rows[0];if(existing?.graded_at)throw new HttpError(409,'This submission has been graded. Contact your lecturer before changing it.');
@@ -92,14 +96,14 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    }
    if(path==='/submissions'&&request.method==='GET'){
     if(!['admin','lecturer'].includes(member.role))throw new HttpError(403,'Lecturer access is required.');
-    const r=await query(`SELECT s.id,s.assignment_id,s.student_id,s.submitted_at,s.updated_at,s.score,s.feedback,s.graded_at,s.file_name,a.title,a.course_id,u.name AS student_name,u.email AS student_email
+    const r=await query(`SELECT s.id,s.assignment_id,s.student_id,s.submitted_at,s.updated_at,s.score,s.feedback,s.graded_at,s.file_name,a.title,a.course_id,a.cohort_id,u.name AS student_name,u.email AS student_email
      FROM time_learning.submissions s JOIN time_learning.assignments a ON a.id=s.assignment_id JOIN neon_auth."user" u ON u.id=s.student_id
      WHERE $1='admin' OR a.course_id=ANY($2::text[]) ORDER BY s.updated_at DESC LIMIT 200`,[member.role,teaching]);return json({submissions:r.rows});
    }
    const submissionMatch=path.match(/^\/submissions\/([^/]+)(\/file|\/grade)?$/);
    if(submissionMatch){
     const id=requireUUID(submissionMatch[1]);
-    const s=(await query('SELECT s.*,a.course_id,a.title FROM time_learning.submissions s JOIN time_learning.assignments a ON a.id=s.assignment_id WHERE s.id=$1',[id])).rows[0];
+    const s=(await query('SELECT s.*,a.course_id,a.title,a.cohort_id FROM time_learning.submissions s JOIN time_learning.assignments a ON a.id=s.assignment_id WHERE s.id=$1',[id])).rows[0];
     if(!s||!canReadSubmission(member,s,teaching))throw new HttpError(404,'Submission not found.');
     if(request.method==='GET'&&submissionMatch[2]==='/file'){
      if(!s.file_data)throw new HttpError(404,'No file was attached.');
@@ -115,13 +119,13 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
     }
    }
    if(path==='/sessions'&&request.method==='GET'){
-    const r=await query(`SELECT s.id,s.course_id,s.title,s.starts_at,s.mode,s.location FROM time_learning.sessions s
-     WHERE $2='admin' OR s.course_id=ANY($3::text[]) OR EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$1 AND e.course_id=s.course_id AND e.status='approved') ORDER BY s.starts_at LIMIT 100`,[identity,member.role,member.role==='lecturer'?teaching:[]]);return json({sessions:r.rows});
+    const r=await query(`SELECT s.id,s.course_id,s.title,s.starts_at,s.mode,s.location,s.cohort_id FROM time_learning.sessions s
+     WHERE $2='admin' OR s.course_id=ANY($3::text[]) OR ($2='student' AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$1 AND e.course_id=s.course_id AND e.status='approved' AND (s.cohort_id IS NULL OR s.cohort_id=e.cohort_id))) ORDER BY s.starts_at LIMIT 100`,[identity,member.role,member.role==='lecturer'?teaching:[]]);return json({sessions:r.rows});
    }
    if(path==='/sessions'&&request.method==='POST'){
     const b=await body();requireCourse(b.courseId);requireTeacher(b.courseId);if(!['online','in-person'].includes(b.mode))throw new HttpError(400,'Choose an online or in-person session.');
-    const location=text(b.location,1,1000,'Meeting link or venue');if(b.mode==='online'){try{if(new URL(location).protocol!=='https:')throw Error();}catch{throw new HttpError(400,'Use a full HTTPS meeting link.');}}
-    const r=await query('INSERT INTO time_learning.sessions(course_id,title,starts_at,mode,location,created_by) VALUES($1,$2,$3,$4,$5,$6) RETURNING id',[b.courseId,text(b.title,1,160,'Session title'),validDate(b.startsAt,true),b.mode,location,identity]);await audit('session.create',r.rows[0].id);return json({session:r.rows[0]},201);
+    const cohort=await contentAudience(query,b.courseId,b.cohortId);const location=text(b.location,1,1000,'Meeting link or venue');if(b.mode==='online'){try{if(new URL(location).protocol!=='https:')throw Error();}catch{throw new HttpError(400,'Use a full HTTPS meeting link.');}}
+    const r=await query('INSERT INTO time_learning.sessions(course_id,title,starts_at,mode,location,created_by,cohort_id) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id',[b.courseId,text(b.title,1,160,'Session title'),validDate(b.startsAt,true),b.mode,location,identity,cohort]);await audit('session.create',r.rows[0].id);return json({session:r.rows[0]},201);
    }
    if(path==='/staff'&&request.method==='GET'){
     if(member.role!=='admin')throw new HttpError(403,'Administrator access is required.');

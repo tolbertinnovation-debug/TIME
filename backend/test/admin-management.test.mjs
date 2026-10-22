@@ -1,8 +1,10 @@
+import {courseIds} from '../src/policy.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createHandler} from '../src/api.mjs';
 const admin='11111111-1111-4111-8111-111111111111',student='22222222-2222-4222-8222-222222222222';
 function harness({role='admin',suspended=false,targetRole='student',targetSuspended=false,verified=true}={}){
  const queries=[];const app=createHandler({verify:async()=>admin,query:async(sql,values=[])=>{queries.push({sql,values});
+ if(sql.startsWith('SELECT id,code,title'))return {rows:[...courseIds].map(id=>({id,archived:false}))};
  if(sql.startsWith('SELECT id, name'))return {rows:[{id:admin,emailVerified:true,banned:false}]};
  if(sql.startsWith('INSERT INTO time_learning.quotas'))return {rows:[{requests:1}]};
  if(sql.startsWith('SELECT user_id, role'))return {rows:[{user_id:admin,role,suspended}]};

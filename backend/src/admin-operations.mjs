@@ -5,12 +5,12 @@ export function dateOnly(value,label='Date'){
  if(value==null||value==='')return null;
  if(typeof value!=='string'||value.startsWith('0000-')||!/^\d{4}-\d{2}-\d{2}$/.test(value)||!Number.isFinite(Date.parse(value+'T00:00:00Z'))||new Date(value+'T00:00:00Z').toISOString().slice(0,10)!==value)throw new HttpError(400,label+' must be a valid calendar date.');return value;
 }
-export function cohortInput(b){
+export function cohortInput(b,validateCourse=requireCourse){
  if(!b||typeof b!=='object'||Array.isArray(b))throw new HttpError(400,'Enter the cohort details.');
  const name=text(b.name,1,80,'Cohort name'),starts=dateOnly(b.startsOn,'Start date'),ends=dateOnly(b.endsOn,'End date');
  if(starts&&ends&&ends<starts)throw new HttpError(400,'The end date must be on or after the start date.');
  if(!cohortStatuses.includes(b.status))throw new HttpError(400,'Choose a valid cohort status.');
- if(!Array.isArray(b.courseIds)||!b.courseIds.length||b.courseIds.length>8||new Set(b.courseIds).size!==b.courseIds.length)throw new HttpError(400,'Choose one or more different courses.');b.courseIds.forEach(requireCourse);
+ if(!Array.isArray(b.courseIds)||!b.courseIds.length||b.courseIds.length>8||new Set(b.courseIds).size!==b.courseIds.length)throw new HttpError(400,'Choose one or more different courses.');b.courseIds.forEach(validateCourse);
  return [name,starts,ends,b.status,b.courseIds,text(b.notes||'',0,2000,'Cohort notes')];
 }
 export function csvCell(value){
@@ -26,12 +26,12 @@ export const reportTypes={
  grades:{columns:cols([['student_id','Student ID'],['name','Student name'],['email','Email'],['course_id','Course ID'],['cohort','Current cohort'],['title','Assignment'],['submitted_at','Submitted at'],['score','Score out of 100'],['graded_at','Graded at']]),sql:`SELECT s.student_id,u.name,u.email,a.course_id,coalesce(c.name,e.cohort,'') AS cohort,a.title,s.submitted_at,s.score,s.graded_at,count(*) OVER()::int AS total FROM time_learning.submissions s JOIN time_learning.assignments a ON a.id=s.assignment_id JOIN neon_auth."user" u ON u.id=s.student_id LEFT JOIN time_learning.enrollments e ON e.user_id=s.student_id AND e.course_id=a.course_id LEFT JOIN time_learning.cohorts c ON c.id=e.cohort_id WHERE ($1='' OR a.course_id=$1) AND ($2::uuid IS NULL OR e.cohort_id=$2) ORDER BY s.submitted_at DESC,s.id`},
  attendance:{columns:cols([['student_id','Student ID'],['name','Student name'],['email','Email'],['course_id','Course ID'],['cohort','Current cohort'],['title','Class'],['starts_at','Class starts at'],['mode','Delivery'],['status','Attendance'],['updated_at','Recorded at']]),sql:`SELECT a.student_id,u.name,u.email,s.course_id,coalesce(c.name,e.cohort,'') AS cohort,s.title,s.starts_at,s.mode,a.status,a.updated_at,count(*) OVER()::int AS total FROM time_learning.attendance a JOIN time_learning.sessions s ON s.id=a.session_id JOIN neon_auth."user" u ON u.id=a.student_id LEFT JOIN time_learning.enrollments e ON e.user_id=a.student_id AND e.course_id=s.course_id LEFT JOIN time_learning.cohorts c ON c.id=e.cohort_id WHERE a.status<>'unrecorded' AND ($1='' OR s.course_id=$1) AND ($2::uuid IS NULL OR e.cohort_id=$2) ORDER BY s.starts_at DESC,a.session_id,a.student_id`}
 };
-export async function handleAdminOperations({path,request,url,body,query,member,identity,audit,json,headers}){
+export async function handleAdminOperations({path,request,url,body,query,member,identity,requireCourse:validateCourse=requireCourse,audit,json,headers}){
  if(!/^\/admin\/(reports|cohorts|activity)(\/|$)/.test(path))return null;
  if(member.role!=='admin')throw new HttpError(403,'Administrator access is required.');
  if(path==='/admin/reports'&&request.method==='GET'){
   const kind=url.searchParams.get('type')||'enrollments';if(!Object.hasOwn(reportTypes,kind))throw new HttpError(400,'Choose a valid report.');
-  const course=url.searchParams.get('courseId')||'',cohort=url.searchParams.get('cohortId')||null;if(course)requireCourse(course);if(cohort)requireUUID(cohort);
+  const course=url.searchParams.get('courseId')||'',cohort=url.searchParams.get('cohortId')||null;if(course)validateCourse(course);if(cohort)requireUUID(cohort);
   const format=url.searchParams.get('format')||'json';if(!['json','csv'].includes(format))throw new HttpError(400,'Choose JSON or CSV.');
   const offset=format==='csv'?0:offsetOf(url),limit=format==='csv'?5001:50,definition=reportTypes[kind];
   const r=await query(definition.sql+' LIMIT $3 OFFSET $4',[course,cohort,limit,offset]);
@@ -51,14 +51,14 @@ export async function handleAdminOperations({path,request,url,body,query,member,
   if(r.rows.length>200)throw new HttpError(422,'This workspace supports up to 200 managed cohorts.');return json({cohorts:r.rows});
  }
  if(path==='/admin/cohorts'&&request.method==='POST'){
-  const input=cohortInput(await body());
+  const input=cohortInput(await body(),validateCourse);
   const r=await query(`INSERT INTO time_learning.cohorts(name,starts_on,ends_on,status,course_ids,notes,created_by) SELECT $1,$2,$3,$4,$5,$6,$7 WHERE (SELECT count(*) FROM time_learning.cohorts)<200 ON CONFLICT(name) DO NOTHING RETURNING id`,[...input,identity]);if(!r.rows[0])throw new HttpError(409,'Choose a unique cohort name. This workspace supports up to 200 managed cohorts.');await audit('cohort.create',r.rows[0].id);return json({cohort:r.rows[0]},201);
  }
  const match=path.match(/^\/admin\/cohorts\/([^/]+)(\/candidates|\/assign)?$/);
  if(match){
   const id=requireUUID(match[1]),cohort=(await query('SELECT * FROM time_learning.cohorts WHERE id=$1',[id])).rows[0];if(!cohort)throw new HttpError(404,'Cohort not found.');
   if(!match[2]&&request.method==='PUT'){
-   const input=cohortInput(await body());const r=await query(`WITH changed AS (UPDATE time_learning.cohorts SET name=$2,starts_on=$3,ends_on=$4,status=$5,course_ids=$6,notes=$7,updated_at=now() WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM time_learning.cohorts other WHERE other.name=$2 AND other.id<>$1) RETURNING id,name), synced AS (UPDATE time_learning.enrollments e SET cohort=c.name FROM changed c WHERE e.cohort_id=c.id RETURNING e.user_id) SELECT id FROM changed`,[id,...input]);if(!r.rows[0])throw new HttpError(409,'A cohort with this name already exists.');await audit('cohort.update',id);return json({ok:true});
+   const input=cohortInput(await body(),validateCourse);const r=await query(`WITH changed AS (UPDATE time_learning.cohorts SET name=$2,starts_on=$3,ends_on=$4,status=$5,course_ids=$6,notes=$7,updated_at=now() WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM time_learning.cohorts other WHERE other.name=$2 AND other.id<>$1) RETURNING id,name), synced AS (UPDATE time_learning.enrollments e SET cohort=c.name FROM changed c WHERE e.cohort_id=c.id RETURNING e.user_id) SELECT id FROM changed`,[id,...input]);if(!r.rows[0])throw new HttpError(409,'A cohort with this name already exists.');await audit('cohort.update',id);return json({ok:true});
   }
   if(match[2]==='/candidates'&&request.method==='GET'){
    const search=(url.searchParams.get('search')||'').trim().slice(0,100),offset=offsetOf(url);
@@ -67,7 +67,7 @@ export async function handleAdminOperations({path,request,url,body,query,member,
   if(match[2]==='/assign'&&request.method==='POST'){
    if(cohort.status==='archived'||cohort.status==='completed')throw new HttpError(409,'Open a planned or active cohort to assign students.');
    const b=await body();if(!Array.isArray(b.studentIds)||!b.studentIds.length||b.studentIds.length>50||new Set(b.studentIds).size!==b.studentIds.length)throw new HttpError(400,'Select between 1 and 50 different students.');b.studentIds.forEach(requireUUID);if(!['approved','pending'].includes(b.status))throw new HttpError(400,'Choose approved or pending enrolment.');
-   const r=await query(`WITH eligible AS (SELECT m.user_id FROM time_learning.members m JOIN neon_auth."user" u ON u.id=m.user_id WHERE m.user_id=ANY($1::uuid[]) AND m.role='student' AND NOT m.suspended AND u."emailVerified" AND NOT coalesce(u.banned,false)), chosen AS (SELECT c.* FROM time_learning.cohorts c WHERE c.id=$2 AND c.status IN('planned','active')), applied AS (INSERT INTO time_learning.enrollments(user_id,course_id,status,cohort,cohort_id) SELECT e.user_id,course,$3::text,c.name,c.id FROM eligible e CROSS JOIN chosen c CROSS JOIN unnest(c.course_ids) AS course WHERE (SELECT count(*) FROM eligible)=cardinality($1::uuid[]) ON CONFLICT(user_id,course_id) DO UPDATE SET status=excluded.status,cohort=excluded.cohort,cohort_id=excluded.cohort_id RETURNING user_id) SELECT count(*)::int AS assigned FROM applied`,[b.studentIds,id,b.status]);
+   const r=await query(`WITH eligible AS (SELECT m.user_id FROM time_learning.members m JOIN neon_auth."user" u ON u.id=m.user_id WHERE m.user_id=ANY($1::uuid[]) AND m.role='student' AND NOT m.suspended AND u."emailVerified" AND NOT coalesce(u.banned,false)), chosen AS (SELECT c.* FROM time_learning.cohorts c WHERE c.id=$2 AND c.status IN('planned','active') AND NOT EXISTS(SELECT 1 FROM time_learning.courses catalogue WHERE catalogue.id=ANY(c.course_ids) AND catalogue.archived)), applied AS (INSERT INTO time_learning.enrollments(user_id,course_id,status,cohort,cohort_id) SELECT e.user_id,course,$3::text,c.name,c.id FROM eligible e CROSS JOIN chosen c CROSS JOIN unnest(c.course_ids) AS course WHERE (SELECT count(*) FROM eligible)=cardinality($1::uuid[]) ON CONFLICT(user_id,course_id) DO UPDATE SET status=excluded.status,cohort=excluded.cohort,cohort_id=excluded.cohort_id RETURNING user_id) SELECT count(*)::int AS assigned FROM applied`,[b.studentIds,id,b.status]);
    const assigned=r.rows[0]?.assigned||0;if(!assigned)throw new HttpError(409,'No changes were made. Refresh and select only active, verified students and an open cohort.');await audit('cohort.assign.'+b.status,id+':'+b.studentIds.join(','));return json({ok:true,assigned});
   }
  }

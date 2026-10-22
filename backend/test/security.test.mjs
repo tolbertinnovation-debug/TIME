@@ -1,9 +1,11 @@
+import {courseIds} from '../src/policy.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createHandler} from '../src/api.mjs';
 import {canTeach,canReadSubmission,checkFile,cleanWorkspace} from '../src/policy.mjs';
 const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222',s='33333333-3333-4333-8333-333333333333';
 function handler({role='student',user=a,verified=true,teaching=[],submission}={}){
  let writes=[];return {writes,app:createHandler({verify:async token=>{if(token==='valid')return user;throw Error();},query:async(sql,values)=>{
+ if(sql.startsWith('SELECT id,code,title'))return {rows:[...courseIds].map(id=>({id,archived:false}))};
  if(sql.startsWith('SELECT id, name'))return {rows:[{id:user,name:'QA',email:'qa@example.invalid',emailVerified:verified,banned:false}]};
  if(sql.startsWith('INSERT INTO time_learning.quotas'))return {rows:[{requests:1}]};
  if(sql.startsWith('SELECT user_id, role'))return {rows:[{user_id:user,role}]};

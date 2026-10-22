@@ -1,5 +1,5 @@
 import {HttpError,requireUUID,requireCourse,text} from './policy.mjs';
-export async function handleAdmin({path,request,url,body,query,member,identity,audit,json}){
+export async function handleAdmin({path,request,url,body,query,member,identity,requireCourse:validateCourse=requireCourse,audit,json}){
  if(!path.startsWith('/admin/'))return null;
  if(member.role!=='admin')throw new HttpError(403,'Administrator access is required.');
  if(path==='/admin/overview'&&request.method==='GET'){
@@ -33,7 +33,7 @@ export async function handleAdmin({path,request,url,body,query,member,identity,a
   if(!r.rows[0])throw new HttpError(409,'Administrator accounts cannot be suspended here.');await audit(b.suspended?'user.suspend':'user.restore',id);return json({ok:true});
  }
  if(path==='/admin/teaching'&&request.method==='PUT'){
-  const b=await body();requireUUID(b.userId);requireCourse(b.courseId);if(b.active!==false)throw new HttpError(400,'Use lecturer approval to assign a course.');
+  const b=await body();requireUUID(b.userId);validateCourse(b.courseId);if(b.active!==false)throw new HttpError(400,'Use lecturer approval to assign a course.');
   await query('UPDATE time_learning.teaching SET active=false WHERE user_id=$1 AND course_id=$2',[b.userId,b.courseId]);await audit('lecturer.course.revoke',b.userId+':'+b.courseId);return json({ok:true});
  }
  if(path==='/admin/enrollments'&&request.method==='GET'){
@@ -45,8 +45,8 @@ export async function handleAdmin({path,request,url,body,query,member,identity,a
   return json({enrollments:r.rows,total:r.rows[0]?.total||0,offset:Math.floor(offset)});
  }
  if(path==='/admin/enrollments'&&request.method==='PUT'){
-  const b=await body();requireUUID(b.userId);requireCourse(b.courseId);if(!['pending','approved','declined'].includes(b.status))throw new HttpError(400,'Invalid enrollment status.');
-  const cohort=text(b.cohort,1,80,'Cohort');
+  const b=await body();requireUUID(b.userId);validateCourse(b.courseId);if(!['pending','approved','declined'].includes(b.status))throw new HttpError(400,'Invalid enrollment status.');
+  const cohort=text(b.cohort,1,80,'Cohort');if(b.status==='approved'&&(await query('SELECT archived FROM time_learning.courses WHERE id=$1',[b.courseId])).rows[0]?.archived)throw new HttpError(409,'Restore this archived course before approving enrolment.');
   const target=(await query(`SELECT m.role,m.suspended,u."emailVerified" AS verified,u.banned FROM time_learning.members m JOIN neon_auth."user" u ON u.id=m.user_id WHERE m.user_id=$1`,[b.userId])).rows[0];
   if(!target||(b.status==='approved'&&(target.role!=='student'||!target.verified||target.banned||target.suspended)))throw new HttpError(400,'Choose an active, verified student account.');
   await query(`INSERT INTO time_learning.enrollments(user_id,course_id,status,cohort) VALUES($1,$2,$3,$4) ON CONFLICT(user_id,course_id) DO UPDATE SET status=excluded.status,cohort=excluded.cohort,cohort_id=CASE WHEN time_learning.enrollments.cohort=excluded.cohort THEN time_learning.enrollments.cohort_id ELSE NULL END`,[b.userId,b.courseId,b.status,cohort]);await audit('enrollment.'+b.status,b.userId+':'+b.courseId);return json({ok:true});

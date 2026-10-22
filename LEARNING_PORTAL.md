@@ -1,18 +1,39 @@
-# TIME Learning: first release
+# TIME Learning
 
-Public, buildless portal at learning.html. Eight courses, 48 draft study guides, 48 practice questions, per-browser notes/progress, assignment draft downloads, and JSON backup/restore.
+## Public study portal
+`learning.html` provides eight courses, 48 draft study guides and practice questions, browser notes/progress, guide downloads, assignment draft preparation, and backup/restore. The teaching materials and proposed ten-week calendar still require lecturer approval.
 
-## Content and release status
-All study guides, practice questions, suggested tasks, and the ten-week plan are newly drafted and require lecturer review. Lecturer names, course titles, ten-week duration, the 60/40 format, and the general master’s-to-PhD qualifications statement were supplied by TIME. No individual credentials or meeting dates are invented.
+## Connected account workspace
+`account.html` uses managed Neon Auth and a Neon Function backend. New accounts are students and must verify email. Joined courses expose lecturer-published tasks and sessions. Students can submit private text with an optional PDF or TXT attachment (2 MB per file, 20 MB total per account), view receipts, scores, and feedback. Lecturers can work only with assigned courses; administrators can assign lecturers. Scoring is 0–100; criteria belong in the published assignment. Graded work cannot be replaced by a student.
 
-## Storage and privacy
-State uses browser localStorage key time-learning-v1; no account, server submission, or cross-device synchronization. Browser profiles share local state. User text is escaped before rendering; imports are validated and bounded. JSON exports contain notes and drafts, so users must keep backups private. Assignment emails only request submission instructions and never automatically send work.
+The account workspace supports manually saving a private snapshot of browser study notes/progress and downloading it on another device. It does not automatically merge browser work or claim that practice progress is an official grade.
 
-## What must be connected next
-1. Choose a backend with student/lecturer roles, verified login, enrolment, private storage, access controls, and backup/retention settings.
-2. Have lecturers approve or replace draft guides; supply readings/videos and official tasks/rubrics.
-3. Confirm contact hours, calendar dates, live meeting provider/links, and campus sessions.
-4. Implement private assignment uploads, lecturer feedback, assessed grades, and verified attendance.
-5. Add certificate issuance only against TIME-approved completion rules.
+## Infrastructure
+- Project: `weathered-forest-48081271` (`time-learning`), AWS Frankfurt.
+- Production branch: `br-weathered-silence-ba91dn4v`.
+- Isolated development branch: `br-dark-tree-baypad1n`.
+- Function slug: `learning`.
+- Production API: `https://br-weathered-silence-ba91dn4v-learning.compute.c-8.eu-central-1.aws.neon.tech/`.
+- Static frontend: existing TIME GitHub Pages website.
+- Vercel creation was denied by that connection, so no Vercel project is used.
 
-No credentials, authentication simulation, private uploads, official assessment results, or certificates are included in this release. Keep future private learner data out of this public Git repository.
+Only public service URLs are in the browser. Database credentials are injected into the Function by Neon and never sent to clients.
+
+## Authorization and data
+The API verifies the Managed Auth JWT signature, issuer, and expiry, then checks the current user record and verified email. Browser-supplied roles and owner IDs cannot grant access. All SQL uses parameters. The service enforces ownership and course assignments for submissions and attachment downloads. JSON responses never contain attachment bytes. Records live in `time_learning`; `PUBLIC` receives no schema/table privileges. No browser-facing database client or Data API is used.
+
+CORS permits the existing GitHub Pages origin. JWT authentication is still required independent of CORS. Verified users have a shared-store limit of 120 requests/minute. This application-level quota is not an edge WAF or DDoS filter. Auth sessions and short-lived issued JWTs follow Neon’s lifecycle; sign-out does not promise immediate revocation of a previously issued JWT.
+
+## Staff activation
+No first-user administrator shortcut exists. Before granting the first administrator, obtain the owner-confirmed email address, have the owner register and verify that exact email, and resolve the verified identity through the account service. Grant the application role in `time_learning.members` by that verified UUID through the trusted database administration connection. Do not grant access from a public form or an unverified email. Existing administrators can assign lecturers to courses in the staff workspace; there is no self-service staff promotion.
+
+## Teaching and scheduling
+TIME staff must publish real assignments, due dates, rubrics, meeting links, and campus venues. The portal does not create Zoom/Meet rooms. All scheduling inputs and displays use Africa/Monrovia (UTC). Automatic attendance, automatic completion certificates, payment verification, and video hosting are not implemented.
+
+## Building and testing
+Run `npm ci` in `backend/`, then `npm test` and `npm run build`. The build bundles the Function into `backend/build/index.mjs` and the Managed Auth client/UI into `assets/learning/account.bundle.js`. Commit the browser bundle with its source changes. Package `index.mjs` at the root of the Function deployment ZIP. The runtime is Node.js 24. Test new migrations on development before production.
+
+`backend/test/security.test.mjs` covers authentication rejection, email verification, ownership boundaries, course-scoped staff access, self-promotion denial, grading rules, file validation, CORS, and backup validation. Development fixtures and credentials are not part of the repository or production database.
+
+## Operational next steps
+Set up production-branded SMTP and verify real email-code delivery with TIME before a cohort-wide launch. Cross-site cookie restrictions may affect browser sign-in; test on the students’ actual devices. Consider a same-site custom frontend/auth domain deployment when hosting permissions are available. Review data retention, storage usage, access logs, and backups for the expected cohort size. Uploads are private database attachments in this release, rather than an object-storage service or malware-scanned document system. Do not upload sensitive clinical records.

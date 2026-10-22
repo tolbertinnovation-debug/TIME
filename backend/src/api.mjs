@@ -1,3 +1,4 @@
+import {handleAttendance} from './attendance-api.mjs';
 import {handleAnnouncements} from './announcements-api.mjs';
 import {handleTeaching} from './teaching-api.mjs';
 import {handleAdmin} from './admin-api.mjs';
@@ -14,7 +15,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    if(origin&&!allowedOrigins.includes(origin))throw new HttpError(403,'This origin is not permitted.');
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
    const url=new URL(request.url),path=url.pathname;
-   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:5});
+   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:6});
    const authorization=request.headers.get('authorization');
    if(!authorization?.startsWith('Bearer '))throw new HttpError(401,'Sign in to continue.');
    let identity;try{identity=await verify(authorization.slice(7));requireUUID(identity);}catch{throw new HttpError(401,'Your session has expired. Sign in again.');}
@@ -40,6 +41,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    const adminResponse=await handleAdmin({path,request,url,body,query,member,identity,audit,json});if(adminResponse)return adminResponse;
    const teachingResponse=await handleTeaching({path,request,url,body,query,member,identity,teaching,teaches,audit,json,headers});if(teachingResponse)return teachingResponse;
    const announcementResponse=await handleAnnouncements({path,request,url,body,query,member,identity,teaching,teaches,audit,json});if(announcementResponse)return announcementResponse;
+   const attendanceResponse=await handleAttendance({path,request,url,body,query,member,identity,teaches,audit,json});if(attendanceResponse)return attendanceResponse;
    if(path==='/me'&&request.method==='GET'){
     const enrollments=(await query('SELECT course_id,joined_at,status,cohort FROM time_learning.enrollments WHERE user_id=$1 ORDER BY joined_at',[identity])).rows;
     return json({user:{id:user.id,name:user.name,email:user.email},role:member.role,teaching,enrollments});

@@ -75,3 +75,11 @@ Students now have an overview of approved courses, pending enrolments, assignmen
 Migration `004_course_announcements.sql` adds private course notices. Assigned lecturers and administrators can draft, publish, edit, and unpublish announcements. Students see published notices only for approved course enrolments, including recent notices on their dashboard. Notices appear inside the application and are refreshed with the workspace; no email, push, or background notification delivery is implemented.
 
 Validation: 79 automated checks covering role/course boundaries, drafts, calendar month/leap dates, submission status, and dashboard controls; real SQL planning on the development database; development deployment; mobile dashboard and calendar visual review with synthetic preview records. Production authenticated interaction remains a user-session check.
+
+## Manual class attendance
+
+Migration `005_class_attendance.sql` adds private attendance records for existing online and in-person sessions. Assigned lecturers and administrators can view the approved, active student roster and record Present, Late, Absent, or Excused after the class starts. Notes are visible to the student. Corrections are audited; Not recorded clears the displayed mark while preserving the row and audit events. Joining a meeting does not mark attendance, and an unrecorded student is never automatically absent.
+
+Students have a My attendance view containing only their own records (up to the most recent 200), with status totals and staff notes. There is no automatic attendance percentage, certificate eligibility policy, or meeting-provider tracking. Rosters are paginated at 50 students.
+
+Validation: 87 automated checks, including own-record privacy, assigned-course scope, approved active rosters, future class restrictions, invalid input, and audited corrections; attendance SQL planned against the development database; development Function deployment; mobile roster and personal attendance visual review with synthetic data. Real authenticated production interaction remains a user-session check.

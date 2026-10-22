@@ -20,3 +20,22 @@ test('installed Neon SDK session-cache regression',async()=>{
   assert.equal(await getAccessToken(auth,call),jwt);
  }finally{globalThis.fetch=originalFetch;}
 });
+
+test('forced SDK session fetch replaces stale email verification state',async()=>{
+ const originalFetch=globalThis.fetch;let verified=false,networkCalls=0;
+ globalThis.fetch=async(url,init)=>{
+  networkCalls++;
+  assert.equal(new Headers(init?.headers).has('X-Force-Fetch'),false,'SDK consumes its cache-bypass header locally');
+  if(String(url).includes('/email-otp/verify-email')){verified=true;return Response.json({status:true});}
+  return Response.json({user:{id:'verification-user',emailVerified:verified},session:{token:'opaque-cookie'}},{headers:{'set-auth-jwt':jwt}});
+ };
+ try{
+  const {createAuthClient}=await import('@neondatabase/auth');const auth=createAuthClient('https://time-auth-test.example/auth');
+  const fresh=()=>call(()=>auth.getSession({query:{disableCookieCache:true},fetchOptions:{headers:{'X-Force-Fetch':'true'}}}));
+  assert.equal((await fresh()).user.emailVerified,false);
+  await call(()=>auth.emailOtp.verifyEmail({email:'verification@example.invalid',otp:'123456'}));
+  assert.equal((await call(()=>auth.getSession())).user.emailVerified,false,'normal getSession can retain the unverified user');
+  const before=networkCalls;assert.equal((await fresh()).user.emailVerified,true);assert.equal(networkCalls,before+1);
+  assert.equal((await call(()=>auth.getSession())).user.emailVerified,true,'refreshed session is cached');
+ }finally{globalThis.fetch=originalFetch;}
+});

@@ -44,10 +44,14 @@ function otpScreen(){
  document.getElementById('otp-send').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{email=new FormData(e.target).get('email');await authCall(()=>auth.emailOtp.sendVerificationOtp({email,type:'sign-in'}));document.getElementById('otp-verify').hidden=false;feedback('If the address is eligible, a sign-in code will arrive shortly. Check your spam folder.');}catch(error){feedback(error.message,true);}finally{b.disabled=false;}};
  document.getElementById('otp-verify').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{await authCall(()=>auth.signIn.emailOtp({email,otp:new FormData(e.target).get('code')}));await load();}catch(error){feedback(error.message,true);}finally{b.disabled=false;}};
 }
+function verifiedScreen(){
+ root.innerHTML=portalLinks()+heading('EMAIL VERIFIED','Email verified successfully.','Your email address has been confirmed.')+'<section class="panel" style="max-width:640px"><div class="notice verification-success" role="status" aria-live="polite"><strong>✓ Your email is verified.</strong><p>'+esc(session.user.email)+'</p></div><p>'+(portal==='lecturer'?'Continue to check your lecturer access. TIME must separately approve your account for the courses you teach.':'Continue to open your approved workspace.')+'</p><div class="btn-row"><button class="btn" id="continue-verified" type="button">Continue to workspace →</button><button class="btn secondary" id="sign-out" type="button">Sign out</button></div></section>';
+ document.getElementById('continue-verified').onclick=load;signOutBinding();root.focus();
+}
 function verifyScreen(){
  root.innerHTML=heading('EMAIL VERIFICATION','Verify your email to continue.',session.user.email)+'<section class="panel" style="max-width:560px"><p>Use the verification code sent to your email. You can request another code below.</p><button class="btn secondary" id="send-verification" type="button">Send verification code</button><form id="verify-form"><div class="field"><label for="verification-code">Verification code</label><input id="verification-code" name="code" autocomplete="one-time-code" inputmode="numeric" required></div><button class="btn" type="submit">Verify email</button></form><div id="account-status" role="status" aria-live="polite"></div><button class="btn secondary" id="sign-out" type="button" style="margin-top:15px">Sign out</button></section>';
  document.getElementById('send-verification').onclick=async()=>{try{await authCall(()=>auth.emailOtp.sendVerificationOtp({email:session.user.email,type:'email-verification'}));feedback('Verification code requested. Check your email.');}catch(error){feedback(error.message,true);}};
- document.getElementById('verify-form').onsubmit=async e=>{e.preventDefault();try{await authCall(()=>auth.emailOtp.verifyEmail({email:session.user.email,otp:new FormData(e.target).get('code')}));await load();}catch(error){feedback(error.message,true);}};
+ document.getElementById('verify-form').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button[type="submit"]');b.disabled=true;feedback('Verifying your email…');try{await authCall(()=>auth.emailOtp.verifyEmail({email:session.user.email,otp:new FormData(e.target).get('code')}));verifiedScreen();}catch(error){feedback(error.message,true);}finally{b.disabled=false;}};
  signOutBinding();
 }
 function signOutBinding(){document.getElementById('sign-out').onclick=async()=>{try{await authCall(()=>auth.signOut());session=null;profile=null;authScreen();}catch(error){feedback(error.message,true);}};}
@@ -55,7 +59,8 @@ async function load(){
  if(!portal){choosePortal();return;}
  root.innerHTML='<p role="status">Loading your private workspace…</p>';
  try{
-  session=await authCall(()=>auth.getSession());if(!session?.user){authScreen(location.hash==='#register'?'register':'sign-in');return;}
+  // Bypass the SDK cache and any server cookie cache after verification or account changes.
+  session=await authCall(()=>auth.getSession({query:{disableCookieCache:true},fetchOptions:{headers:{'X-Force-Fetch':'true'}}}));if(!session?.user){authScreen(location.hash==='#register'?'register':'sign-in');return;}
   if(!session.user.emailVerified){verifyScreen();return;}
   profile=await api('/me');
   if(!portalAccess(portal,profile.role)){accessScreen();return;}

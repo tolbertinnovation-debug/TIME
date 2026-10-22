@@ -18,7 +18,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    if(origin&&!allowedOrigins.includes(origin))throw new HttpError(403,'This origin is not permitted.');
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
    const url=new URL(request.url),path=url.pathname;
-   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:9});
+   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:10});
    const authorization=request.headers.get('authorization');
    if(!authorization?.startsWith('Bearer '))throw new HttpError(401,'Sign in to continue.');
    let identity;try{identity=await verify(authorization.slice(7));requireUUID(identity);}catch{throw new HttpError(401,'Your session has expired. Sign in again.');}

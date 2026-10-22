@@ -59,3 +59,11 @@ Migration `002_admin_management.sql` adds reversible member suspension, active t
 The administrator dashboard shows aggregate counts, searchable user records (50 per page), teaching approval/revocation, account suspension/restoration, and enrolment review with cohort assignment. Administrator accounts cannot be suspended through these controls; account deletion and administrator promotion are not exposed. Every access-management write is audited. Counts refresh with the workspace. Suspension blocks learning API access on the next request, while identity-provider sessions remain managed by the existing authentication service.
 
 Validated: 58 automated tests, administrator SQL statements planned against the development database, development deployment, and mobile layout review with synthetic QA records. Real administrator sign-in and email delivery remain user-session checks.
+
+## Lecturer teaching tools
+
+Migration `003_lecturer_lessons.sql` adds a private lessons table. Lecturer overview totals cover active teaching assignments only. Course student lists include approved, active student accounts with name, email, cohort, and joining date; search and pagination are scoped to an assigned course.
+
+Lecturers and administrators can create, edit, publish, or unpublish lessons. Lessons support plain text (40,000 characters), up to 10 HTTPS resource links (reading, PDF, slides, video), and one PDF/text attachment up to 2 MB. Editing keeps an existing attachment unless explicitly replaced or removed. Slides and video are external links, not uploaded/hosted media. Drafts are visible to authorized staff only. Students open published lessons from the Lecturer lessons button on an approved course card. Authenticated attachment downloads require the same course access as the lesson. Existing public study guides remain separate.
+
+Validation: 70 automated checks, real SQL planning on the development database, development Function deployment, and mobile/dashboard/editor visual review with synthetic preview data. Production authenticated user interaction remains a user-session check.

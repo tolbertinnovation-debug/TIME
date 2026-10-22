@@ -49,7 +49,7 @@ export async function handleAdmin({path,request,url,body,query,member,identity,a
   const cohort=text(b.cohort,1,80,'Cohort');
   const target=(await query(`SELECT m.role,m.suspended,u."emailVerified" AS verified,u.banned FROM time_learning.members m JOIN neon_auth."user" u ON u.id=m.user_id WHERE m.user_id=$1`,[b.userId])).rows[0];
   if(!target||(b.status==='approved'&&(target.role!=='student'||!target.verified||target.banned||target.suspended)))throw new HttpError(400,'Choose an active, verified student account.');
-  await query(`INSERT INTO time_learning.enrollments(user_id,course_id,status,cohort) VALUES($1,$2,$3,$4) ON CONFLICT(user_id,course_id) DO UPDATE SET status=excluded.status,cohort=excluded.cohort`,[b.userId,b.courseId,b.status,cohort]);await audit('enrollment.'+b.status,b.userId+':'+b.courseId);return json({ok:true});
+  await query(`INSERT INTO time_learning.enrollments(user_id,course_id,status,cohort) VALUES($1,$2,$3,$4) ON CONFLICT(user_id,course_id) DO UPDATE SET status=excluded.status,cohort=excluded.cohort,cohort_id=CASE WHEN time_learning.enrollments.cohort=excluded.cohort THEN time_learning.enrollments.cohort_id ELSE NULL END`,[b.userId,b.courseId,b.status,cohort]);await audit('enrollment.'+b.status,b.userId+':'+b.courseId);return json({ok:true});
  }
  throw new HttpError(404,'This administrator action is not available.');
 }

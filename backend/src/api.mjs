@@ -1,3 +1,4 @@
+import {handleAdminOperations} from './admin-operations.mjs';
 import {handleAttendance} from './attendance-api.mjs';
 import {handleAnnouncements} from './announcements-api.mjs';
 import {handleTeaching} from './teaching-api.mjs';
@@ -15,7 +16,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    if(origin&&!allowedOrigins.includes(origin))throw new HttpError(403,'This origin is not permitted.');
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
    const url=new URL(request.url),path=url.pathname;
-   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:6});
+   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:7});
    const authorization=request.headers.get('authorization');
    if(!authorization?.startsWith('Bearer '))throw new HttpError(401,'Sign in to continue.');
    let identity;try{identity=await verify(authorization.slice(7));requireUUID(identity);}catch{throw new HttpError(401,'Your session has expired. Sign in again.');}
@@ -38,6 +39,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
     while(true){const {done,value}=await reader.read();if(done)break;bytes+=value.byteLength;if(bytes>MAX){await reader.cancel();throw new HttpError(413,'Request is too large.');}chunks.push(value);}
     try{return JSON.parse(Buffer.concat(chunks).toString());}catch{throw new HttpError(400,'Request data is not valid JSON.');}
    };
+   const operationsResponse=await handleAdminOperations({path,request,url,body,query,member,identity,audit,json,headers});if(operationsResponse)return operationsResponse;
    const adminResponse=await handleAdmin({path,request,url,body,query,member,identity,audit,json});if(adminResponse)return adminResponse;
    const teachingResponse=await handleTeaching({path,request,url,body,query,member,identity,teaching,teaches,audit,json,headers});if(teachingResponse)return teachingResponse;
    const announcementResponse=await handleAnnouncements({path,request,url,body,query,member,identity,teaching,teaches,audit,json});if(announcementResponse)return announcementResponse;

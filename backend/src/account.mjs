@@ -17,6 +17,7 @@ async function authCall(fn){let timer;try{const r=await Promise.race([fn(),new P
 async function api(path,method='GET',body){const token=await getAccessToken(auth,authCall);const response=await fetch(API+path,{method,headers:{Authorization:'Bearer '+token,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,cache:'no-store',signal:AbortSignal.timeout(20000)});let data;try{data=await response.json();}catch{throw Error('The learning service is temporarily unavailable. Please refresh and try again.');}if(!response.ok)throw Error(data.error||'Request failed.');return data;}
 const options=(ids=courses.map(c=>c.id))=>courses.filter(c=>ids.includes(c.id)).map(c=>'<option value="'+c.id+'">'+esc(c.title)+'</option>').join('');
 const time=v=>v?new Intl.DateTimeFormat('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'Africa/Monrovia'}).format(new Date(v))+' (Liberia time)':'No deadline set';
+function loadingScreen(title,detail){return '<section class="workspace-loading" role="status" aria-live="polite" aria-labelledby="loading-title"><div class="loading-emblem" aria-hidden="true"><span class="loading-orbit"></span><img src="assets/img/time-logo.png" alt="" width="76" height="76"></div><span class="loading-brand">TIME LEARNING</span><h1 id="loading-title">'+esc(title)+'</h1><p id="loading-detail">'+esc(detail)+'</p><div class="loading-track" aria-hidden="true"><span></span></div><span class="loading-caption">A little preparation. A world of possibility.</span><div class="loading-preview" aria-hidden="true"><div><i></i><b></b><b></b></div><div><i></i><b></b><b></b></div><div><i></i><b></b><b></b></div></div></section>';}
 function choosePortal(){
  root.innerHTML=heading('TIME LEARNING','Your place to learn and teach.','Choose your workspace to sign in. Your approved account role determines access.')+'<div class="portal-grid">'+[
  ['student','01','Student','Learn at your pace.','Join online courses, submit assignments, and see your grades.','Student Login'],
@@ -63,14 +64,16 @@ async function requestVerificationCode(){
 }
 function signOutBinding(){document.getElementById('sign-out').onclick=async()=>{try{await authCall(()=>auth.signOut());session=null;profile=null;authScreen();}catch(error){feedback(error.message,true);}};}
 async function load(options={}){
- root.innerHTML='<p role="status">Loading your private workspace…</p>';
+ root.innerHTML=loadingScreen('Opening your '+(portal?portalName.toLowerCase()+' workspace':'learning space')+'…','Checking your sign-in securely.');
  try{
   // Bypass the SDK cache and any server cookie cache after verification or account changes.
   session=await authCall(()=>auth.getSession({query:{disableCookieCache:true},fetchOptions:{headers:{'X-Force-Fetch':'true'}}}));if(!session?.user){authScreen(location.hash==='#register'?'register':'sign-in');return;}
   if(!session.user.emailVerified){verifyScreen();if(options.sendVerificationCode===true)await requestVerificationCode();return;}
+  document.getElementById('loading-detail').textContent='Checking your account access…';
   profile=await api('/me');
   if(!portal){location.replace(portalPage(profile.role));return;}
   if(!portalAccess(portal,profile.role)){accessScreen();return;}
+  document.getElementById('loading-detail').textContent='Preparing your courses and class details…';
   const results=await Promise.all([api('/assignments'),api('/sessions')]);assignments=results[0].assignments;sessions=results[1].sessions;
   if(profile.role==='lecturer'||profile.role==='admin')submissions=(await api('/submissions')).submissions;
   dashboard();
@@ -99,7 +102,7 @@ function download(name,blob){const u=URL.createObjectURL(blob),a=document.create
 function backBinding(){document.getElementById('back-workspace').onclick=dashboard;}
 function formHeading(title,desc){return heading('TIME LEARNING',title,desc)+'<button class="btn secondary" id="back-workspace" type="button" style="margin-bottom:20px">← Back to workspace</button>';}
 async function submissionForm(a){
- root.innerHTML=formHeading(a.title,label(a.course_id))+'<p role="status">Loading submission…</p>';backBinding();
+ root.innerHTML=formHeading(a.title,label(a.course_id))+loadingScreen('Opening your submission…','Retrieving your coursework securely.');backBinding();
  try{
   let existing=a.submission_id?(await api('/submissions/'+a.submission_id)).submission:null;
   root.innerHTML=formHeading(a.title,label(a.course_id))+'<section class="panel"><p>'+esc(a.instructions).replace(/\n/g,'<br>')+'</p><p class="small muted">Due: '+time(a.due_at)+'</p><form id="submission-form"><label for="submission-body">Your answer</label><textarea id="submission-body" name="body" maxlength="30000" style="min-height:280px" '+(existing?.graded_at?'readonly':'')+'>'+esc(existing?.body||'')+'</textarea><div class="field"><label for="submission-file">Optional PDF or text file (maximum 2 MB)</label><input id="submission-file" type="file" accept=".pdf,.txt,application/pdf,text/plain" '+(existing?.graded_at?'disabled':'')+'></div>'+(existing?.file_name?'<p class="small">Current attachment: '+esc(existing.file_name)+'. Submitting again replaces this attachment. Reattach it if you want to keep it.</p><button class="btn secondary" id="get-file" type="button">Download current attachment</button>':'')+'<p class="small">Submit only your own coursework. Do not include confidential patient or student information.</p>'+(existing?.graded_at?'<p class="notice">This work has been graded and is locked. Score: '+esc(existing.score)+' / 100<br>'+esc(existing.feedback||'')+'</p>':'<button class="btn" type="submit" style="margin-top:15px">Submit privately to lecturer</button>')+'</form><div id="account-status" role="status" aria-live="polite"></div></section>';backBinding();

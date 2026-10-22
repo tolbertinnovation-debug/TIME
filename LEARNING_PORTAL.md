@@ -51,3 +51,11 @@ Signed-in screens hide all role login links. Opening `account.html` with a verif
 After successful student or lecturer registration, the verification page automatically requests an email-verification code once. It displays delivery-request status and a Resend code button. Normal reloads do not automatically send another email. While a request is in flight, the button is disabled. Failed delivery requests preserve the created account and show retry instructions. Only the most recent code should be used.
 
 Account requests now share a loading indicator across sign-in, verification, course requests, saves, grading, lecturer access, snapshots, and attachment downloads. Concurrent requests keep the indicator visible until all finish, including errors. Grading and lecturer access screens also show the branded loading view while fetching. Portal links carry a release version to refresh cached entry pages.
+
+## Administrator management release
+
+Migration `002_admin_management.sql` adds reversible member suspension, active teaching assignments, and enrolment status/cohort fields. Existing enrolments default to approved and teaching assignments default to active. New student requests are pending until an administrator approves them. Published assignments, meeting details, and submission writes require approved enrolment. Previously submitted work remains available to its owner.
+
+The administrator dashboard shows aggregate counts, searchable user records (50 per page), teaching approval/revocation, account suspension/restoration, and enrolment review with cohort assignment. Administrator accounts cannot be suspended through these controls; account deletion and administrator promotion are not exposed. Every access-management write is audited. Counts refresh with the workspace. Suspension blocks learning API access on the next request, while identity-provider sessions remain managed by the existing authentication service.
+
+Validated: 58 automated tests, administrator SQL statements planned against the development database, development deployment, and mobile layout review with synthetic QA records. Real administrator sign-in and email delivery remain user-session checks.

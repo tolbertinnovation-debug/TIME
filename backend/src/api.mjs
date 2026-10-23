@@ -1,3 +1,4 @@
+import {handleAssessments} from './assessments-api.mjs';
 import {handleCatalogue,contentAudience,keepAudience} from './catalogue-api.mjs';
 import {handleSupport} from './support-api.mjs';
 import {handleAdminOperations} from './admin-operations.mjs';
@@ -18,7 +19,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    if(origin&&!allowedOrigins.includes(origin))throw new HttpError(403,'This origin is not permitted.');
    if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
    const url=new URL(request.url),path=url.pathname;
-   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:10});
+   if(path==='/health'&&request.method==='GET')return json({service:'TIME Learning',status:'ready',version:11});
    const authorization=request.headers.get('authorization');
    if(!authorization?.startsWith('Bearer '))throw new HttpError(401,'Sign in to continue.');
    let identity;try{identity=await verify(authorization.slice(7));requireUUID(identity);}catch{throw new HttpError(401,'Your session has expired. Sign in again.');}
@@ -47,6 +48,7 @@ export function createHandler({query,verify,allowedOrigins=[ORIGIN]}){
    const supportResponse=await handleSupport({path,request,url,body,query,member,identity,requireCourse,audit,json});if(supportResponse)return supportResponse;
    const operationsResponse=await handleAdminOperations({path,request,url,body,query,member,identity,requireCourse,audit,json,headers});if(operationsResponse)return operationsResponse;
    const adminResponse=await handleAdmin({path,request,url,body,query,member,identity,requireCourse,audit,json});if(adminResponse)return adminResponse;
+   const assessmentResponse=await handleAssessments({path,request,url,body,query,member,identity,teaching,teaches,requireCourse,audit,json});if(assessmentResponse)return assessmentResponse;
    const teachingResponse=await handleTeaching({path,request,url,body,query,member,identity,teaching,teaches,requireCourse,courseIds:catalogueIds,audit,json,headers});if(teachingResponse)return teachingResponse;
    const announcementResponse=await handleAnnouncements({path,request,url,body,query,member,identity,teaching,teaches,requireCourse,courseIds:catalogueIds,audit,json});if(announcementResponse)return announcementResponse;
    const attendanceResponse=await handleAttendance({path,request,url,body,query,member,identity,teaches,requireCourse,courseIds:catalogueIds,audit,json});if(attendanceResponse)return attendanceResponse;

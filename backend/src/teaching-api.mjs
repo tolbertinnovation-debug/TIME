@@ -1,3 +1,4 @@
+import {lessonOrderInput,lessonLockedSQL,lessonIsLocked} from './learning-path.mjs';
 import {contentAudience,keepAudience} from './catalogue-api.mjs';
 import {HttpError,requireCourse,requireUUID,text,checkFile,courseIds} from './policy.mjs';
 export function cleanResources(value){
@@ -22,6 +23,10 @@ export async function handleTeaching({path,request,url,body,query,member,identit
    (SELECT count(*)::int FROM time_learning.lessons l WHERE l.course_id=c.course_id AND NOT l.published) AS draft_lessons
    FROM unnest($1::text[]) AS c(course_id) ORDER BY c.course_id`,[scope]);return json({courses:r.rows});
  }
+ if(path==='/teaching/progress'&&request.method==='GET'){
+  const course=url.searchParams.get('courseId');requireTeacher(course);const offset=Math.max(0,Math.min(100000,Math.floor(Number(url.searchParams.get('offset'))||0)));
+  const r=await query(`SELECT u.name,u.email,e.cohort,(SELECT count(*)::int FROM time_learning.lessons l WHERE l.course_id=e.course_id AND l.published AND (l.cohort_id IS NULL OR l.cohort_id=e.cohort_id)) AS lessons,(SELECT count(*)::int FROM time_learning.lesson_completions p JOIN time_learning.lessons l ON l.id=p.lesson_id WHERE p.student_id=e.user_id AND l.course_id=e.course_id AND l.published AND (l.cohort_id IS NULL OR l.cohort_id=e.cohort_id)) AS completed,count(*) OVER()::int AS total FROM time_learning.enrollments e JOIN time_learning.members m ON m.user_id=e.user_id JOIN neon_auth."user" u ON u.id=e.user_id WHERE e.course_id=$1 AND e.status='approved' AND m.role='student' AND NOT m.suspended AND NOT coalesce(u.banned,false) ORDER BY u.name,u.id LIMIT 50 OFFSET $2`,[course,offset]);return json({students:r.rows,total:r.rows[0]?.total||0,offset});
+ }
  if(path==='/teaching/students'&&request.method==='GET'){
   const course=url.searchParams.get('courseId');requireTeacher(course);
   const search=(url.searchParams.get('search')||'').trim().slice(0,100),offset=Math.max(0,Math.min(100000,Math.floor(Number(url.searchParams.get('offset'))||0)));
@@ -32,24 +37,26 @@ export async function handleTeaching({path,request,url,body,query,member,identit
  }
  if(path==='/lessons'&&request.method==='GET'){
   const course=url.searchParams.get('courseId');validateCourse(course);if(!await canStudy(course))throw new HttpError(403,'Approved course enrolment is required.');
-  const r=await query(`SELECT id,course_id,title,published,file_name,created_at,updated_at,cohort_id FROM time_learning.lessons l WHERE course_id=$1 AND ($2::boolean OR (published AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$3 AND e.course_id=l.course_id AND e.status='approved' AND (l.cohort_id IS NULL OR l.cohort_id=e.cohort_id)))) ORDER BY created_at DESC LIMIT 200`,[course,teaches(course),identity]);return json({lessons:r.rows});
+  const r=await query(`SELECT id,course_id,title,published,file_name,created_at,updated_at,cohort_id,week_number,lesson_order,require_previous,(SELECT completed_at FROM time_learning.lesson_completions done WHERE done.lesson_id=l.id AND done.student_id=$3) AS completed_at,CASE WHEN $2::boolean THEN false ELSE ${lessonLockedSQL('l','$3')} END AS locked FROM time_learning.lessons l WHERE course_id=$1 AND ($2::boolean OR (published AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$3 AND e.course_id=l.course_id AND e.status='approved' AND (l.cohort_id IS NULL OR l.cohort_id=e.cohort_id)))) ORDER BY week_number,lesson_order,created_at,id LIMIT 1000`,[course,teaches(course),identity]);return json({lessons:r.rows});
  }
  if(path==='/lessons'&&request.method==='POST'){
-  const b=await body();requireTeacher(b.courseId);const cohort=await contentAudience(query,b.courseId,b.cohortId);const resources=cleanResources(b.resources||[]),file=checkFile(b.fileName,b.fileType,b.fileData);
-  const r=await query(`INSERT INTO time_learning.lessons(course_id,title,content,resources,published,file_name,file_type,file_data,created_by,cohort_id) VALUES($1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10) RETURNING id`,[b.courseId,text(b.title,1,160,'Lesson title'),text(b.content,1,40000,'Lesson content'),JSON.stringify(resources),b.published===true,file?.name||null,file?.type||null,file?.bytes||null,identity,cohort]);await audit('lesson.create',r.rows[0].id);return json({lesson:r.rows[0]},201);
+  const b=await body();requireTeacher(b.courseId);const cohort=await contentAudience(query,b.courseId,b.cohortId);const order=lessonOrderInput(b),resources=cleanResources(b.resources||[]),file=checkFile(b.fileName,b.fileType,b.fileData);
+  const r=await query(`INSERT INTO time_learning.lessons(course_id,title,content,resources,published,file_name,file_type,file_data,created_by,cohort_id,week_number,lesson_order,require_previous) VALUES($1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,[b.courseId,text(b.title,1,160,'Lesson title'),text(b.content,1,40000,'Lesson content'),JSON.stringify(resources),b.published===true,file?.name||null,file?.type||null,file?.bytes||null,identity,cohort,...order]);await audit('lesson.create',r.rows[0].id);return json({lesson:r.rows[0]},201);
  }
- const match=path.match(/^\/lessons\/([^/]+)(\/file)?$/);
+ const match=path.match(/^\/lessons\/([^/]+)(\/file|\/complete)?$/);
  if(match){
   const id=requireUUID(match[1]),lesson=(await query('SELECT * FROM time_learning.lessons WHERE id=$1',[id])).rows[0];
   if(!lesson||(!teaches(lesson.course_id)&&(!lesson.published||!await canStudy(lesson.course_id,lesson.cohort_id||null))))throw new HttpError(404,'Lesson not found.');
+  if(!teaches(lesson.course_id)&&await lessonIsLocked(query,id,identity))throw new HttpError(409,'Complete the earlier available lessons before opening this lesson.');
+  if(request.method==='POST'&&match[2]==='/complete'){if(member.role!=='student')throw new HttpError(403,'Only students can record their own lesson completion.');const completion=await query(`INSERT INTO time_learning.lesson_completions(lesson_id,student_id) SELECT l.id,$2 FROM time_learning.lessons l WHERE l.id=$1 AND l.published AND EXISTS(SELECT 1 FROM time_learning.enrollments e WHERE e.user_id=$2 AND e.course_id=l.course_id AND e.status='approved' AND (l.cohort_id IS NULL OR l.cohort_id=e.cohort_id)) AND NOT ${lessonLockedSQL('l','$2')} ON CONFLICT(lesson_id,student_id) DO UPDATE SET completed_at=time_learning.lesson_completions.completed_at RETURNING lesson_id`,[id,identity]);if(!completion.rows[0])throw new HttpError(409,'Lesson access changed. Refresh your course before recording completion.');await audit('lesson.complete',id);return json({ok:true});}
   if(request.method==='GET'&&match[2]==='/file'){
    if(!lesson.file_data)throw new HttpError(404,'No file is attached.');return new Response(lesson.file_data,{headers:{...headers,'Content-Type':'application/octet-stream','Content-Disposition':'attachment; filename="'+lesson.file_name.replace(/[^a-zA-Z0-9._ -]/g,'_')+'"','Content-Security-Policy':"sandbox; default-src 'none'"}});
   }
-  if(request.method==='GET'&&!match[2]){const {file_data,...safe}=lesson;return json({lesson:safe});}
+  if(request.method==='GET'&&!match[2]){const {file_data,...safe}=lesson;const progress=member.role==='student'?(await query('SELECT completed_at FROM time_learning.lesson_completions WHERE lesson_id=$1 AND student_id=$2',[id,identity])).rows[0]:null;return json({lesson:{...safe,completed_at:progress?.completed_at||null}});}
   if(request.method==='PUT'&&!match[2]){
-   requireTeacher(lesson.course_id);const b=await body();keepAudience(b,lesson);const resources=cleanResources(b.resources||[]),file=checkFile(b.fileName,b.fileType,b.fileData);
+   requireTeacher(lesson.course_id);const b=await body();keepAudience(b,lesson);const order=lessonOrderInput({...b,weekNumber:b.weekNumber??lesson.week_number,lessonOrder:b.lessonOrder??lesson.lesson_order,requirePrevious:b.requirePrevious??lesson.require_previous});const resources=cleanResources(b.resources||[]),file=checkFile(b.fileName,b.fileType,b.fileData);
    if(file&&b.removeFile)throw new HttpError(400,'Choose either a new file or remove the attachment.');
-   await query(`UPDATE time_learning.lessons SET title=$2,content=$3,resources=$4::jsonb,published=$5,file_name=$6,file_type=$7,file_data=$8,updated_at=now() WHERE id=$1`,[id,text(b.title,1,160,'Lesson title'),text(b.content,1,40000,'Lesson content'),JSON.stringify(resources),b.published===true,file?.name||(b.removeFile?null:lesson.file_name),file?.type||(b.removeFile?null:lesson.file_type),file?.bytes||(b.removeFile?null:lesson.file_data)]);await audit('lesson.update',id);return json({ok:true});
+   await query(`UPDATE time_learning.lessons SET title=$2,content=$3,resources=$4::jsonb,published=$5,file_name=$6,file_type=$7,file_data=$8,week_number=$9,lesson_order=$10,require_previous=$11,updated_at=now() WHERE id=$1`,[id,text(b.title,1,160,'Lesson title'),text(b.content,1,40000,'Lesson content'),JSON.stringify(resources),b.published===true,file?.name||(b.removeFile?null:lesson.file_name),file?.type||(b.removeFile?null:lesson.file_type),file?.bytes||(b.removeFile?null:lesson.file_data),...order]);await audit('lesson.update',id);return json({ok:true});
   }
  }
  throw new HttpError(404,'This teaching action is not available.');

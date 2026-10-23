@@ -25,3 +25,5 @@ main:focus{outline:none}
 .support-staff{border-left:4px solid var(--green)}.support-message .announcement-content{overflow-wrap:anywhere}
 
 .check-choice input[type=radio]{width:20px;min-width:20px;height:20px;margin:3px 0 0;accent-color:var(--green)}
+
+.workspace-guide summary{font-family:Manrope,system-ui,sans-serif;font-size:1.1rem;line-height:1.45;list-style-position:outside;margin-left:18px}.workspace-guide[open] summary{margin-bottom:18px}.workspace-guide ol{padding-left:24px;margin:20px 0 0}.workspace-guide li{padding:0 0 14px 6px}.workspace-guide li:last-child{padding-bottom:0}.workspace-guide li p{margin:5px 0 0;color:var(--muted)}

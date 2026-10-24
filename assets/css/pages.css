@@ -426,3 +426,12 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 .momo-number { font-size: 1.7rem; font-weight: 800; letter-spacing: .03em; color: var(--white); font-variant-numeric: tabular-nums; }
 .momo-name { font-size: .92rem; color: var(--white); }
 @media print { .momo { background: none; border: 1px solid #bbb; } .momo-number, .momo-name { color: #000; } }
+
+/* Outreach video (Our Impact) */
+.video-feature { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.video-feature .section-head { margin-bottom: 0; }
+.video-card { margin: 0; }
+.video-card video { display: block; width: 100%; height: auto; aspect-ratio: 640 / 368; border-radius: var(--radius-lg); background: #111; box-shadow: var(--shadow-lg); }
+.video-card figcaption { margin-top: 10px; font-size: .86rem; color: var(--muted); }
+@media (max-width: 900px) { .video-feature { grid-template-columns: 1fr; } }
+@media print { .video-card { display: none; } }

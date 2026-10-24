@@ -61,6 +61,8 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 21 | **Mobile Money payments and donations**: 0888 901 848 (Lonestar Cell MTN, Philip V. Saywrayne) on Donate, Fees & Admissions, every program page's enrolment steps, the FAQ and the chat. A test keeps the number identical everywhere. | ✅ |
 
+| 22 | **Outreach video** on Our Impact (`#video`), linked from the Photo Gallery: self-hosted MP4 compressed from 5.2 MB to 3 MB, downloads only when play is pressed, with a poster image and a text description of what it shows. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

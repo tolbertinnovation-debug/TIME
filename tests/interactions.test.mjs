@@ -187,22 +187,3 @@ test('news filters show one topic at a time and can return to all stories', asyn
   assert.equal(await page.locator('.news-item:not([hidden])').count(), total);
   await page.close();
 });
-
-test('the home page offers four choices, each leading only to its own information', async () => {
-  const page = await openPage(ctx, 'index.html', PHONE);
-  const cards = page.locator('.gateway-card');
-  assert.equal(await cards.count(), 4);
-  const expected = [['A', 'time.html', /TIME Inc\./], ['B', 'phica.html', /Phìtìa Academy/], ['C', 'consultation.html', /Consultation/], ['D', 'books.html', /Book Production, Sales & Publications/]];
-  for (const [i, [letter, href, title]] of expected.entries()) {
-    const card = cards.nth(i);
-    assert.equal(await card.getAttribute('href'), href);
-    assert.equal(await card.locator('.gateway-letter').textContent(), letter);
-    assert.match(await card.locator('.gateway-title').textContent(), title);
-  }
-  assert.match(await cards.nth(0).textContent(), /Enrollment is on a rolling basis[\s\S]*Registration is in progress/);
-  assert.match(await cards.nth(2).textContent(), /Education[\s\S]*Agriculture/);
-  await cards.nth(0).click();
-  await page.waitForURL(/time\.html$/);
-  assert.equal(await page.locator('.phica-band').count(), 0, 'the TIME Inc. page shows only TIME information');
-  await page.close();
-});

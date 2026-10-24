@@ -137,4 +137,6 @@ function render() {
 document.getElementById('year').textContent=new Date().getFullYear();
 document.querySelector('.skip').addEventListener('click', e => { e.preventDefault(); main.focus(); main.scrollIntoView(); });
 window.addEventListener('hashchange',render);render();
+// Keep the study guides available offline (the account workspace is never cached).
+if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 })();

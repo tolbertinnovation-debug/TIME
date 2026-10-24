@@ -50,6 +50,9 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 | 14 | **Program pages**: one per program category plus Special Education Cohort #1. Each has who it's for, an at-a-glance box, courses, schedule or delivery, four enrolment steps, questions, related programs and Course structured data. Generated from `data/programs.json`. | ✅ |
 | 15 | **Site search**: header search button on every page and `search.html`. Ranks pages, courses and FAQ answers from a prebuilt index; ignores accents and case; handles empty and no-result searches; FAQ results open the answer. | ✅ |
 
+| 16 | **Lighter TIME Learning workspace**: account script 717 KB → 214 KB (164 → 61 KB gzipped) by dropping unused auth-library code. Behaviour verified identical against the live sign-in service. | ✅ |
+| 17 | **Offline study guides**: the public study portal is cached for offline study; the account workspace stays network-only. Added to the home-screen app shortcuts. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

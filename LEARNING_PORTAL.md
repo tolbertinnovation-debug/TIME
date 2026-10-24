@@ -153,3 +153,14 @@ Validation: 174 automated checks passed. Added failing-then-passing regression c
 ## Workspace operating guides
 
 Collapsible guides now explain the existing workflow inside the application. Administrators see course/cohort setup, verified lecturer access, student enrolment approval, publication readiness and support steps. Lecturers see a first-week checklist covering lesson resources, ordering, audience, draft/publication, quizzes/tests, written assignments, class scheduling and review. Approved students see a course guide covering lesson completion, saved quiz answers, submission, class attendance, feedback and support. Guides are static instructions, do not grant access, and do not imply that course content has been published. They add no backend calls or schema changes. The 174 existing automated checks pass; a real signed-in production account trial remains outstanding.
+
+
+## Lighter, offline-friendly portal (website release)
+
+The account workspace bundle (`assets/learning/account.bundle.js`) is now 214 KB (61 KB gzipped), down from 717 KB (164 KB gzipped), with no change to `account.mjs` or the backend. The browser build in `backend/scripts/build.mjs`:
+- maps `zod` to `src/zod-browser.mjs`, which exports only the `object`/`string`/`number` schemas from `zod/mini` that the Neon Auth client uses to validate its anonymous-token response. The full `zod` import pulled in about 420 KB of locale messages.
+- lets esbuild drop `@supabase/auth-js`. The default Better Auth adapter shares a file with the unused Supabase adapter.
+
+Against the live Neon Auth service, the old and new bundles made identical requests (`get-session`, `sign-in/email`) and showed identical screens and errors on all four portal pages. The 174 backend tests pass.
+
+The website service worker now caches the public study portal (`learning.html`, `assets/learning/portal.js`, `courses.js` and `portal.css`), so draft study guides, notes and practice checks work offline after a first visit. Account pages and the account bundle are never cached: offline sign-in attempts show the offline page.

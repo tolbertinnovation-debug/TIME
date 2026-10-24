@@ -1,7 +1,7 @@
 // Service worker: lets visitors on slow or patchy connections reopen pages they have
 // already visited, and shows a helpful offline page otherwise.
 // The learning portal (accounts, courses, uploads) is never cached: it always uses the network.
-const VERSION = "2026-10-24-1";
+const VERSION = "2026-10-24-2";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 const IMAGES = "images-v1";
@@ -9,7 +9,7 @@ const MAX_IMAGES = 80;
 
 const CORE = [
   "./", "index.html", "programs.html", "contact.html", "faq.html", "offline.html",
-  "assets/css/style.css?v=20261024-offline", "assets/css/pages.css?v=20261024-offline", "assets/js/main.js?v=20261024-offline",
+  "assets/css/style.css?v=20261024-print", "assets/css/pages.css?v=20261024-print", "assets/js/main.js?v=20261024-print",
   "assets/fonts/dm-sans-latin.woff2", "assets/fonts/manrope-latin.woff2", "assets/img/time-logo-128.png",
 ];
 

@@ -384,6 +384,16 @@
     });
   }
 
+  // Print every FAQ answer, then put the page back as it was
+  var printOpened = [];
+  window.addEventListener("beforeprint", function () {
+    printOpened = Array.prototype.filter.call(document.querySelectorAll(".faq details:not([open])"), function (d) { d.open = true; return true; });
+  });
+  window.addEventListener("afterprint", function () {
+    printOpened.forEach(function (d) { d.open = false; });
+    printOpened = [];
+  });
+
   // Live search across every course on the Programs page
   var q = document.getElementById("course-q");
   var tabs = document.getElementById("course-tabs");

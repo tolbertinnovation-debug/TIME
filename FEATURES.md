@@ -35,7 +35,7 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 | 7 | **Basic security hardening**: Content-Security-Policy and referrer policy on public pages; every `target="_blank"` link has `rel="noopener"`. The portal pages are left as they are, because their live sign-in can't be tested from here. | ✅ |
 | 8 | **Contact form polish**: inline field errors instead of browser pop-ups, a message length limit with counter, and topic preselected from links such as `contact.html?topic=Volunteering` | ✅ |
 | 9 | **FAQ search**: filter questions as you type, with an empty state | ✅ |
-| 10 | **Print styles**: Programs, FAQ and Donate print cleanly without navigation or decorative elements | ⏳ |
+| 10 | **Print styles**: Programs, FAQ and Donate print cleanly without navigation or decorative elements | ✅ |
 
 ## P2: nice to have
 | # | Feature | Status |

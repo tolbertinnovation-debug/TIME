@@ -10,7 +10,8 @@ const ctx = useBrowser();
 for (const file of SITE_PAGES) {
   for (const [label, viewport] of [['phone', PHONE], ['desktop', DESKTOP]]) {
     test(`${file} has no WCAG 2.1 A/AA violations on ${label}`, async () => {
-      const page = await openPage(ctx, file, viewport);
+      // bypassCSP lets the audit script be injected; it does not change how the page renders.
+      const page = await openPage(ctx, file, viewport, { bypassCSP: true });
       await settle(page);
       await page.addScriptTag({ content: axeSource });
       const violations = await page.evaluate(async () => {

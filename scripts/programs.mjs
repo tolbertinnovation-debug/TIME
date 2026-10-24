@@ -54,7 +54,7 @@ function steps(p) {
     ['Choose your course', `Pick the ${p.credential.toLowerCase()} course that fits your work and goals from the list above.`],
     ['Talk to admissions', `Call <a href="tel:+231880902568">+231 880 902 568</a> or <a href="${WA}" target="_blank" rel="noopener">message us on WhatsApp</a> to confirm your total fees and timetable, and whether you qualify for a discount.`],
     ['Register by January 4, 2027', 'Visit the Phìtìa Academy campus on Robertsfield Highway, Monday – Friday, 8:00 AM – 4:00 PM, and pay the registration fee where applicable.'],
-    ['Pay and start on March 8', p.installments ? 'Pay your first installment when you register and the second before the exit examination. Keep every official receipt.' : 'Pay your tuition through an official TIME Inc. payment channel, keep your receipt, and start classes on March 8, 2027.'],
+    ['Pay and start on March 8', p.installments ? 'Pay your first installment when you register and the second before the exit examination. Keep every official receipt.' : 'Pay your tuition by Mobile Money to 0888 901 848 (Philip V. Saywrayne) or another official TIME Inc. payment channel, keep your receipt, and start classes on March 8, 2027.'],
   ];
   return s.map(([t, d], i) => `          <li class="step reveal"><span class="step-n" aria-hidden="true">${i + 1}</span><div><h3 class="h4">${t}</h3><p>${d}</p></div></li>`).join('\n');
 }

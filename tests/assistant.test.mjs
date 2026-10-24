@@ -116,6 +116,24 @@ test('questions it cannot answer go to a person on WhatsApp with the question fi
   await page.close();
 });
 
+test('the official Mobile Money number is the same on every page and in the chat', async () => {
+  const number = '0888 901 848', name = 'Philip V. Saywrayne';
+  for (const file of ['donate.html', 'admissions.html', 'faq.html']) {
+    const html = read(file);
+    assert.ok(html.includes(number) && html.includes(name), `${file} shows the Mobile Money number and name`);
+  }
+  for (const file of SITE_PAGES) {
+    const numbers = read(file).match(/\b0(?:77|88)\d \d{3} \d{3}\b/g) || [];
+    assert.deepEqual([...new Set(numbers)].filter((n) => n !== number), [], `${file} has no other Mobile Money number`);
+  }
+  const page = await openChat();
+  await page.fill('#chat-q', 'How do I pay?');
+  await page.press('#chat-q', 'Enter');
+  await page.locator('.chat-msg.user', { hasText: 'How do I pay?' }).waitFor();
+  assert.match(await lastReply(page).textContent(), /0888 901 848[\s\S]*Philip V\. Saywrayne/);
+  await page.close();
+});
+
 test('typed text is shown as text, never as markup', async () => {
   const page = await openChat();
   await page.fill('#chat-q', '<img src=x onerror=alert(1)>');

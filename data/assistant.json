@@ -59,6 +59,42 @@
       "handoff": true
     },
     {
+      "id": "how-to-pay",
+      "keywords": [
+        "how to pay",
+        "how do i pay",
+        "where do i pay",
+        "where to pay",
+        "pay by phone",
+        "mobile money",
+        "momo",
+        "lonestar",
+        "mtn",
+        "orange money",
+        "send money",
+        "payment method",
+        "pay online",
+        "account number",
+        "bank",
+        "transfer"
+      ],
+      "answer": [
+        "You can pay by Mobile Money: 0888 901 848 (Lonestar Cell MTN, name: Philip V. Saywrayne).",
+        "After paying, send your name, program and the transaction ID to admissions on WhatsApp (+231 888 901 848), and keep every official receipt.",
+        "Before you enroll, admissions will confirm your total fees and payment schedule."
+      ],
+      "links": [
+        {
+          "label": "Payment rules",
+          "href": "admissions.html#fees"
+        },
+        {
+          "label": "Send payment details on WhatsApp",
+          "href": "https://wa.me/231888901848?text=Hello%20TIME%20Inc.%2C%20I%20have%20paid%20by%20Mobile%20Money.%20My%20name%2C%20program%20and%20transaction%20ID%3A"
+        }
+      ]
+    },
+    {
       "id": "installments",
       "keywords": [
         "installment",
@@ -67,7 +103,10 @@
         "part payment",
         "pay small small",
         "two payment",
-        "pay later"
+        "pay later",
+        "pay in installment",
+        "in installment",
+        "by installment"
       ],
       "answer": [
         "Yes, for the \"C\" Certificate in Elementary Education: two equal installments of US$40 (LRD 6,800), the first when you register and the second before the exit examination.",
@@ -478,11 +517,13 @@
         "fund",
         "help children",
         "books",
-        "supplies"
+        "supplies",
+        "donate by mobile money",
+        "mobile money donation"
       ],
       "answer": [
         "Thank you for wanting to help! Gifts provide textbooks and supplies for rural schools, benches and chalkboards, scholarships at Phìtìa Academy, teacher training and salaries, and water and sanitation at PHICA.",
-        "Books and supplies are welcome too. The quickest way to start is to message us on WhatsApp."
+        "In Liberia, send your gift by Mobile Money: 0888 901 848 (Lonestar Cell MTN, name: Philip V. Saywrayne), then message us on WhatsApp so we can thank you. Giving from abroad? Message or email us and we will arrange the best way. Books and supplies are welcome too."
       ],
       "links": [
         {
@@ -652,7 +693,7 @@
         "1. Choose your program.",
         "2. Confirm your fees and timetable with admissions (call or WhatsApp).",
         "3. Register by January 4, 2027 at the Phìtìa Academy campus, Monday – Friday, 8:00 AM – 4:00 PM, and pay the US$15 registration fee where applicable.",
-        "4. Pay your tuition through an official TIME Inc. payment channel and keep every receipt.",
+        "4. Pay your tuition by Mobile Money to 0888 901 848 (Philip V. Saywrayne) or another official TIME Inc. payment channel, and keep every receipt.",
         "5. Start classes on March 8, 2027.",
         "Admissions lines: +231 880 902 568 · +231 776 037 641 · +231 777 714 784 · +231 778 138 548"
       ],
@@ -691,6 +732,7 @@
         "• Diploma courses: US$175 per course (LRD 29,750)",
         "• Skills courses (Standard English, Research Skills, Records Keeping): US$125 per course (LRD 21,250)",
         "• Science lab training: confirmed by the administration before registration",
+        "How to pay: Mobile Money: 0888 901 848 (Lonestar Cell MTN, name: Philip V. Saywrayne).",
         "Other fees: registration US$15 where applicable, and the exit exam US$10 (LRD 1,700). A 50% tuition discount may apply if you qualify."
       ],
       "links": [

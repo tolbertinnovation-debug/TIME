@@ -27,6 +27,12 @@ Assets live in `assets/css/style.css`, `assets/js/main.js`, `assets/fonts/` (sel
 3. Under **Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, then save.
 4. The site will be live at `https://<username>.github.io/<repo>/` within a minute or two. To use `www.time-liberia.com`, add it under **Custom domain** and point the domain's DNS to GitHub Pages.
 
+## Testing
+
+Install once with `npm ci`, then run `npm test`. This runs Playwright browser tests of every page: rendering, links, forms, accessibility (axe), SEO data, offline mode and print. `npm run serve` previews the site at http://127.0.0.1:8080. GitHub Actions runs these tests and the learning portal's backend tests on every pull request.
+
+When you change `assets/css/*.css` or `assets/js/main.js`, update the `?v=` version on those links in every page and in the `CORE` list in `sw.js`, so visitors' browsers fetch the new file. A test checks that the two match.
+
 ## Google Business Profile
 
 See [`GOOGLE_BUSINESS_PROFILE.md`](GOOGLE_BUSINESS_PROFILE.md) for the details to enter and the steps to get TIME Inc. onto Google Maps.
@@ -37,5 +43,6 @@ See [`GOOGLE_BUSINESS_PROFILE.md`](GOOGLE_BUSINESS_PROFILE.md) for the details t
 - **Photos:** add a JPG to `assets/img/` (ideally no wider than 1600px) and point an `<img src="...">` at it, with `width` and `height` set to the photo's pixel size. For gallery items, also add a smaller `thumb-` copy. Pages serve smaller WebP copies from `assets/img/webp/` (`name-480.webp`, `name-960.webp`, `name-1600.webp`) through a `<picture>` tag; copy the markup of an existing photo and create the WebP files for new ones (for example with `cwebp -q 72 -resize 960 0 photo.jpg -o webp/photo-960.webp`). Without them the JPG still shows, just more slowly.
 - **Donating:** to add Mobile Money numbers or an online giving link, copy one of the "way" boxes under *How to give* in `donate.html` (there is a commented example there).
 - **FAQ:** each question in `faq.html` is a `<details>` block. When you add or change one, update the matching entry in the `FAQPage` data at the bottom of the page so Google shows the same answer.
-- **Contact details** appear in the top bar and footer of every page, and on `contact.html` and `programs.html`.
+- **Menu, top bar, footer and phone action bar** are shared by every page. Edit them once in `partials/` (for example a phone number in `partials/footer.html`), then run `npm run layout` to copy the change into every page. The tests fail if a page falls out of step.
+- **Contact details** also appear in the body of `contact.html`, `programs.html`, `faq.html`, `donate.html` and `offline.html`.
 - **Contact form:** messages are delivered to `tinstitute312@gmail.com` through [FormSubmit](https://formsubmit.co), a free service that needs no account. The **first** message sent after publishing triggers an "Activate Form" email to that inbox; click the link once and every message after that arrives directly. Until then, and whenever sending fails, visitors are offered a prepared email or WhatsApp message instead. To change the receiving address, edit `data-to` on the form in `contact.html`.

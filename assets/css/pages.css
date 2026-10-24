@@ -1,5 +1,6 @@
 /* Page composition and readable, consistent content surfaces. */
  :root {
+ color-scheme: only light;
  --olive: #59732b; --radius-lg: 24px;
  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
  --font-display: "Manrope", system-ui, "Segoe UI", sans-serif;
@@ -151,4 +152,18 @@ body.nav-open .site-header { transform: none; }
  [data-page="index"] .hero .btn { min-height: 48px; }
  [data-page="index"] .hero-media img { object-position: 58% center; }
  [data-page="index"] .hero::before { background: linear-gradient(90deg,rgba(12,30,20,.87),rgba(12,30,20,.66)),linear-gradient(0deg,rgba(12,30,20,.5),transparent); }
+}
+/* Keep hero copy near the header on phones, without a fixed-height spacer. */
+@media (max-width: 760px) {
+ .hero, .page-hero, [data-page="index"] .hero {
+  min-height: 0;
+  height: auto;
+  align-items: flex-start;
+ }
+ .page-hero { padding-top: 16px; }
+ .hero .wrap, [data-page="index"] .hero .wrap { padding-top: 16px; }
+ .page-hero .wrap { padding-top: 0; }
+ .hero .wrap > :first-child, .page-hero .wrap > :first-child { margin-top: 0; }
+ .page-hero .crumbs { margin-bottom: 12px; }
+ .page-hero .eyebrow { margin-bottom: 10px; }
 }

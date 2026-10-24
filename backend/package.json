@@ -1,0 +1,1 @@
+{"name":"time-learning-backend","private":true,"type":"module","scripts":{"build":"node scripts/build.mjs","test":"node --test test/*.test.mjs"},"dependencies":{"@neon/functions":"^0.8.0","@neondatabase/auth":"0.7.0-beta","jose":"^6.1.0","pg":"^8.16.0"},"devDependencies":{"esbuild":"^0.25.0"}}

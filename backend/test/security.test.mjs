@@ -1,0 +1,29 @@
+import {courseIds} from '../src/policy.mjs';
+import test from 'node:test';import assert from 'node:assert/strict';
+import {createHandler} from '../src/api.mjs';
+import {canTeach,canReadSubmission,checkFile,cleanWorkspace} from '../src/policy.mjs';
+const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222',s='33333333-3333-4333-8333-333333333333';
+function handler({role='student',user=a,verified=true,teaching=[],submission}={}){
+ let writes=[];return {writes,app:createHandler({verify:async token=>{if(token==='valid')return user;throw Error();},query:async(sql,values)=>{
+ if(sql.startsWith('SELECT id,code,title'))return {rows:[...courseIds].map(id=>({id,archived:false}))};
+ if(sql.startsWith('SELECT id, name'))return {rows:[{id:user,name:'QA',email:'qa@example.invalid',emailVerified:verified,banned:false}]};
+ if(sql.startsWith('INSERT INTO time_learning.quotas'))return {rows:[{requests:1}]};
+ if(sql.startsWith('SELECT user_id, role'))return {rows:[{user_id:user,role}]};
+ if(sql.startsWith('SELECT course_id FROM time_learning.teaching'))return {rows:teaching.map(course_id=>({course_id}))};
+ if(sql.startsWith('SELECT s.*,a.course_id'))return {rows:submission?[submission]:[]};
+ if(sql.startsWith('INSERT INTO time_learning.members'))return {rows:[]};
+ if(sql.startsWith('UPDATE')||sql.startsWith('INSERT'))writes.push({sql,values});return {rows:[]};
+ }})};
+}
+const req=(path,method='GET',body,token='valid')=>new Request('https://api.example'+path,{method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Origin:'https://tolbertinnovation-debug.github.io'},body:body?JSON.stringify(body):undefined});
+test('anonymous and invalid-token requests cannot access workspace',async()=>{const {app}=handler();assert.equal((await app.fetch(new Request('https://api.example/me'))).status,401);assert.equal((await app.fetch(req('/me','GET',null,'bad'))).status,401);});
+test('unverified email is denied',async()=>{assert.equal((await handler({verified:false}).app.fetch(req('/me'))).status,403);});
+test('student cannot read another student submission or attachment',async()=>{const {app}=handler({submission:{id:s,student_id:b,course_id:'research-skills',file_data:Buffer.from('private')}});for(const path of ['/submissions/'+s,'/submissions/'+s+'/file']){const r=await app.fetch(req(path));assert.equal(r.status,404);assert(!JSON.stringify(await r.json()).includes('private'));}});
+test('student may read own submission but file bytes never appear in JSON',async()=>{const {app}=handler({submission:{id:s,student_id:a,course_id:'research-skills',body:'my work',file_data:Buffer.from('private')}});const r=await app.fetch(req('/submissions/'+s));assert.equal(r.status,200);const data=await r.json();assert.equal(data.submission.body,'my work');assert(!('file_data' in data.submission));});
+test('unassigned lecturer cannot read or grade another course',async()=>{const {app,writes}=handler({role:'lecturer',teaching:['school-leadership'],submission:{id:s,student_id:b,course_id:'research-skills'}});assert.equal((await app.fetch(req('/submissions/'+s))).status,404);assert.equal((await app.fetch(req('/submissions/'+s+'/grade','POST',{score:90}))).status,404);assert.equal(writes.length,0);});
+test('assigned lecturer may grade but cannot self-grade',async()=>{const sub={id:s,student_id:b,course_id:'research-skills'};let h=handler({role:'lecturer',teaching:['research-skills'],submission:sub});assert.equal((await h.app.fetch(req('/submissions/'+s+'/grade','POST',{score:87,feedback:'Clear work'}))).status,200);assert(h.writes.some(x=>x.sql.startsWith('UPDATE')));h=handler({role:'lecturer',user:b,teaching:['research-skills'],submission:sub});assert.equal((await h.app.fetch(req('/submissions/'+s+'/grade','POST',{score:87}))).status,403);});
+test('self-promotion and forged role fields cannot grant lecturer privileges',async()=>{const {app}=handler();assert.equal((await app.fetch(req('/staff/assign-course','POST',{userId:a,courseId:'research-skills',role:'admin'}))).status,403);assert.equal((await app.fetch(req('/assignments','POST',{courseId:'research-skills',title:'x',instructions:'x',role:'admin'}))).status,403);});
+test('untrusted browser origins denied, approved preflight allowed',async()=>{const {app}=handler();assert.equal((await app.fetch(new Request('https://api.example/me',{headers:{Origin:'https://evil.example'}}))).status,403);const r=await app.fetch(new Request('https://api.example/me',{method:'OPTIONS',headers:{Origin:'https://tolbertinnovation-debug.github.io'}}));assert.equal(r.status,204);assert.equal(r.headers.get('access-control-allow-origin'),'https://tolbertinnovation-debug.github.io');});
+test('file validation rejects executable formats, fake PDF, and oversize data',()=>{assert.throws(()=>checkFile('x.exe','application/octet-stream','YWJj'));assert.throws(()=>checkFile('x.pdf','application/pdf','YWJj'));assert.throws(()=>checkFile('x.txt','text/plain',Buffer.alloc(2097153).toString('base64')));assert.equal(checkFile('a.txt','text/plain','YWJj').bytes.toString(),'abc');assert.equal(checkFile('a.pdf','application/pdf',Buffer.from('%PDF-1.4\n').toString('base64')).type,'application/pdf');});
+test('workspace sanitization drops foreign ownership and unknown courses',()=>{const r=cleanWorkspace({version:1,userId:b,role:'admin',lessons:{'research-skills:0':true,'secret:0':true},notes:{'research-skills:0':'<script>not executable</script>'}});assert(!('userId' in r));assert(!('role' in r));assert.equal(r.lessons['secret:0'],undefined);assert.equal(r.lessons['research-skills:0'],true);});
+test('grading cannot accept invalid scores',async()=>{const {app}=handler({role:'lecturer',teaching:['research-skills'],submission:{id:s,student_id:b,course_id:'research-skills'}});for(const score of [-1,101,'90'])assert.equal((await app.fetch(req('/submissions/'+s+'/grade','POST',{score}))).status,400);});

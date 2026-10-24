@@ -1,0 +1,5 @@
+.openai/
+dist/
+backend/node_modules/
+backend/build/
+.env*

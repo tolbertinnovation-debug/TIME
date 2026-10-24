@@ -1,5 +1,5 @@
 {
-  "_note": "Source for the program pages. Edit here, then run `npm run programs` (and `npm run search`). Course lists must match programs.html; the tests check this.",
+  "_note": "Source for the program pages. Edit here, then run `npm run programs` and `npm run search`. Course lists must match programs.html and tuition must match its fee table; the tests check both. Fees follow TIME Inc.'s approved fee schedule (US$1 = LRD 170).",
   "programs": [
     {
       "slug": "c-certificate",
@@ -13,13 +13,62 @@
       "lead": "An accredited teacher-training certificate that helps elementary teachers and subject specialists become skilled, ethical, professional classroom teachers.",
       "image": "graduation-procession",
       "imageAlt": "TIME Inc. graduates in black gowns and 2026 stoles walking in the graduation procession",
-      "facts": [["Accreditation", "Bureau of Teacher Education, Ministry of Education"], ["Fees", "Payable in 2 installments"], ["Classes", "Weekday afternoons or Saturdays"], ["Where", "Phìtìa Academy campus, Margibi County"]],
-      "who": ["Elementary school teachers who have not yet had formal teacher training", "Subject specialists who know their subject and want to learn how to teach it", "School staff preparing for an accredited teaching qualification"],
-      "learn": ["Teaching methods for each subject area", "Lesson planning and classroom management", "Assessment of learners' progress", "Professional ethics and educational leadership"],
+      "facts": [
+        [
+          "Duration",
+          "9 months"
+        ],
+        [
+          "Tuition",
+          "US$80 (LRD 13,600), in 2 installments of US$40"
+        ],
+        [
+          "2027 intake",
+          "Register by January 4, 2027 · classes begin March 8, 2027"
+        ],
+        [
+          "Accreditation",
+          "Bureau of Teacher Education, Ministry of Education"
+        ],
+        [
+          "Classes",
+          "Weekday afternoons and/or Saturdays"
+        ]
+      ],
+      "who": [
+        "Elementary school teachers who have not yet had formal teacher training",
+        "Subject specialists who know their subject and want to learn how to teach it",
+        "School staff preparing for an accredited teaching qualification"
+      ],
+      "learn": [
+        "Teaching methods for each subject area",
+        "Lesson planning and classroom management",
+        "Assessment of learners' progress",
+        "Professional ethics and educational leadership"
+      ],
       "coursesTitle": "Subject areas",
-      "courses": [{"name": "Mathematics and Integrated Science"}, {"name": "Language Arts & Social Studies"}, {"name": "Early Childhood Education"}, {"name": "Geography and Government Studies"}],
+      "courses": [
+        {
+          "name": "Mathematics and Integrated Science"
+        },
+        {
+          "name": "Language Arts & Social Studies"
+        },
+        {
+          "name": "Early Childhood Education"
+        },
+        {
+          "name": "Geography and Government Studies"
+        }
+      ],
       "installments": true,
-      "related": ["science-lab", "skills", "diploma"]
+      "related": [
+        "science-lab",
+        "skills",
+        "diploma"
+      ],
+      "tuition": 80,
+      "feeAnswer": "Tuition is US$80 (LRD 13,600) for the full nine-month program, paid in two equal installments of US$40 (LRD 6,800): the first when you register and the second before the exit examination. A registration fee of US$15 may apply, and the exit examination fee is US$10 (LRD 1,700)."
     },
     {
       "slug": "science-lab",
@@ -30,16 +79,64 @@
       "category": "Teacher education",
       "credential": "Certificate",
       "summary": "Hands-on laboratory training and teaching methods for science teachers.",
-      "lead": "A 10-week \"C\" Certificate program combining laboratory training with elementary education methods for Senior High School science teachers.",
+      "lead": "A 10-week \"C\" Certificate program of theory and hands-on laboratory training for Senior High School science teachers, followed by a two-month supervised internship.",
       "image": "outreach-school",
       "imageAlt": "TIME Inc. team addressing pupils and parents at an open-air school",
-      "facts": [["Duration", "10 weeks"], ["Fees", "Payable in 2 installments"], ["Classes", "Weekday afternoons or Saturdays"], ["Where", "Phìtìa Academy campus, Margibi County"]],
-      "who": ["Senior High School teachers of physics, chemistry, biology, mathematics or economics", "Science graduates who teach, or plan to teach, without formal teacher training"],
-      "learn": ["Hands-on laboratory practice in your subject", "Teaching methods for science lessons", "Classroom management and assessment", "Professional ethics for teachers"],
+      "facts": [
+        [
+          "Duration",
+          "10 weeks, plus a 2-month supervised internship"
+        ],
+        [
+          "Tuition",
+          "Confirmed by the administration before registration"
+        ],
+        [
+          "2027 intake",
+          "Register by January 4, 2027 · classes begin March 8, 2027"
+        ],
+        [
+          "Classes",
+          "Weekday afternoons and/or Saturdays"
+        ]
+      ],
+      "who": [
+        "Senior High School teachers of physics, chemistry, biology, mathematics or economics",
+        "Science graduates who teach, or plan to teach, without formal teacher training"
+      ],
+      "learn": [
+        "Hands-on laboratory practice in your subject",
+        "Teaching methods for science lessons",
+        "Classroom management and assessment",
+        "Professional ethics for teachers",
+        "Supervised teaching practice during a two-month internship"
+      ],
       "coursesTitle": "Subjects",
-      "courses": [{"name": "Physics"}, {"name": "Chemistry"}, {"name": "Mathematics"}, {"name": "Biology"}, {"name": "Economics"}],
-      "installments": true,
-      "related": ["c-certificate", "skills", "professional"]
+      "courses": [
+        {
+          "name": "Physics"
+        },
+        {
+          "name": "Chemistry"
+        },
+        {
+          "name": "Mathematics"
+        },
+        {
+          "name": "Biology"
+        },
+        {
+          "name": "Economics"
+        }
+      ],
+      "installments": false,
+      "related": [
+        "c-certificate",
+        "skills",
+        "professional"
+      ],
+      "tuition": null,
+      "feeAnswer": "The tuition fee for this program is confirmed by the administration before registration, so please contact admissions. A registration fee of US$15 may apply, and the exit examination fee is US$10 (LRD 1,700)."
     },
     {
       "slug": "skills",
@@ -50,16 +147,58 @@
       "category": "Skills",
       "credential": "Certificate",
       "summary": "Foundational academic and administrative skills for teachers, students and school staff.",
-      "lead": "Short, practical 10-week courses in English, research and school recordkeeping for teachers, students and school staff.",
+      "lead": "Practical courses in Standard English, research skills and school records keeping for teachers, students and school staff.",
       "image": "team-women",
       "imageAlt": "Three smiling TIME Inc. team members in branded polo shirts",
-      "facts": [["Duration", "10 weeks"], ["Classes", "Weekday afternoons or Saturdays"], ["Where", "Phìtìa Academy campus, Margibi County"]],
-      "who": ["Teachers who want to strengthen their own reading, writing and research", "Students preparing for further study", "School administrators and office staff who keep school records"],
-      "learn": ["Clear, correct written English", "Planning, carrying out and presenting research", "Keeping accurate school records"],
+      "facts": [
+        [
+          "Tuition",
+          "US$125 per course (LRD 21,250)"
+        ],
+        [
+          "Duration",
+          "Confirmed for each course"
+        ],
+        [
+          "2027 intake",
+          "Register by January 4, 2027 · classes begin March 8, 2027"
+        ],
+        [
+          "Classes",
+          "Weekday afternoons and/or Saturdays"
+        ]
+      ],
+      "who": [
+        "Teachers who want to strengthen their own reading, writing and research",
+        "Students preparing for further study",
+        "School administrators and office staff who keep school records"
+      ],
+      "learn": [
+        "Clear, correct written English",
+        "Planning, carrying out and presenting research",
+        "Keeping accurate school records"
+      ],
       "coursesTitle": "Courses",
-      "courses": [{"name": "English Grammar & Composition", "detail": "Reading · Writing · Spelling"}, {"name": "Research Skills Development & Presentation"}, {"name": "School-Based Recordkeeping and Management"}],
+      "courses": [
+        {
+          "name": "English Grammar & Composition",
+          "detail": "Reading · Writing · Spelling"
+        },
+        {
+          "name": "Research Skills Development & Presentation"
+        },
+        {
+          "name": "School-Based Recordkeeping and Management"
+        }
+      ],
       "installments": false,
-      "related": ["c-certificate", "diploma", "professional"]
+      "related": [
+        "c-certificate",
+        "diploma",
+        "professional"
+      ],
+      "tuition": 125,
+      "feeAnswer": "Tuition is US$125 (LRD 21,250) per course. A registration fee of US$15 may apply, and the exit examination fee is US$10 (LRD 1,700)."
     },
     {
       "slug": "professional",
@@ -73,13 +212,79 @@
       "lead": "Eleven 10-week certificate courses in community health, safety, counseling and ethics for practitioners and community workers.",
       "image": "community-group",
       "imageAlt": "Women and children of a rural community gathered together",
-      "facts": [["Duration", "10 weeks (2 months, 2 weeks)"], ["Courses", "11 to choose from"], ["Classes", "Weekday afternoons or Saturdays"], ["Where", "Phìtìa Academy campus, Margibi County"]],
-      "who": ["Community and public health workers", "Health facility and drugstore staff", "Counselors, social workers and community educators", "Anyone who wants a recognized certificate in a specialist area"],
-      "learn": ["Practical skills you can use in your community or workplace", "Up-to-date knowledge in your chosen specialist area", "Professional ethics for practitioners"],
+      "facts": [
+        [
+          "Duration",
+          "10 weeks per course"
+        ],
+        [
+          "Tuition",
+          "US$125 per course (LRD 21,250)"
+        ],
+        [
+          "2027 intake",
+          "Register by January 4, 2027 · classes begin March 8, 2027"
+        ],
+        [
+          "Courses",
+          "11 to choose from"
+        ]
+      ],
+      "who": [
+        "Community and public health workers",
+        "Health facility and drugstore staff",
+        "Counselors, social workers and community educators",
+        "Anyone who wants a recognized certificate in a specialist area"
+      ],
+      "learn": [
+        "Practical skills you can use in your community or workplace",
+        "Up-to-date knowledge in your chosen specialist area",
+        "Professional ethics for practitioners"
+      ],
       "coursesTitle": "Choose a course",
-      "courses": [{"name": "Substance Abuse Prevention / Education"}, {"name": "IPC Education"}, {"name": "Emergency Community Education"}, {"name": "Community Surveillance & Reporting"}, {"name": "Community Health Facility Management"}, {"name": "Guidance & Psychosocial Counseling"}, {"name": "Community Health and Engagement"}, {"name": "GIS for Environmental Mapping"}, {"name": "Environmental Health and Safety"}, {"name": "Professional Ethics"}, {"name": "Drugstore Operations & Medication Knowledge"}],
+      "courses": [
+        {
+          "name": "Substance Abuse Prevention / Education"
+        },
+        {
+          "name": "IPC Education"
+        },
+        {
+          "name": "Emergency Community Education"
+        },
+        {
+          "name": "Community Surveillance & Reporting"
+        },
+        {
+          "name": "Community Health Facility Management"
+        },
+        {
+          "name": "Guidance & Psychosocial Counseling"
+        },
+        {
+          "name": "Community Health and Engagement"
+        },
+        {
+          "name": "GIS for Environmental Mapping"
+        },
+        {
+          "name": "Environmental Health and Safety"
+        },
+        {
+          "name": "Professional Ethics"
+        },
+        {
+          "name": "Drugstore Operations & Medication Knowledge"
+        }
+      ],
       "installments": false,
-      "related": ["diploma", "special-education", "skills"]
+      "related": [
+        "diploma",
+        "special-education",
+        "skills"
+      ],
+      "tuition": 125,
+      "feeAnswer": "Tuition is US$125 (LRD 21,250) per course. A registration fee of US$15 may apply, and the exit examination fee is US$10 (LRD 1,700)."
     },
     {
       "slug": "diploma",
@@ -93,13 +298,76 @@
       "lead": "Ten 10-week diploma courses that build careers in education, finance, leadership, ministry and media.",
       "image": "graduates-2026",
       "imageAlt": "TIME Inc. Class of 2026 graduates in caps and gowns with their dean",
-      "facts": [["Duration", "10 weeks (2 months, 2 weeks)"], ["Courses", "10 to choose from"], ["Classes", "Weekday afternoons or Saturdays"], ["Where", "Phìtìa Academy campus, Margibi County"]],
-      "who": ["Teachers and school leaders moving into management", "Finance, accounting and audit staff", "Church leaders and ministry workers", "Journalists and media professionals"],
-      "learn": ["Skills employers and organizations need", "Leadership and management in your field", "Practical tools such as QuickBooks and monitoring and evaluation"],
+      "facts": [
+        [
+          "Duration",
+          "10 weeks per course"
+        ],
+        [
+          "Tuition",
+          "US$175 per course (LRD 29,750)"
+        ],
+        [
+          "2027 intake",
+          "Register by January 4, 2027 · classes begin March 8, 2027"
+        ],
+        [
+          "Courses",
+          "10 to choose from"
+        ]
+      ],
+      "who": [
+        "Teachers and school leaders moving into management",
+        "Finance, accounting and audit staff",
+        "Church leaders and ministry workers",
+        "Journalists and media professionals"
+      ],
+      "learn": [
+        "Skills employers and organizations need",
+        "Leadership and management in your field",
+        "Practical tools such as QuickBooks and monitoring and evaluation"
+      ],
       "coursesTitle": "Choose a diploma",
-      "courses": [{"name": "Phonics Education"}, {"name": "QuickBooks"}, {"name": "Monitoring & Evaluation (M&E)"}, {"name": "Gender & Peace Studies"}, {"name": "Biblical Interpretation, Greek I & II"}, {"name": "Church Leadership and Administration"}, {"name": "School Leadership & Management"}, {"name": "School Finance"}, {"name": "Internal Auditing"}, {"name": "Professional Journalism"}],
+      "courses": [
+        {
+          "name": "Phonics Education"
+        },
+        {
+          "name": "QuickBooks"
+        },
+        {
+          "name": "Monitoring & Evaluation (M&E)"
+        },
+        {
+          "name": "Gender & Peace Studies"
+        },
+        {
+          "name": "Biblical Interpretation, Greek I & II"
+        },
+        {
+          "name": "Church Leadership and Administration"
+        },
+        {
+          "name": "School Leadership & Management"
+        },
+        {
+          "name": "School Finance"
+        },
+        {
+          "name": "Internal Auditing"
+        },
+        {
+          "name": "Professional Journalism"
+        }
+      ],
       "installments": false,
-      "related": ["professional", "c-certificate", "special-education"]
+      "related": [
+        "professional",
+        "c-certificate",
+        "special-education"
+      ],
+      "tuition": 175,
+      "feeAnswer": "Tuition is US$175 (LRD 29,750) per course. A registration fee of US$15 may apply, and the exit examination fee is US$10 (LRD 1,700)."
     },
     {
       "slug": "special-education",
@@ -113,23 +381,78 @@
       "lead": "Our first special training cohort: eight courses taught by qualified lecturers, studied 60% online through TIME Learning and 40% in person.",
       "image": "graduates-2026",
       "imageAlt": "TIME Inc. graduates with their dean",
-      "facts": [["Duration", "10 weeks"], ["Delivery", "60% online, 40% in person"], ["Courses", "8, each with a named lecturer"], ["Lecturers", "Master's to PhD qualifications"]],
-      "who": ["School leaders and administrators", "Teachers supporting learners with different needs", "Health and project professionals who want structured, blended study"],
-      "learn": ["School leadership, policy and decision-making", "Project planning, research and communication skills", "Health care management and drug dispensing principles"],
+      "facts": [
+        [
+          "Duration",
+          "10 weeks"
+        ],
+        [
+          "Delivery",
+          "60% online, 40% in person"
+        ],
+        [
+          "Courses",
+          "8, each with a named lecturer"
+        ],
+        [
+          "Lecturers",
+          "Master's to PhD qualifications"
+        ]
+      ],
+      "who": [
+        "School leaders and administrators",
+        "Teachers supporting learners with different needs",
+        "Health and project professionals who want structured, blended study"
+      ],
+      "learn": [
+        "School leadership, policy and decision-making",
+        "Project planning, research and communication skills",
+        "Health care management and drug dispensing principles"
+      ],
       "coursesTitle": "Courses and lecturers",
       "courses": [
-        {"name": "School Leadership and Management", "lecturer": "Rev. Yekeku"},
-        {"name": "Leadership, Policy, and Decision-Making for School Administrators", "lecturer": "Dr. Saywrayne, III"},
-        {"name": "Leadership, Policy, and Strategy", "lecturer": "Dr. Saywrayne, III"},
-        {"name": "Project Planning and Management", "lecturer": "AB Kekulah"},
-        {"name": "Research Skills Development", "lecturer": "Mr. Gbeh, Jr."},
-        {"name": "Standard English: Reading, Writing, and Public Speaking", "lecturer": "Dr. Toga"},
-        {"name": "Principles of Drug Dispensing", "lecturer": "Mr. Bee"},
-        {"name": "Health Care Management", "lecturer": "Mr. Kollie"}
+        {
+          "name": "School Leadership and Management",
+          "lecturer": "Rev. Yekeku"
+        },
+        {
+          "name": "Leadership, Policy, and Decision-Making for School Administrators",
+          "lecturer": "Dr. Saywrayne, III"
+        },
+        {
+          "name": "Leadership, Policy, and Strategy",
+          "lecturer": "Dr. Saywrayne, III"
+        },
+        {
+          "name": "Project Planning and Management",
+          "lecturer": "AB Kekulah"
+        },
+        {
+          "name": "Research Skills Development",
+          "lecturer": "Mr. Gbeh, Jr."
+        },
+        {
+          "name": "Standard English: Reading, Writing, and Public Speaking",
+          "lecturer": "Dr. Toga"
+        },
+        {
+          "name": "Principles of Drug Dispensing",
+          "lecturer": "Mr. Bee"
+        },
+        {
+          "name": "Health Care Management",
+          "lecturer": "Mr. Kollie"
+        }
       ],
       "online": true,
       "installments": false,
-      "related": ["professional", "diploma", "c-certificate"]
+      "related": [
+        "professional",
+        "diploma",
+        "c-certificate"
+      ],
+      "tuition": null,
+      "feeAnswer": "Please contact admissions for the fee and payment arrangements for the Special Education Support Training."
     }
   ]
 }

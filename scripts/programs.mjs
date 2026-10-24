@@ -32,13 +32,14 @@ const byslug = Object.fromEntries(DATA.map((p) => [p.slug, p]));
 function faq(p) {
   const items = [
     ['Is TIME Inc. accredited?', 'Yes. TIME Inc. is an accredited supplementary teacher-training institution under the Bureau of Teacher Education, Ministry of Education (MoE), Liberia, and has been registered with the Government of Liberia since January 2021.'],
-    ['How much does this program cost?', p.installments
-      ? 'Please contact admissions for the current fee. Fees for this program can be paid in two installments.'
-      : 'Please contact admissions for the current fee and payment options for your course.'],
+    ['How much does this program cost?', p.feeAnswer],
+    ...(p.online ? [] : [['What else should I know about fees?', 'Tuition covers instruction only unless stated in writing; admissions will tell you before you enroll whether learning materials, exams, certificate processing or internship costs are extra. Eligible PHICA staff, approved groups and early payers may receive a 50% tuition discount, subject to approval. All tuition must be paid before the exit examination, and you should pay only through official TIME Inc. channels and keep your receipts.']]),
     p.online
       ? ['How does the online part work?', 'You study the online part in TIME Learning: create a student account, verify your email address and request enrolment. Once TIME approves your enrolment, your lessons, quizzes, assignments and class schedule appear in your account. The in-person classes take place with your lecturers.']
       : ['When are classes held?', 'Most programs offer a weekday track (Monday, Wednesday and Friday, 3:00 PM – 6:00 PM) and a Saturday track (8:00 AM – 3:00 PM). Schedules vary by program, so confirm the timetable for your course with admissions.'],
-    ['When does the next class start?', 'Registration is ongoing. Contact admissions for the next start date.'],
+    p.online
+      ? ['When does the next cohort start?', 'Contact admissions for the start date of the next Special Education Support Training cohort.']
+      : ['When does the next class start?', 'For the 2027 intake, register by Monday, January 4, 2027. Classes begin on Monday, March 8, 2027, and the following intake is on Thursday, October 14, 2027.'],
   ];
   return items.map(([q, a]) => `          <details><summary>${q}</summary><div class="answer"><p>${a}</p></div></details>`).join('\n');
 }
@@ -51,9 +52,9 @@ function steps(p) {
     ['Start learning', 'Open each course to find lessons, quizzes, assignments, class dates and announcements from your lecturers.'],
   ] : [
     ['Choose your course', `Pick the ${p.credential.toLowerCase()} course that fits your work and goals from the list above.`],
-    ['Talk to admissions', `Call <a href="tel:+231880902568">+231 880 902 568</a> or <a href="${WA}" target="_blank" rel="noopener">message us on WhatsApp</a> to confirm the fee, timetable and next start date.`],
-    ['Register at the campus', 'Visit the Phìtìa Academy campus on Robertsfield Highway, Monday – Friday, 8:00 AM – 4:00 PM, to register.'],
-    ['Pay and start classes', p.installments ? 'Pay your fees, in two installments if you prefer, and join the weekday or Saturday track.' : 'Pay your fees and join the weekday or Saturday track that suits you.'],
+    ['Talk to admissions', `Call <a href="tel:+231880902568">+231 880 902 568</a> or <a href="${WA}" target="_blank" rel="noopener">message us on WhatsApp</a> to confirm your total fees and timetable, and whether you qualify for a discount.`],
+    ['Register by January 4, 2027', 'Visit the Phìtìa Academy campus on Robertsfield Highway, Monday – Friday, 8:00 AM – 4:00 PM, and pay the registration fee where applicable.'],
+    ['Pay and start on March 8', p.installments ? 'Pay your first installment when you register and the second before the exit examination. Keep every official receipt.' : 'Pay your tuition through an official TIME Inc. payment channel, keep your receipt, and start classes on March 8, 2027.'],
   ];
   return s.map(([t, d], i) => `          <li class="step reveal"><span class="step-n" aria-hidden="true">${i + 1}</span><div><h3 class="h4">${t}</h3><p>${d}</p></div></li>`).join('\n');
 }
@@ -203,7 +204,8 @@ function head(base, p) {
     { '@type': 'ListItem', position: 3, name: plain(p.short), item: url }] };
   const provider = { '@type': 'EducationalOrganization', name: 'Technical Institute for Many Empowerment (TIME) Inc.', url: SITE };
   const list = { '@context': 'https://schema.org', '@type': 'ItemList', name: plain(p.name), itemListElement: p.courses.map((c, i) => ({
-    '@type': 'ListItem', position: i + 1, item: { '@type': 'Course', name: c.detail ? `${c.name} (${c.detail})` : c.name, description: `${plain(p.name)}. ${p.summary}`, educationalCredentialAwarded: p.credential, provider } })) };
+    '@type': 'ListItem', position: i + 1, item: { '@type': 'Course', name: c.detail ? `${c.name} (${c.detail})` : c.name, description: `${plain(p.name)}. ${p.summary}`, educationalCredentialAwarded: p.credential, provider,
+      ...(p.tuition ? { offers: { '@type': 'Offer', category: 'Tuition', price: p.tuition, priceCurrency: 'USD' } } : {}) } })) };
   let h = base
     .replace(/<script type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>\s*/g, '')
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)

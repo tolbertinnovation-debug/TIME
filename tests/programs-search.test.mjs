@@ -106,3 +106,31 @@ test('typing updates results and the address without reloading', async () => {
   await page.waitForFunction(() => location.search.includes('q=saturday'));
   await page.close();
 });
+
+test('tuition on each program page matches the fee table on the Programs page', () => {
+  const programs = read('programs.html');
+  const table = programs.slice(programs.indexOf('<table class="fee-table">'), programs.indexOf('</table>'));
+  for (const p of DATA) {
+    const row = table.match(new RegExp(`<tr><th scope="row"><a href="${p.file}">[\\s\\S]*?</tr>`))?.[0];
+    if (p.online) { assert.equal(row, undefined, `${p.slug} has no published fee`); continue; }
+    assert.ok(row, `${p.file} is in the fee table`);
+    if (p.tuition) {
+      assert.ok(row.includes(`US$${p.tuition}`), `${p.slug} tuition US$${p.tuition} in fee table`);
+      assert.ok(read(p.file).includes(`US$${p.tuition}`), `${p.slug} page shows US$${p.tuition}`);
+      assert.ok(row.includes(`LRD ${(p.tuition * 170).toLocaleString('en-US')}`), `${p.slug} LRD amount uses US$1 = LRD 170`);
+    } else {
+      assert.match(row, /Confirmed by the administration/);
+    }
+  }
+});
+
+test('the 2027 intake dates are the same everywhere they appear', () => {
+  const dates = { '2027-01-04': /January 4|Jan 4/, '2027-03-08': /March 8|Mar 8/, '2027-10-14': /October 14|Oct 14/ };
+  for (const file of ['programs.html', 'faq.html', 'news.html', 'index.html', ...DATA.filter((p) => !p.online).map((p) => p.file)]) {
+    const html = read(file);
+    for (const [iso, words] of Object.entries(dates)) {
+      for (const m of html.matchAll(new RegExp(`<time datetime="${iso}">([^<]*)</time>`, 'g'))) assert.match(m[1], words, `${file}: ${m[1]}`);
+    }
+    assert.ok(!/datetime="2027-(?!01-04|03-08|10-14)/.test(html), `${file} has no other 2027 dates`);
+  }
+});

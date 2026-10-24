@@ -55,6 +55,8 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 18 | **Approved fees and 2027 intake**: fee table (US$ and LRD at US$1 = LRD 170), other fees, the 50% discount, payment rules and intake dates on the Programs page; tuition and dates on every program page, the FAQ, News & Events and the home banner. Tests keep fees and dates consistent everywhere. | ✅ |
 
+| 19 | **Own pages for crowded topics**: Fees & Admissions (`admissions.html`), Leadership & Faculty (`team.html`, with every Cohort #1 lecturer) and Photo Gallery (`gallery.html`) split out of Programs, About and Our Impact. Programs page went from 14 to 8 phone screens; "Admissions" joins the main menu; all old links redirected. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

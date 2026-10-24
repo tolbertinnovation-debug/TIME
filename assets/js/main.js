@@ -365,6 +365,7 @@
     var faqItems = Array.prototype.slice.call(document.querySelectorAll(".faq-group details"));
     var faqCount = document.getElementById("faq-count");
     var faqEmpty = document.querySelector(".faq-empty");
+    var faqInitial = new URLSearchParams(window.location.search).get("q");
     faqQ.addEventListener("input", function () {
       var words = faqQ.value.toLowerCase().split(/\s+/).filter(Boolean);
       var shown = 0;
@@ -382,6 +383,7 @@
       faqEmpty.hidden = !words.length || shown > 0;
       faqCount.textContent = words.length ? shown + (shown === 1 ? " question matches" : " questions match") : "";
     });
+    if (faqInitial) { faqQ.value = faqInitial; faqQ.dispatchEvent(new Event("input")); }
   }
 
   // News: filter stories by topic
@@ -402,6 +404,111 @@
         newsCount.textContent = cat === "all" ? "" : shown + (shown === 1 ? " story" : " stories") + " about " + btn.textContent;
       });
     });
+  }
+
+  // Site search (search.html): ranks pages, courses and FAQ answers from a prebuilt index
+  var searchBox = document.getElementById("search-q");
+  var searchList = document.getElementById("search-results");
+  if (searchBox && searchList) {
+    var searchStatus = document.getElementById("search-status");
+    var searchIndex = null;
+    var fold = function (s) { return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); };
+    var LABELS = { page: "Page", course: "Course", faq: "Question" };
+
+    function highlight(el, str, words) {
+      var parts = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).filter(Boolean);
+      if (!parts.length) { el.textContent = str; return; }
+      var re = new RegExp("(" + parts.join("|") + ")", "gi");
+      str.split(re).forEach(function (piece, i) {
+        if (i % 2) { var m = document.createElement("mark"); m.textContent = piece; el.appendChild(m); }
+        else if (piece) el.appendChild(document.createTextNode(piece));
+      });
+    }
+    function snippet(entry, words) {
+      var source = entry.description || "";
+      var body = entry.text || "";
+      var folded = fold(body);
+      for (var i = 0; i < words.length; i++) {
+        if (fold(source).indexOf(words[i]) !== -1) return source;
+        var at = folded.indexOf(words[i]);
+        if (at !== -1) {
+          var start = Math.max(0, at - 70);
+          return (start ? "\u2026" : "") + body.slice(start, start + 200).trim() + "\u2026";
+        }
+      }
+      return source;
+    }
+    function rank(query) {
+      var words = fold(query).split(/[^a-z0-9$]+/).filter(Boolean);
+      if (!words.length) return { words: words, hits: [] };
+      var hits = [];
+      searchIndex.entries.forEach(function (e) {
+        var title = fold(e.title), heads = fold(e.headings.join(" ")), desc = fold(e.description), body = fold(e.text);
+        var score = 0;
+        for (var i = 0; i < words.length; i++) {
+          var w = words[i], s = 0;
+          if (title.indexOf(w) !== -1) s += title.indexOf(w) === 0 ? 15 : 10;
+          if (heads.indexOf(w) !== -1) s += 4;
+          if (desc.indexOf(w) !== -1) s += 3;
+          if (body.indexOf(w) !== -1) s += 1;
+          if (!s) return; // every word must appear somewhere
+          score += s;
+        }
+        hits.push({ e: e, score: score });
+      });
+      hits.sort(function (a, b) { return b.score - a.score; });
+      return { words: words, hits: hits.slice(0, 25) };
+    }
+    function show(query) {
+      searchList.innerHTML = "";
+      var q = query.trim();
+      if (!q) { searchStatus.textContent = "Type a word or two to search the site."; return; }
+      var result = rank(q);
+      if (!result.hits.length) {
+        searchStatus.textContent = "No results for \u201c" + q + "\u201d. Try another word, or browse the popular links below.";
+        return;
+      }
+      searchStatus.textContent = result.hits.length + (result.hits.length === 1 ? " result" : " results") + " for \u201c" + q + "\u201d";
+      result.hits.forEach(function (h) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = h.e.url;
+        highlight(a, h.e.title, result.words);
+        var type = document.createElement("span");
+        type.className = "search-type";
+        type.textContent = LABELS[h.e.type] || "";
+        var p = document.createElement("p");
+        highlight(p, snippet(h.e, result.words), result.words);
+        li.appendChild(a); li.appendChild(type); li.appendChild(p);
+        searchList.appendChild(li);
+      });
+    }
+    var initial = new URLSearchParams(window.location.search).get("q") || "";
+    searchBox.value = initial;
+    searchStatus.textContent = "Loading search\u2026";
+    fetch("assets/search-index.json")
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        searchIndex = data;
+        show(searchBox.value);
+        var timer;
+        searchBox.addEventListener("input", function () {
+          clearTimeout(timer);
+          timer = setTimeout(function () {
+            show(searchBox.value);
+            var url = new URL(window.location.href);
+            if (searchBox.value.trim()) url.searchParams.set("q", searchBox.value.trim()); else url.searchParams.delete("q");
+            history.replaceState(null, "", url);
+          }, 120);
+        });
+      })
+      .catch(function () {
+        searchStatus.textContent = "Search couldn't load. Check your connection, or browse the popular links below.";
+      });
+    searchBox.form.addEventListener("submit", function (e) {
+      if (searchIndex) { e.preventDefault(); show(searchBox.value); }
+    });
+    if (!initial) searchBox.focus();
   }
 
   // Print every FAQ answer, then put the page back as it was

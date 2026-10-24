@@ -14,6 +14,8 @@ A fast, mobile-first static site: plain HTML, CSS and a small JavaScript file. I
 | `programs.html` | All certificate & diploma courses, schedules, registration |
 | `phica.html` | Phìtìa Academy profile, needs and appeal |
 | `impact.html` | Focus areas, success stories, photo gallery |
+| `programs-*.html` | One page per program (generated from `data/programs.json`) |
+| `search.html` | Site search across pages, courses and FAQ answers |
 | `news.html` | News & events: stories with topic filters, registration and class schedule |
 | `contact.html` | Donate / volunteer / partner, contact details, message form |
 | `donate.html` | What a gift provides, how to give, in-kind donations, where support goes |
@@ -45,6 +47,8 @@ See [`GOOGLE_BUSINESS_PROFILE.md`](GOOGLE_BUSINESS_PROFILE.md) for the details t
 - **Donating:** to add Mobile Money numbers or an online giving link, copy one of the "way" boxes under *How to give* in `donate.html` (there is a commented example there).
 - **FAQ:** each question in `faq.html` is a `<details>` block. When you add or change one, update the matching entry in the `FAQPage` data at the bottom of the page so Google shows the same answer.
 - **Menu, top bar, footer and phone action bar** are shared by every page. Edit them once in `partials/` (for example a phone number in `partials/footer.html`), then run `npm run layout` to copy the change into every page. The tests fail if a page falls out of step.
+- **Program pages:** edit `data/programs.json` (who it's for, facts, courses), then run `npm run programs`. Course lists must match the tabs on `programs.html`; the tests check this.
+- **Search:** after changing page text, programs or FAQ answers, run `npm run search` to rebuild `assets/search-index.json`. The tests fail if it is out of date.
 - **News:** to add a story to `news.html`, copy one `<article class="img-card news-item">` block to the top of the list and change its text, link, photo, date (`<time datetime="2026-11">November 2026</time>`) and `data-category` (`programs`, `graduation`, `outreach` or `phica`). Add confirmed intake or graduation dates to the *Events & schedule* list.
 - **Contact details** also appear in the body of `contact.html`, `programs.html`, `faq.html`, `donate.html` and `offline.html`.
 - **Contact form:** messages are delivered to `tinstitute312@gmail.com` through [FormSubmit](https://formsubmit.co), a free service that needs no account. The **first** message sent after publishing triggers an "Activate Form" email to that inbox; click the link once and every message after that arrives directly. Until then, and whenever sending fails, visitors are offered a prepared email or WhatsApp message instead. To change the receiving address, edit `data-to` on the form in `contact.html`.

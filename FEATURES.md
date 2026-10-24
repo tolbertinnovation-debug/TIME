@@ -44,6 +44,12 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 | 12 | Graduate testimonials (needs real quotes and permission) | ⛔ |
 | 13 | Shared header and footer kept in one place (`partials/` + `npm run layout`; tests catch drift). This found and fixed a missing "Online Learning" link on the About page. | ✅ |
 
+## Added after launch
+| # | Feature | Status |
+|---|---|---|
+| 14 | **Program pages**: one per program category plus Special Education Cohort #1. Each has who it's for, an at-a-glance box, courses, schedule or delivery, four enrolment steps, questions, related programs and Course structured data. Generated from `data/programs.json`. | ✅ |
+| 15 | **Site search**: header search button on every page and `search.html`. Ranks pages, courses and FAQ answers from a prebuilt index; ignores accents and case; handles empty and no-result searches; FAQ results open the answer. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

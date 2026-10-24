@@ -10,7 +10,7 @@ This pass turned the TIME Inc. website into a tested, accessible, secure and off
 | **Accessibility** | Zero WCAG 2.1 A/AA violations (axe-core) on every public page and the study portal, at phone and desktop widths. Fixes covered heading order, colour contrast, breadcrumb links, landmarks, keyboard access to swipe rows and screen-reader-friendly form errors. |
 | **Forms** | Contact form sends directly, with inline error messages, length limits and a counter, a spam honeypot, an email/WhatsApp fallback when sending fails, and topic preselection from links. |
 | **Search** | FAQ search with match counts and an empty state; the existing course search is now tested. |
-| **Offline and slow networks** | Installable web app (manifest and icons) and a service worker. Visited pages reopen with no connection; other pages show an offline page with phone numbers. The learning portal is never cached. |
+| **Offline and slow networks** | Installable web app (manifest and icons) and a service worker. Visited pages reopen with no connection; other pages show an offline page with phone numbers. TIME Learning's study guides also work offline; the signed-in account workspace is never cached. |
 | **Performance** | Responsive WebP images and self-hosted fonts (both earlier in this session); versioned, cache-friendly CSS and JS. |
 | **SEO** | Canonical and social tags on every page with page-specific share images; Organization/LocalBusiness, FAQ, course list and breadcrumb structured data; a complete sitemap; noindex on utility and login pages. |
 | **Security** | Content-Security-Policy and referrer policy on public pages (no inline or third-party scripts); `noopener` on every new-tab link. |

@@ -49,19 +49,23 @@ test('visited pages keep working offline; other pages show the offline page', as
   await context.close();
 });
 
-test('the learning portal is never served from the cache', async () => {
+test('study guides work offline, but the account workspace is never cached', async () => {
   const { context, page } = await controlledPage();
-  await page.goto(`${ctx.url}/learning.html`, { waitUntil: 'load' });
+  await page.goto(`${ctx.url}/learning.html`, { waitUntil: 'networkidle' });
+  await page.goto(`${ctx.url}/student-login.html`, { waitUntil: 'load' });
   const cached = await page.evaluate(async () => {
-    const names = await caches.keys();
     const urls = [];
-    for (const n of names) for (const r of await (await caches.open(n)).keys()) urls.push(r.url);
+    for (const n of await caches.keys()) for (const r of await (await caches.open(n)).keys()) urls.push(r.url);
     return urls;
   });
-  assert.ok(cached.length > 0);
-  assert.deepEqual(cached.filter((u) => /learning|account|login|assets\/learning/.test(u)), []);
+  assert.ok(cached.some((u) => u.endsWith('/learning.html')), 'study portal page is saved');
+  assert.ok(cached.some((u) => u.includes('/assets/learning/courses.js')), 'course text is saved');
+  assert.deepEqual(cached.filter((u) => /account|login|account\.bundle/.test(u)), [], 'nothing from the account workspace is saved');
+
   await context.setOffline(true);
-  await page.goto(`${ctx.url}/learning.html`);
-  assert.match(await page.title(), /offline/i, 'portal shows the offline page rather than a stale copy');
+  await page.goto(`${ctx.url}/learning.html#lesson/school-leadership/0`);
+  await page.waitForFunction(() => /shared school vision/i.test(document.body.innerText));
+  await page.goto(`${ctx.url}/student-login.html`);
+  assert.match(await page.title(), /offline/i, 'sign-in shows the offline page instead of a stale copy');
   await context.close();
 });

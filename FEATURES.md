@@ -57,6 +57,8 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 19 | **Own pages for crowded topics**: Fees & Admissions (`admissions.html`), Leadership & Faculty (`team.html`, with every Cohort #1 lecturer) and Photo Gallery (`gallery.html`) split out of Programs, About and Our Impact. Programs page went from 14 to 8 phone screens; "Admissions" joins the main menu; all old links redirected. | ✅ |
 
+| 20 | **Four-way entry point**: the home page offers A. TIME Inc. (enrollment on a rolling basis, registration in progress), B. Phìtìa Academy, C. Consultation (education, agriculture) and D. Book production, sales & publications. Each leads only to its own information (`time.html`, `phica.html`, `consultation.html`, `books.html`). | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

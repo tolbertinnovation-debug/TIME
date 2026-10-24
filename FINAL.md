@@ -22,13 +22,14 @@ Each batch went through a pull request with green CI, was merged, and was checke
 
 ## Still needed from TIME Inc.
 These can't be done without your information or accounts. Details are in `FEATURES.md` under "Blocked".
-1. Program fees, installment rules and the next intake dates (for the Programs page, FAQ and home banner)
-2. Orange Money and MTN MoMo numbers, or an online giving link (there's a ready slot in `donate.html`)
-3. Google Business Profile links once it's verified (steps in `GOOGLE_BUSINESS_PROFILE.md`)
-4. DNS access for the custom domain `time-liberia.com`
-5. A free analytics account (GoatCounter or Cloudflare Web Analytics)
-6. Official Facebook page and WhatsApp Channel links
-7. Neon deploy access and SMTP settings for any future learning-portal backend changes and branded emails
+1. Orange Money and MTN MoMo numbers, or an online giving link (there's a ready slot in `donate.html`)
+2. Google Business Profile links once it's verified (steps in `GOOGLE_BUSINESS_PROFILE.md`)
+3. DNS access for the custom domain `time-liberia.com`
+4. A free analytics account (GoatCounter or Cloudflare Web Analytics)
+5. Official Facebook page and WhatsApp Channel links
+6. Neon deploy access and SMTP settings for any future learning-portal backend changes and branded emails
+
+Since then: the approved fee schedule and 2027 intake dates are published across the site.
 
 ## Nice to have later
 - A news and events page, once there are dated items to publish

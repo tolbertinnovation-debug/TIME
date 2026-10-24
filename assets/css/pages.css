@@ -309,3 +309,40 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 /* Make room for the search button on mid-size screens */
 .brand-name { white-space: nowrap; }
 @media (min-width: 1181px) and (max-width: 1340px) { .site-header .brand-sub { display: none; } }
+
+/* Fees & intake */
+.intake-dates { list-style: none; margin: 0 0 8px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.intake-dates li { background: var(--olive-deep); color: var(--white); border-radius: var(--radius-lg); padding: 20px 22px; }
+.intake-label { display: block; font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em; font-size: .74rem; font-weight: 700; color: #dceab1; margin-bottom: 6px; }
+.intake-dates time { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1.3; }
+.fine-print { font-size: .86rem; color: var(--muted); margin: 8px 0 28px; }
+.fee-table-wrap { overflow-x: auto; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.fee-table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: .97rem; }
+.fee-table caption { text-align: left; padding: 18px 22px 0; font-weight: 700; font-family: var(--font-display); font-size: 1.1rem; }
+.fee-table th, .fee-table td { text-align: left; vertical-align: top; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+.fee-table thead th { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .08em; font-size: .74rem; color: var(--muted); }
+.fee-table tbody tr:last-child > * { border-bottom: 0; }
+.fee-table tbody th { font-weight: 600; }
+.fee-table a { color: var(--ink); }
+.fee-table .muted { font-size: .86rem; font-weight: 400; }
+.fee-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 8px 0 24px; }
+.fee-notes ul { padding-left: 18px; margin: 0 0 10px; color: var(--ink-2); }
+.fee-notes li { margin-bottom: 8px; }
+.fee-notes p { color: var(--ink-2); }
+@media (max-width: 900px) { .intake-dates, .fee-notes { grid-template-columns: 1fr; } }
+@media print { .fee-table { min-width: 0; } .intake-dates li { background: none; color: #000; border: 1px solid #000; } .intake-label { color: #000; } }
+.event-date { border-color: var(--olive); }
+.event-date .event-when strong { color: var(--red); }
+@media (max-width: 640px) {
+  .fee-table-wrap { overflow: visible; }
+  .fee-table { min-width: 0; }
+  .fee-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .fee-table, .fee-table tbody, .fee-table tr, .fee-table th, .fee-table td { display: block; }
+  .fee-table tr { padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .fee-table tbody tr:last-child { border-bottom: 0; }
+  .fee-table th, .fee-table td { padding: 0; border: 0; }
+  .fee-table tbody th { font-size: 1.02rem; margin-bottom: 8px; }
+  .fee-table td { display: grid; grid-template-columns: 9.5em 1fr; gap: 10px; padding: 4px 0; }
+  .fee-table td::before { content: attr(data-label); font-family: var(--font-label); text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; font-weight: 700; color: var(--muted); padding-top: 3px; }
+  .fee-table caption { display: block; width: auto; padding: 16px 18px 4px; }
+}

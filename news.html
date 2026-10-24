@@ -22,8 +22,8 @@
   <link rel="manifest" href="site.webmanifest">
   <link rel="preload" href="assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=20261024-search">
-  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-search">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261024-fees">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-fees">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tolbertinnovation-debug.github.io/TIME/"}, {"@type": "ListItem", "position": 2, "name": "News & Events", "item": "https://tolbertinnovation-debug.github.io/TIME/news.html"}]}</script>
 </head>
 <body data-page="news">
@@ -86,6 +86,15 @@
         <div class="news-filters" role="group" aria-label="Filter news by topic"><button type="button" class="news-filter" data-filter="all" aria-pressed="true">All</button><button type="button" class="news-filter" data-filter="programs" aria-pressed="false">Programs</button><button type="button" class="news-filter" data-filter="graduation" aria-pressed="false">Graduation</button><button type="button" class="news-filter" data-filter="outreach" aria-pressed="false">Outreach</button><button type="button" class="news-filter" data-filter="phica" aria-pressed="false">Phìtìa Academy</button></div>
         <p class="news-count" role="status" aria-live="polite"></p>
         <div class="grid grid-3 news-grid">
+          <article class="img-card news-item reveal" data-category="programs">
+            <div class="fig"><picture><source type="image/webp" srcset="assets/img/webp/graduation-procession-480.webp 480w, assets/img/webp/graduation-procession-900.webp 900w" sizes="(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 33vw"><img src="assets/img/thumb-graduation-procession.jpg" width="360" height="640" alt="TIME Inc. graduates in black gowns walking in the graduation procession" loading="lazy"></picture></div>
+            <div class="body">
+              <p class="news-meta"><span class="chip navy">Programs</span> <span>2027 intake</span></p>
+              <h3>2027 intake: fees and dates announced</h3>
+              <p>Register by Monday, January 4, 2027 for classes beginning Monday, March 8. The &ldquo;C&rdquo; Certificate costs US$80 in two installments; professional certificates US$125 and diplomas US$175 per course. A 50% tuition discount may be available.</p>
+              <a class="card-link" href="programs.html#fees">See fees and dates <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </div>
+          </article>
           <article class="img-card news-item reveal" data-category="programs">
             <div class="fig"><picture><source type="image/webp" srcset="assets/img/webp/graduates-2026-480.webp 480w, assets/img/webp/graduates-2026-960.webp 960w, assets/img/webp/graduates-2026-1600.webp 1600w" sizes="(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 33vw"><img src="assets/img/thumb-graduates-2026.jpg" width="640" height="360" alt="TIME Inc. graduates with their dean" loading="lazy"></picture></div>
             <div class="body">
@@ -158,9 +167,21 @@
         <div class="section-head reveal">
           <span class="eyebrow">Events &amp; schedule</span>
           <h2>When to visit and study</h2>
-          <p class="lead">Registration is ongoing. Dates for the next intake and graduation will be posted here as soon as they are confirmed.</p>
+          <p class="lead">Key dates for the 2027 intake, and when to visit the campus. Dates apply unless TIME Inc. issues an official written notice changing them.</p>
         </div>
         <ul class="events">
+          <li class="event event-date reveal">
+            <div class="event-when"><strong><time datetime="2027-01-04">Mon, Jan 4, 2027</time></strong><span>Registration deadline</span></div>
+            <div><h3 class="h4">Last day to register for the 2027 intake</h3><p>Register at the campus and pay the registration fee where applicable. Confirm your total fees with admissions first.</p><a class="card-link" href="programs.html#fees">Fees &amp; how to register <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+          </li>
+          <li class="event event-date reveal">
+            <div class="event-when"><strong><time datetime="2027-03-08">Mon, Mar 8, 2027</time></strong><span>Classes begin</span></div>
+            <div><h3 class="h4">2027 classes start</h3><p>The administration gives registered students their exact timetable before this date.</p><a class="card-link" href="programs.html#professional">Class schedules <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+          </li>
+          <li class="event event-date reveal">
+            <div class="event-when"><strong><time datetime="2027-10-14">Thu, Oct 14, 2027</time></strong><span>Next intake</span></div>
+            <div><h3 class="h4">Second 2027 intake</h3><p>The following intake for students who miss the March start.</p><a class="card-link" href="contact.html?topic=Registering%20for%20a%20course#contact-form">Ask about this intake <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+          </li>
           <li class="event reveal">
             <div class="event-when"><strong>Monday – Friday</strong><span>8:00 AM – 4:00 PM</span></div>
             <div><h3 class="h4">Registration at the campus</h3><p>Visit the Phìtìa Academy campus on Robertsfield Highway to register for a course or ask questions.</p><a class="card-link" href="programs.html#register">How to register <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
@@ -256,6 +277,6 @@
 
   <aside aria-label="WhatsApp chat"><a class="wa-float" href="https://wa.me/231888901848" target="_blank" rel="noopener" aria-label="Chat with TIME Inc. on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-2.4-1.5 9 9 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.5-.6.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.5 13.5 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.8 17.9L.1 24l6.3-1.6A11.8 11.8 0 0 0 12 23.8 11.8 11.8 0 0 0 20.4 3.6z"/></svg></a></aside>
 
-  <script src="assets/js/main.js?v=20261024-search"></script>
+  <script src="assets/js/main.js?v=20261024-fees"></script>
 </body>
 </html>

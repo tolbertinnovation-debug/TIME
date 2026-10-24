@@ -53,10 +53,11 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 | 16 | **Lighter TIME Learning workspace**: account script 717 KB → 214 KB (164 → 61 KB gzipped) by dropping unused auth-library code. Behaviour verified identical against the live sign-in service. | ✅ |
 | 17 | **Offline study guides**: the public study portal is cached for offline study; the account workspace stays network-only. Added to the home-screen app shortcuts. | ✅ |
 
+| 18 | **Approved fees and 2027 intake**: fee table (US$ and LRD at US$1 = LRD 170), other fees, the 50% discount, payment rules and intake dates on the Programs page; tuition and dates on every program page, the FAQ, News & Events and the home banner. Tests keep fees and dates consistent everywhere. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|
-| Program fees and next intake dates | Fee amounts per program, installment rules, registration deadline and start dates |
 | Mobile Money and online donations | Orange Money and MTN MoMo numbers (account names); a Givebutter, Donorbox or PayPal giving link |
 | Google Maps and review links | The verified Google Business Profile links (see `GOOGLE_BUSINESS_PROFILE.md`) |
 | Custom domain (`time-liberia.com`) | Access to the domain's DNS settings |

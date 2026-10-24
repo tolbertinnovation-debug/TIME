@@ -7,7 +7,7 @@ const sw = read('sw.js');
 
 test('the service worker pre-caches the same asset versions the pages use', () => {
   const core = [...sw.match(/const CORE = \[([\s\S]*?)\];/)[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]);
-  const used = new Set(SITE_PAGES.flatMap((f) => [...read(f).matchAll(/(?:href|src)="(assets\/(?:css|js)\/[^"]+\?v=[^"]+)"/g)].map((m) => m[1])));
+  const used = new Set(SITE_PAGES.flatMap((f) => [...read(f).matchAll(/(?:href|src|data-assistant)="(assets\/(?:css|js)\/[^"]+\?v=[^"]+)"/g)].map((m) => m[1])));
   for (const ref of core.filter((r) => r.includes('?v='))) assert.ok(used.has(ref), `${ref} is what the pages load`);
   for (const ref of used) assert.ok(core.includes(ref), `${ref} is pre-cached`);
 });

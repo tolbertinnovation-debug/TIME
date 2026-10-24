@@ -521,6 +521,24 @@
     printOpened = [];
   });
 
+  // TIME Assistant: the chat code and answers download only when a visitor first opens it
+  var chatButton = document.querySelector(".chat-launcher");
+  if (chatButton) {
+    chatButton.addEventListener("click", function () {
+      if (window.TIMEAssistant) { window.TIMEAssistant.open(chatButton); return; }
+      if (chatButton.getAttribute("aria-busy")) return;
+      chatButton.setAttribute("aria-busy", "true");
+      var fail = function () { window.location.href = "contact.html"; };
+      var script = document.createElement("script");
+      script.src = chatButton.getAttribute("data-assistant");
+      script.onload = function () {
+        window.TIMEAssistant.open(chatButton).catch(fail).then(function () { chatButton.removeAttribute("aria-busy"); });
+      };
+      script.onerror = fail;
+      document.body.appendChild(script);
+    });
+  }
+
   // Live search across every course on the Programs page
   var q = document.getElementById("course-q");
   var tabs = document.getElementById("course-tabs");

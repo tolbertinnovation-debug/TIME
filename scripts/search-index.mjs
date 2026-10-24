@@ -19,7 +19,7 @@ function pageEntry(file, html) {
   const title = text(html.match(/<title>([^<]*)<\/title>/)[1]).replace(/\s*\|\s*TIME Inc\..*$/, '');
   const description = decode(html.match(/<meta name="description" content="([^"]*)"/)?.[1] || '');
   let body = between(html, '<main id="main">', '</main>')
-    .replace(/<script[\s\S]*?<\/script>/g, '').replace(/<nav class="page-links"[\s\S]*?<\/nav>/g, '');
+    .replace(/<!--[\s\S]*?-->/g, '').replace(/<script[\s\S]*?<\/script>/g, '').replace(/<nav class="page-links"[\s\S]*?<\/nav>/g, '');
   const headings = [...body.matchAll(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/g)].map((m) => text(m[1])).filter(Boolean);
   return { url: file === 'index.html' ? './' : file, title, description, headings: headings.slice(0, 30), text: text(body).slice(0, 3000) };
 }

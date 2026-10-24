@@ -62,3 +62,14 @@ test('every page has a unique id for each id attribute', () => {
   }
   assert.deepEqual(dupes, []);
 });
+
+test('public pages declare a Content Security Policy that only allows the site itself and FormSubmit', () => {
+  for (const file of ALL_PAGES.filter((f) => !PORTAL_PAGES.includes(f))) {
+    const csp = read(file).match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1];
+    assert.ok(csp, `${file} has a CSP`);
+    assert.match(csp, /script-src 'self';/, `${file} allows no inline or third-party scripts`);
+    assert.match(csp, /connect-src 'self' https:\/\/formsubmit\.co;/);
+    assert.match(csp, /object-src 'none'/);
+    assert.match(read(file), /<meta name="referrer" content="strict-origin-when-cross-origin">/);
+  }
+});

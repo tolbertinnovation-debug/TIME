@@ -104,17 +104,63 @@ test('contact form keeps the message and offers email/WhatsApp when sending fail
   }
 });
 
-test('contact form does not send incomplete or bot submissions', async () => {
+test('contact form shows inline errors and does not send incomplete or bot submissions', async () => {
   const page = await contactPage({ success: 'true' });
   await page.click('#contact-form button[type=submit]');
+  assert.equal(await page.locator('#f-name-error').textContent(), 'Please enter your name.');
+  assert.equal(await page.locator('#f-email-error').textContent(), 'Please enter your email address.');
+  assert.equal(await page.locator('#f-msg-error').textContent(), 'Please enter a message.');
+  assert.equal(await page.getAttribute('#f-name', 'aria-invalid'), 'true');
+  assert.match(await page.getAttribute('#f-name', 'aria-describedby'), /f-name-error/);
+  assert.equal(await page.evaluate(() => document.activeElement.id), 'f-name', 'focus moves to the first problem');
+
   await fillForm(page);
+  assert.equal(await page.locator('#f-name-error').count(), 0, 'errors clear as the user fixes them');
   await page.fill('#f-email', 'not-an-email');
   await page.click('#contact-form button[type=submit]');
+  assert.match(await page.locator('#f-email-error').textContent(), /valid email address/);
+
   await fillForm(page);
   await page.fill('#f-honey', 'spam');
   await page.click('#contact-form button[type=submit]');
   await page.waitForTimeout(300);
   assert.equal(page.posts.length, 0);
+  await page.close();
+});
+
+test('message counter tracks length and the limit is enforced', async () => {
+  const page = await openPage(ctx, 'contact.html', PHONE);
+  await page.fill('#f-msg', 'Hello');
+  assert.equal(await page.locator('#f-msg-count').textContent(), '5 / 4,000 characters');
+  await page.fill('#f-msg', 'x'.repeat(4100));
+  assert.equal((await page.inputValue('#f-msg')).length, 4000);
+  await page.close();
+});
+
+test('links can open the form with a topic chosen', async () => {
+  const page = await openPage(ctx, 'contact.html?topic=Becoming%20a%20partner#contact-form', PHONE);
+  assert.equal(await page.inputValue('#f-topic'), 'Becoming a partner');
+  await page.close();
+  const unknown = await openPage(ctx, 'contact.html?topic=%3Cscript%3E', PHONE);
+  assert.equal(await unknown.inputValue('#f-topic'), 'Registering for a course', 'unknown topics are ignored');
+  await unknown.close();
+});
+
+test('FAQ search filters questions, opens a few matches and shows an empty state', async () => {
+  const page = await openPage(ctx, 'faq.html', PHONE);
+  const total = await page.locator('.faq-group details').count();
+  await page.fill('#faq-q', 'installments');
+  const visible = page.locator('.faq-group details:not([hidden])');
+  const n = await visible.count();
+  assert.ok(n >= 1 && n < total);
+  assert.match(await page.locator('#faq-count').textContent(), /^\d+ questions? match/);
+  assert.ok(await visible.first().evaluate((d) => d.open), 'matching answers open');
+  await page.fill('#faq-q', 'qqqq nothing');
+  assert.ok(await page.locator('.faq-empty').isVisible());
+  assert.equal(await page.locator('.faq-group:not([hidden])').count(), 0);
+  await page.fill('#faq-q', '');
+  assert.equal(await page.locator('.faq-group details:not([hidden])').count(), total);
+  assert.ok(!(await page.locator('.faq-empty').isVisible()));
   await page.close();
 });
 

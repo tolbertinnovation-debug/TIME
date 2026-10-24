@@ -30,8 +30,8 @@ export function useBrowser() {
 }
 
 // Opens a page that records script errors and failed same-origin requests.
-export async function openPage(ctx, path, viewport = PHONE) {
-  const page = await ctx.browser.newPage({ viewport });
+export async function openPage(ctx, path, viewport = PHONE, options = {}) {
+  const page = await ctx.browser.newPage({ viewport, ...options });
   const problems = [];
   page.on('pageerror', (e) => problems.push(`script error: ${e.message}`));
   page.on('console', (m) => { if (m.type() === 'error') problems.push(`console error: ${m.text()}`); });

@@ -26,16 +26,16 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 | 2 | **Automated tests for the public site** (Playwright and `node:test`): every page loads without errors, internal links and anchors resolve, images load, mobile menu, tabs, course search, lightbox, contact form (success, failure, validation), FAQ | ✅ |
 | 3 | **Continuous integration**: a GitHub Actions workflow that runs the site tests and backend tests on every pull request and push to `main` | ✅ |
 | 4 | **Accessibility audit and fixes**: axe-core on every page at phone and desktop sizes; fix contrast, names, landmarks and heading order; keyboard checks | ✅ |
-| 5 | **SEO completeness**: canonical and social tags on `learning.html`, Course and Breadcrumb structured data, sitemap covering every public page, consistent titles | ⏳ |
+| 5 | **SEO completeness**: canonical and social tags on `learning.html`, Course and Breadcrumb structured data, sitemap covering every public page, consistent titles | ✅ |
 
 ## P1: high value
 | # | Feature | Status |
 |---|---|---|
-| 6 | **Offline and slow-network support**: web app manifest (Add to Home Screen) and a service worker that caches the site shell and pages for offline reading. Never caches portal API or auth traffic. | ⏳ |
-| 7 | **Basic security hardening**: Content-Security-Policy and referrer policy on public pages; every `target="_blank"` link has `rel="noopener"` | ⏳ |
-| 8 | **Contact form polish**: inline field errors instead of browser pop-ups, a message length limit with counter, and topic preselected from links such as `contact.html?topic=Volunteering` | ⏳ |
-| 9 | **FAQ search**: filter questions as you type, with an empty state | ⏳ |
-| 10 | **Print styles**: Programs, FAQ and Donate print cleanly without navigation or decorative elements | ⏳ |
+| 6 | **Offline and slow-network support**: web app manifest (Add to Home Screen) and a service worker that caches the site shell and pages for offline reading. Never caches portal API or auth traffic. | ✅ |
+| 7 | **Basic security hardening**: Content-Security-Policy and referrer policy on public pages; every `target="_blank"` link has `rel="noopener"`. The portal pages are left as they are, because their live sign-in can't be tested from here. | ✅ |
+| 8 | **Contact form polish**: inline field errors instead of browser pop-ups, a message length limit with counter, and topic preselected from links such as `contact.html?topic=Volunteering` | ✅ |
+| 9 | **FAQ search**: filter questions as you type, with an empty state | ✅ |
+| 10 | **Print styles**: Programs, FAQ and Donate print cleanly without navigation or decorative elements | ✅ |
 
 ## P2: nice to have
 | # | Feature | Status |

@@ -181,9 +181,72 @@
     var note = form.querySelector(".form-status");
     var submit = form.querySelector("button[type='submit']");
     var submitLabel = submit.innerHTML;
+    var fields = Array.prototype.slice.call(form.querySelectorAll("input[required], textarea[required], input[type=email]"));
+    var labels = { "f-name": "your name", "f-email": "your email address", "f-msg": "a message" };
+
+    // Inline validation messages (instead of the browser's pop-ups)
+    function problem(f) {
+      if (f.validity.valueMissing) return "Please enter " + (labels[f.id] || "this field") + ".";
+      if (f.validity.typeMismatch) return "Please enter a valid email address, like name@example.com.";
+      if (f.validity.tooLong) return "Please shorten this to " + f.maxLength + " characters.";
+      return "";
+    }
+    function showProblem(f, msg) {
+      var id = f.id + "-error";
+      var err = document.getElementById(id);
+      var described = (f.getAttribute("aria-describedby") || "").split(" ").filter(function (x) { return x && x !== id; });
+      if (msg) {
+        if (!err) {
+          err = document.createElement("p");
+          err.className = "field-error";
+          err.id = id;
+          f.insertAdjacentElement("afterend", err);
+        }
+        err.textContent = msg;
+        f.setAttribute("aria-invalid", "true");
+        described.unshift(id);
+      } else {
+        if (err) err.remove();
+        f.removeAttribute("aria-invalid");
+      }
+      if (described.length) f.setAttribute("aria-describedby", described.join(" "));
+      else f.removeAttribute("aria-describedby");
+    }
+    function validate() {
+      var first = null;
+      fields.forEach(function (f) {
+        var msg = problem(f);
+        showProblem(f, msg);
+        if (msg && !first) first = f;
+      });
+      if (first) first.focus();
+      return !first;
+    }
+    fields.forEach(function (f) {
+      f.addEventListener("input", function () { if (f.getAttribute("aria-invalid")) showProblem(f, problem(f)); });
+    });
+
+    // Character counter for the message
+    var msgBox = document.getElementById("f-msg");
+    var msgCount = document.getElementById("f-msg-count");
+    if (msgBox && msgCount) {
+      msgBox.addEventListener("input", function () {
+        var n = msgBox.value.length;
+        msgCount.textContent = n ? n.toLocaleString() + " / " + msgBox.maxLength.toLocaleString() + " characters" : "Up to " + msgBox.maxLength.toLocaleString() + " characters";
+      });
+    }
+
+    // Preselect the topic from links such as contact.html?topic=Volunteering
+    var wanted = new URLSearchParams(window.location.search).get("topic");
+    var topicSelect = document.getElementById("f-topic");
+    if (wanted && topicSelect) {
+      Array.prototype.forEach.call(topicSelect.options, function (o) {
+        if (o.text.toLowerCase() === wanted.toLowerCase()) topicSelect.value = o.value;
+      });
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!form.reportValidity()) return;
+      if (!validate()) return;
       var d = new FormData(form);
       if (d.get("_honey")) return;
       var subject = "[" + d.get("topic") + "] Message from " + d.get("name");
@@ -231,6 +294,7 @@
         .then(function (ok) {
           if (!ok) return failed();
           form.reset();
+          if (msgCount) msgCount.textContent = "Up to " + msgBox.maxLength.toLocaleString() + " characters";
           note.textContent = "Thank you, your message has been sent. We'll reply as soon as we can.";
         })
         .catch(failed)
@@ -238,6 +302,13 @@
           submit.disabled = false;
           submit.innerHTML = submitLabel;
         });
+    });
+  }
+
+  // Offline support: keep visited pages available on slow or patchy connections
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
     });
   }
 
@@ -286,6 +357,41 @@
     window.addEventListener("resize", focusable);
     update();
     focusable();
+  });
+
+  // FAQ search: filter questions and answers as you type
+  var faqQ = document.getElementById("faq-q");
+  if (faqQ) {
+    var faqItems = Array.prototype.slice.call(document.querySelectorAll(".faq-group details"));
+    var faqCount = document.getElementById("faq-count");
+    var faqEmpty = document.querySelector(".faq-empty");
+    faqQ.addEventListener("input", function () {
+      var words = faqQ.value.toLowerCase().split(/\s+/).filter(Boolean);
+      var shown = 0;
+      faqItems.forEach(function (d) {
+        var text = d.textContent.toLowerCase();
+        var match = words.every(function (w) { return text.indexOf(w) !== -1; });
+        d.hidden = !match;
+        if (match) shown++;
+        // Open the answers when the search narrows things down to a few
+        d.open = words.length > 0 && match && shown <= 3 ? true : (words.length ? false : d.open);
+      });
+      document.querySelectorAll(".faq-group").forEach(function (g) {
+        g.hidden = !g.querySelector("details:not([hidden])");
+      });
+      faqEmpty.hidden = !words.length || shown > 0;
+      faqCount.textContent = words.length ? shown + (shown === 1 ? " question matches" : " questions match") : "";
+    });
+  }
+
+  // Print every FAQ answer, then put the page back as it was
+  var printOpened = [];
+  window.addEventListener("beforeprint", function () {
+    printOpened = Array.prototype.filter.call(document.querySelectorAll(".faq details:not([open])"), function (d) { d.open = true; return true; });
+  });
+  window.addEventListener("afterprint", function () {
+    printOpened.forEach(function (d) { d.open = false; });
+    printOpened = [];
   });
 
   // Live search across every course on the Programs page

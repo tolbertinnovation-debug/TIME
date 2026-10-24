@@ -19,8 +19,8 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=20261024-a11y">
-  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-a11y">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261024-forms">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-forms">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tolbertinnovation-debug.github.io/TIME/"}, {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://tolbertinnovation-debug.github.io/TIME/contact.html"}]}</script>
 </head>
 <body data-page="contact">
@@ -121,10 +121,10 @@
             <h3>Send us a message</h3>
             <p class="muted" style="font-size:.95rem">We'll reply as soon as we can.</p>
             <div class="form-row">
-              <div class="field"><label for="f-name">Full name *</label><input id="f-name" name="name" autocomplete="name" required></div>
-              <div class="field"><label for="f-phone">Phone / WhatsApp</label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+              <div class="field"><label for="f-name">Full name *</label><input id="f-name" name="name" autocomplete="name" maxlength="100" required></div>
+              <div class="field"><label for="f-phone">Phone / WhatsApp</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" maxlength="30"></div>
             </div>
-            <div class="field"><label for="f-email">Email address *</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+            <div class="field"><label for="f-email">Email address *</label><input id="f-email" name="email" type="email" autocomplete="email" maxlength="200" required></div>
             <div class="field"><label for="f-topic">I'm interested in *</label>
               <select id="f-topic" name="topic" required>
                 <option>Registering for a course</option>
@@ -135,7 +135,7 @@
                 <option>General enquiry</option>
               </select>
             </div>
-            <div class="field"><label for="f-msg">Message *</label><textarea id="f-msg" name="message" required></textarea></div>
+            <div class="field"><label for="f-msg">Message *</label><textarea id="f-msg" name="message" maxlength="4000" required aria-describedby="f-msg-count"></textarea><p class="char-count" id="f-msg-count">Up to 4,000 characters</p></div>
             <div class="sr-only" aria-hidden="true"><label for="f-honey">Leave this field empty</label><input id="f-honey" name="_honey" tabindex="-1" autocomplete="off"></div>
             <button class="btn btn-primary" type="submit">Send message <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             <p class="form-note form-status" role="status" aria-live="polite">Your message goes straight to the TIME Inc. office inbox. See our <a href="privacy.html#form">privacy policy</a>.</p>
@@ -174,8 +174,8 @@
           <h2 class="h4">Get Involved</h2>
           <ul>
             <li><a href="donate.html">Donate</a></li>
-            <li><a href="contact.html#support">Volunteer</a></li>
-            <li><a href="contact.html#support">Become a Partner</a></li>
+            <li><a href="contact.html?topic=Volunteering#contact-form">Volunteer</a></li>
+            <li><a href="contact.html?topic=Becoming%20a%20partner#contact-form">Become a Partner</a></li>
             <li><a href="programs.html#register">Register for a Course</a></li>
             <li><a href="contact.html">Contact Us</a></li>
           </ul>
@@ -207,6 +207,6 @@
 
   <aside aria-label="WhatsApp chat"><a class="wa-float" href="https://wa.me/231888901848" target="_blank" rel="noopener" aria-label="Chat with TIME Inc. on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-2.4-1.5 9 9 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.5-.6.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.5 13.5 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.8 17.9L.1 24l6.3-1.6A11.8 11.8 0 0 0 12 23.8 11.8 11.8 0 0 0 20.4 3.6z"/></svg></a></aside>
 
-  <script src="assets/js/main.js?v=20261024-a11y"></script>
+  <script src="assets/js/main.js?v=20261024-forms"></script>
 </body>
 </html>

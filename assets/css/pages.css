@@ -186,6 +186,13 @@ body.nav-open .site-header { transform: none; }
 .faq-more .btn-row { justify-content: center; }
 @media (max-width: 560px) { .faq summary { padding: 16px 48px 16px 18px; } .faq .answer { padding: 0 18px 18px; } .faq-more { padding: 24px 18px; } }
 
+.faq-search { max-width: 820px; margin: 0 auto 40px; }
+.faq-search label { display: block; font-weight: 700; margin-bottom: 8px; }
+.faq-search input { width: 100%; padding: 14px 18px; font: inherit; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+.faq-count { margin: 8px 0 0; font-size: .9rem; color: var(--muted); min-height: 1.4em; }
+.faq-empty { max-width: 820px; margin: 0 auto 40px; padding: 20px 22px; border-radius: 14px; background: var(--white); border: 1px dashed var(--line); }
+.faq-empty a { color: var(--red); font-weight: 600; }
+
 /* Donate */
 .way p a { color: inherit; font-weight: 600; }
 

@@ -19,8 +19,8 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=20261024-a11y">
-  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-a11y">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261024-forms">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261024-forms">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://tolbertinnovation-debug.github.io/TIME/"}, {"@type": "ListItem", "position": 2, "name": "FAQ", "item": "https://tolbertinnovation-debug.github.io/TIME/faq.html"}]}</script>
 </head>
 <body data-page="faq">
@@ -75,6 +75,12 @@
 
     <section class="section faq">
       <div class="wrap">
+        <div class="faq-search" role="search">
+          <label for="faq-q">Search the questions</label>
+          <input id="faq-q" type="search" placeholder="Try &ldquo;installments&rdquo;, &ldquo;online&rdquo; or &ldquo;volunteer&rdquo;" autocomplete="off" aria-describedby="faq-count">
+          <p class="faq-count" id="faq-count" role="status" aria-live="polite"></p>
+        </div>
+        <p class="faq-empty" hidden>No question matches your search. <a href="contact.html#contact-form">Ask us directly</a> or <a href="https://wa.me/231888901848" target="_blank" rel="noopener">message us on WhatsApp</a>.</p>
         <div class="faq-group reveal" id="admissions">
           <h2>Admissions &amp; programs</h2>
           <details><summary>Is TIME Inc. accredited?</summary><div class="answer"><p>Yes. TIME Inc. is an accredited supplementary teacher-training institution under the Bureau of Teacher Education, Ministry of Education (MoE), Liberia. It was established and registered with the Government of Liberia in January 2021.</p></div></details>
@@ -97,15 +103,15 @@
           <h2>Phìtìa Academy (PHICA)</h2>
           <details><summary>What is Phìtìa Academy?</summary><div class="answer"><p>Phìtìa Academy (PHICA) is TIME Inc.&rsquo;s sister school: a government-registered nursery, elementary and junior high school in Tower Hill, Margibi County, founded to support children whose lives were disrupted by the Ebola crisis. <a href="phica.html">Learn more about PHICA</a>.</p></div></details>
           <details><summary>How much does PHICA cost?</summary><div class="answer"><p>Many pupils attend tuition-free or receive significant financial help. Families who can contribute pay US$60 or less (Nursery &ndash; Grade 6).</p></div></details>
-          <details><summary>How do I enrol my child at PHICA?</summary><div class="answer"><p>Visit the school, call <a href="tel:+231777891104">+231 777 891 104</a>, or <a href="contact.html#contact-form">send us a message</a> and choose &ldquo;Phìtìa Academy enrollment&rdquo;.</p></div></details>
+          <details><summary>How do I enrol my child at PHICA?</summary><div class="answer"><p>Visit the school, call <a href="tel:+231777891104">+231 777 891 104</a>, or <a href="contact.html?topic=Ph%C3%ACt%C3%ACa%20Academy%20enrollment#contact-form">send us a message</a> about enrollment.</p></div></details>
         </div>
         <div class="faq-group reveal" id="support">
           <h2>Supporting our work</h2>
           <details><summary>How can I donate?</summary><div class="answer"><p>See <a href="donate.html">Donate</a> for what your gift provides and how to give from Liberia or abroad. The quickest way to start is to <a href="https://wa.me/231888901848?text=Hello%20TIME%20Inc.%2C%20I%20would%20like%20to%20make%20a%20donation." target="_blank" rel="noopener">message us on WhatsApp</a>.</p></div></details>
           <details><summary>What does my donation pay for?</summary><div class="answer"><p>Textbooks, copybooks and pencils for rural schools; benches and chalkboards; scholarships for vulnerable children at Phìtìa Academy; teacher training and salaries; and water and sanitation at PHICA.</p></div></details>
           <details><summary>Can I give books or supplies instead of money?</summary><div class="answer"><p>Yes. Textbooks, copybooks, pencils, reading books, shoes and school supplies all reach children directly. <a href="donate.html#in-kind">See what we need</a>.</p></div></details>
-          <details><summary>Can I volunteer?</summary><div class="answer"><p>Yes. You can join outreach trips, teach a class, mentor students, or lend professional skills in health, finance, media or education. <a href="contact.html#contact-form">Tell us how you would like to help</a>.</p></div></details>
-          <details><summary>Can my organization partner with TIME?</summary><div class="answer"><p>We welcome churches, schools, NGOs, businesses and development partners who want to help scale teacher training and community outreach. <a href="contact.html#contact-form">Get in touch</a>.</p></div></details>
+          <details><summary>Can I volunteer?</summary><div class="answer"><p>Yes. You can join outreach trips, teach a class, mentor students, or lend professional skills in health, finance, media or education. <a href="contact.html?topic=Volunteering#contact-form">Tell us how you would like to help</a>.</p></div></details>
+          <details><summary>Can my organization partner with TIME?</summary><div class="answer"><p>We welcome churches, schools, NGOs, businesses and development partners who want to help scale teacher training and community outreach. <a href="contact.html?topic=Becoming%20a%20partner#contact-form">Get in touch</a>.</p></div></details>
         </div>
         <div class="faq-group reveal" id="contact">
           <h2>Contacting us</h2>
@@ -156,8 +162,8 @@
           <h2 class="h4">Get Involved</h2>
           <ul>
             <li><a href="donate.html">Donate</a></li>
-            <li><a href="contact.html#support">Volunteer</a></li>
-            <li><a href="contact.html#support">Become a Partner</a></li>
+            <li><a href="contact.html?topic=Volunteering#contact-form">Volunteer</a></li>
+            <li><a href="contact.html?topic=Becoming%20a%20partner#contact-form">Become a Partner</a></li>
             <li><a href="programs.html#register">Register for a Course</a></li>
             <li><a href="contact.html">Contact Us</a></li>
           </ul>
@@ -189,6 +195,6 @@
 
   <aside aria-label="WhatsApp chat"><a class="wa-float" href="https://wa.me/231888901848" target="_blank" rel="noopener" aria-label="Chat with TIME Inc. on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-2.4-1.5 9 9 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.5-.6.3-.5c.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.2 3.1 13.5 13.5 0 0 0 5.2 4.6c.7.3 1.3.5 1.7.6a4.2 4.2 0 0 0 1.9.1 3.1 3.1 0 0 0 2-1.4 2.5 2.5 0 0 0 .2-1.4c-.1-.2-.3-.2-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zm8.4-18.2A11.8 11.8 0 0 0 1.8 17.9L.1 24l6.3-1.6A11.8 11.8 0 0 0 12 23.8 11.8 11.8 0 0 0 20.4 3.6z"/></svg></a></aside>
 
-  <script src="assets/js/main.js?v=20261024-a11y"></script>
+  <script src="assets/js/main.js?v=20261024-forms"></script>
 </body>
 </html>

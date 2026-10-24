@@ -57,7 +57,7 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 19 | **Own pages for crowded topics**: Fees & Admissions (`admissions.html`), Leadership & Faculty (`team.html`, with every Cohort #1 lecturer) and Photo Gallery (`gallery.html`) split out of Programs, About and Our Impact. Programs page went from 14 to 8 phone screens; "Admissions" joins the main menu; all old links redirected. | ✅ |
 
-| 20 | **TIME Assistant chat**: a chat button on every page that answers questions about fees, 2027 dates, applying, programs and individual courses, class times, location, accreditation, PHICA, donating and the learning portal, from approved site content (`data/assistant.json`). Questions it can't answer go to WhatsApp with the question filled in. Free to run, no third-party service, works offline, and downloads only when opened (about 9 KB compressed). | ✅ |
+| 20 | **TIME Assistant chat**: a chat button on every page that answers questions about fees, 2027 dates, applying, programs and individual courses, class times, location, accreditation, PHICA, donating and the learning portal, from approved answers (`data/assistant.json`), and answers anything else from the text of every public page (366 passages, `npm run assistant`), with a link to the section it came from. Questions it can't answer go to WhatsApp with the question filled in. Free to run, no third-party service, works offline, and downloads only when opened (about 9 KB compressed). | ✅ |
 
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |

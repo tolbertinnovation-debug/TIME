@@ -1,7 +1,7 @@
 {
   "version": 1,
   "greeting": [
-    "Hello! I'm the TIME Assistant. I can answer questions about our programs, fees, the 2027 intake, class times and how to register.",
+    "Hello! I’m the TIME Assistant. I can answer questions about anything on this website: programs and courses, fees, the 2027 intake, class times, how to register, our founders and lecturers, Phìtìa Academy, outreach and donating.",
     "Pick a topic below or type your question."
   ],
   "quick": [
@@ -142,7 +142,10 @@
         "child school fee",
         "nursery fee",
         "pupil",
-        "academy fee"
+        "academy fee",
+        "school fee",
+        "phica school fee",
+        "phica tuition"
       ],
       "answer": [
         "At Phìtìa Academy (PHICA), many pupils attend tuition-free or receive significant financial help. Families who can contribute pay US$60 or less (Nursery – Grade 6).",
@@ -354,6 +357,68 @@
       ]
     },
     {
+      "id": "founder",
+      "keywords": [
+        "founder",
+        "founders",
+        "co-founder",
+        "founded",
+        "who started",
+        "who owns",
+        "owner",
+        "who runs",
+        "executive director",
+        "director",
+        "established",
+        "establish"
+      ],
+      "answer": [
+        "TIME Inc. was founded by Dr. Philip V. Saywrayne, III (Co-founder & Executive Director), Ms. Tibeh E. Gbassagee (Co-founder, and Principal of Phìtìa Academy) and Ms. Tijue N. Suah (Co-founder, who helped coin the name).",
+        "It was established and registered with the Government of Liberia in January 2021."
+      ],
+      "links": [
+        {
+          "label": "Leadership & Faculty",
+          "href": "team.html#leadership"
+        },
+        {
+          "label": "Dr. Saywrayne’s biography",
+          "href": "founder.html"
+        }
+      ]
+    },
+    {
+      "id": "privacy",
+      "keywords": [
+        "privacy",
+        "private",
+        "data",
+        "personal information",
+        "my information",
+        "my details",
+        "cookie",
+        "cookies",
+        "tracking",
+        "delete my",
+        "safe",
+        "secure"
+      ],
+      "answer": [
+        "Your privacy, in short:",
+        "• The public website uses no cookies, no advertising and no tracking or analytics tools.",
+        "• We only receive personal information you choose to send us: through the contact form, by WhatsApp, phone or email, or by creating a TIME Learning account.",
+        "• We use it to answer you, to run our courses and to keep records of your learning. We do not sell it or share it for marketing.",
+        "• You can ask us to see, correct or delete your information at any time.",
+        "This chat stays in your browser unless you send a message to us on WhatsApp."
+      ],
+      "links": [
+        {
+          "label": "Privacy policy",
+          "href": "privacy.html"
+        }
+      ]
+    },
+    {
       "id": "lecturers",
       "keywords": [
         "lecturer",
@@ -443,7 +508,13 @@
         "employment",
         "collaborate",
         "ngo",
-        "church"
+        "church",
+        "teach at time",
+        "teach with time",
+        "become a lecturer",
+        "work as a lecturer",
+        "teach for you",
+        "teach for time"
       ],
       "answer": [
         "You can join outreach trips, teach a class, mentor students, or lend professional skills in health, finance, media or education. Churches, schools, NGOs, businesses and development partners are welcome to partner with us."
@@ -456,6 +527,10 @@
         {
           "label": "Become a partner",
           "href": "contact.html?topic=Becoming%20a%20partner#contact-form"
+        },
+        {
+          "label": "Teach with TIME",
+          "href": "team.html#teach"
         }
       ]
     },
@@ -471,7 +546,11 @@
         "directions",
         "map",
         "find you",
-        "office"
+        "office",
+        "get there",
+        "how to get",
+        "how do i find",
+        "landmark"
       ],
       "answer": [
         "Classes and registration are at the Phìtìa Academy (PHICA) campus: Slagbaawein Oldfield, Live Smart Community, Tower Hill, behind Christian Aid Ministries, Robertsfield Highway, Margibi County, Liberia.",
@@ -492,7 +571,6 @@
       "id": "schedule",
       "keywords": [
         "schedule",
-        "times",
         "timetable",
         "saturday",
         "weekend",
@@ -660,16 +738,23 @@
     {
       "id": "about",
       "keywords": [
-        "who are you",
-        "what is time",
-        "founder",
-        "history",
-        "mission",
-        "vision",
-        "what do you do",
         "about time",
         "about you",
-        "about the institute"
+        "about the institute",
+        "who are you",
+        "what is time",
+        "history",
+        "story",
+        "how did time start",
+        "how did you start",
+        "how it started",
+        "began",
+        "beginning",
+        "motto",
+        "slogan",
+        "what does time stand for",
+        "stand for",
+        "full name"
       ],
       "answer": [
         "TIME Inc. (Technical Institute for Many Empowerment) is a Liberian, government-registered institution for teacher education, skills training and humanitarian outreach to women, children and rural communities. It was established in January 2021. Our motto: \"When we can help, let us help.\""

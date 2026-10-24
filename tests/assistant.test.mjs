@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { DESKTOP, PHONE, SITE_PAGES, openPage, read, settle, useBrowser } from './helpers.mjs';
+import { buildKnowledge } from '../scripts/assistant-knowledge.mjs';
 
 const axeSource = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 const ctx = useBrowser();
 const data = JSON.parse(read('data/assistant.json'));
+const knowledge = JSON.parse(read('data/assistant-knowledge.json'));
 
 async function openChat(path = 'index.html', viewport = PHONE, options = {}) {
   const page = await openPage(ctx, path, viewport, options);
@@ -61,6 +63,44 @@ test('typed questions are understood', async () => {
   }
   assert.equal(await page.inputValue('#chat-q'), '', 'the box clears after sending');
   await page.close();
+});
+
+test('it answers from anything on the website, with a link to the section', async () => {
+  const page = await openChat();
+  const cases = [
+    ['How many books has Dr. Saywrayne written?', /12 books/, 'founder.html'],
+    ['Who is the principal of PHICA?', /Gbassagee/, ''],
+    ['What is your vision?', /God-given potential/, 'about.html'],
+    ['What happened at Kpehpue Town?', /122/, ''],
+    ['Who teaches drug dispensing?', /Mr\. Bee/, ''],
+    ['Which counties do you serve?', /Grand Bassa/, ''],
+  ];
+  for (const [question, expected, link] of cases) {
+    await page.fill('#chat-q', question);
+    await page.press('#chat-q', 'Enter');
+    await page.locator('.chat-msg.user', { hasText: question }).waitFor();
+    await page.waitForFunction(() => document.querySelector('.chat-log').lastElementChild.classList.contains('bot'));
+    assert.match(await lastReply(page).textContent(), expected, question);
+    if (link) assert.ok(await lastReply(page).locator(`a[href^="${link}"]`).count() >= 1, `${question} links to ${link}`);
+  }
+  await page.fill('#chat-q', 'How much is the diploma?');
+  await page.press('#chat-q', 'Enter');
+  await page.locator('.chat-msg.user', { hasText: 'How much is the diploma?' }).waitFor();
+  await page.waitForFunction(() => document.querySelector('.chat-log').lastElementChild.classList.contains('bot'));
+  const fee = await lastReply(page).textContent();
+  assert.match(fee, /US\$175/);
+  assert.doesNotMatch(fee, /US\$80/, 'only the line that was asked about');
+  await page.close();
+});
+
+test('the website knowledge is up to date and covers every public page', () => {
+  assert.equal(read('data/assistant-knowledge.json'), buildKnowledge(), 'run: npm run assistant');
+  const covered = new Set(knowledge.passages.map((p) => p.u.split(/[?#]/)[0]));
+  for (const file of SITE_PAGES.filter((f) => !['404.html', 'offline.html', 'search.html'].includes(f))) {
+    assert.ok(covered.has(file), `${file} is in the assistant's knowledge`);
+  }
+  assert.doesNotMatch(read('assets/search-index.json'), /<!--|-->/, 'HTML comments (such as placeholder payment numbers) never reach site search');
+  for (const p of knowledge.passages) assert.ok(p.t.length > 0 && p.h.length > 0 && !/[<>]/.test(p.t), `clean passage: ${p.u}`);
 });
 
 test('questions it cannot answer go to a person on WhatsApp with the question filled in', async () => {

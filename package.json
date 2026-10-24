@@ -9,7 +9,8 @@
     "serve": "node tests/serve.mjs",
     "layout": "node scripts/layout.mjs",
     "programs": "node scripts/programs.mjs",
-    "search": "node scripts/search-index.mjs"
+    "search": "node scripts/search-index.mjs",
+    "assistant": "node scripts/assistant-knowledge.mjs"
   },
   "devDependencies": {
     "axe-core": "4.10.3",

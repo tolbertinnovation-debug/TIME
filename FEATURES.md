@@ -42,7 +42,7 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 |---|---|---|
 | 11 | News and events page (needs real dates and items from TIME) | ⛔ |
 | 12 | Graduate testimonials (needs real quotes and permission) | ⛔ |
-| 13 | Shared header and footer generated from one source (today they are copied into each page) | ⏳ |
+| 13 | Shared header and footer kept in one place (`partials/` + `npm run layout`; tests catch drift). This found and fixed a missing "Online Learning" link on the About page. | ✅ |
 
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |

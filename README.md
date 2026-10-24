@@ -18,7 +18,7 @@ A fast, mobile-first static site: plain HTML, CSS and a small JavaScript file. I
 | `donate.html` | What a gift provides, how to give, in-kind donations, where support goes |
 | `faq.html` | Frequently asked questions (admissions, online learning, PHICA, supporting TIME) |
 
-Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (full-size photos plus `thumb-*` versions for grids).
+Assets live in `assets/css/style.css`, `assets/js/main.js`, `assets/fonts/` (self-hosted DM Sans, Manrope and Fraunces, with their licenses) and `assets/img/` (full-size photos plus `thumb-*` versions for grids).
 
 ## Publish on GitHub Pages
 
@@ -26,6 +26,10 @@ Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (fu
 2. In the repository, open **Settings → Pages**.
 3. Under **Build and deployment**, choose **Deploy from a branch**, pick `main` and `/ (root)`, then save.
 4. The site will be live at `https://<username>.github.io/<repo>/` within a minute or two. To use `www.time-liberia.com`, add it under **Custom domain** and point the domain's DNS to GitHub Pages.
+
+## Google Business Profile
+
+See [`GOOGLE_BUSINESS_PROFILE.md`](GOOGLE_BUSINESS_PROFILE.md) for the details to enter and the steps to get TIME Inc. onto Google Maps.
 
 ## Editing
 

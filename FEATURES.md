@@ -59,10 +59,12 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 20 | **TIME Assistant chat**: a chat button on every page that answers questions about fees, 2027 dates, applying, programs and individual courses, class times, location, accreditation, PHICA, donating and the learning portal, from approved answers (`data/assistant.json`), and answers anything else from the text of every public page (366 passages, `npm run assistant`), with a link to the section it came from. Questions it can't answer go to WhatsApp with the question filled in. Free to run, no third-party service, works offline, and downloads only when opened (about 9 KB compressed). | ✅ |
 
+| 21 | **Mobile Money payments and donations**: 0888 901 848 (Lonestar Cell MTN, Philip V. Saywrayne) on Donate, Fees & Admissions, every program page's enrolment steps, the FAQ and the chat. A test keeps the number identical everywhere. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|
-| Mobile Money and online donations | Orange Money and MTN MoMo numbers (account names); a Givebutter, Donorbox or PayPal giving link |
+| Online donations from abroad | A Givebutter, Donorbox or PayPal giving link. (Mobile Money is done: 0888 901 848, Philip V. Saywrayne.) |
 | Google Maps and review links | The verified Google Business Profile links (see `GOOGLE_BUSINESS_PROFILE.md`) |
 | Custom domain (`time-liberia.com`) | Access to the domain's DNS settings |
 | Visitor analytics | A GoatCounter or Cloudflare Web Analytics account (free) |

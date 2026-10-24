@@ -420,3 +420,9 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 }
 @media print { .chat-launcher, .chat { display: none !important; } }
 .chat-msg-head { color: var(--olive-deep); }
+
+/* Mobile Money details on the Donate page */
+.momo { display: flex; flex-direction: column; gap: 2px; margin: 4px 0 6px; padding: 14px 16px; border-radius: var(--radius); background: var(--red-deep); }
+.momo-number { font-size: 1.7rem; font-weight: 800; letter-spacing: .03em; color: var(--white); font-variant-numeric: tabular-nums; }
+.momo-name { font-size: .92rem; color: var(--white); }
+@media print { .momo { background: none; border: 1px solid #bbb; } .momo-number, .momo-name { color: #000; } }

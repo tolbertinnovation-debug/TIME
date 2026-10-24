@@ -31,7 +31,7 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 ## P1: high value
 | # | Feature | Status |
 |---|---|---|
-| 6 | **Offline and slow-network support**: web app manifest (Add to Home Screen) and a service worker that caches the site shell and pages for offline reading. Never caches portal API or auth traffic. | ⏳ |
+| 6 | **Offline and slow-network support**: web app manifest (Add to Home Screen) and a service worker that caches the site shell and pages for offline reading. Never caches portal API or auth traffic. | ✅ |
 | 7 | **Basic security hardening**: Content-Security-Policy and referrer policy on public pages; every `target="_blank"` link has `rel="noopener"` | ⏳ |
 | 8 | **Contact form polish**: inline field errors instead of browser pop-ups, a message length limit with counter, and topic preselected from links such as `contact.html?topic=Volunteering` | ✅ |
 | 9 | **FAQ search**: filter questions as you type, with an empty state | ✅ |

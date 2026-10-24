@@ -214,3 +214,9 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 .crumbs a { text-decoration: underline; text-underline-offset: 3px; }
 .grid.swipe:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
 .card .num { color: #879268; }
+
+/* Offline page */
+.offline-box { text-align: left; }
+.offline-box h1 { font-size: clamp(2rem, 5vw, 3rem); }
+.offline-box h2 { margin-top: 36px; }
+.offline-box a:not(.btn) { color: var(--red); font-weight: 600; }

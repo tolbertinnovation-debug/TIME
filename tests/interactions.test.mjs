@@ -205,3 +205,16 @@ test('the outreach video is self-hosted, light on data and described in text', a
   assert.deepEqual(page.problems, []);
   await page.close();
 });
+
+test('the home page shows the outreach video without downloading it up front', async () => {
+  const page = await openPage(ctx, 'index.html', DESKTOP);
+  const video = page.locator('.home-video video');
+  assert.equal(await video.getAttribute('preload'), 'none');
+  assert.equal(await page.locator('.home-video source').getAttribute('src'), 'assets/video/outreach-2026.mp4');
+  assert.match(await page.locator('#home-video-desc').textContent(), /What the video shows/);
+  assert.equal(await page.locator('.home-video a[href="impact.html#video"]').count(), 1);
+  await page.waitForLoadState('networkidle');
+  assert.ok(await video.isVisible());
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});

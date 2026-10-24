@@ -22,10 +22,10 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 ## P0: required for launch
 | # | Feature | Status |
 |---|---|---|
-| 1 | **Privacy policy page**: what the contact form, WhatsApp links and learning portal collect, where it goes, and how to ask for deletion; linked from every footer, the contact form and the portal | ⏳ |
-| 2 | **Automated tests for the public site** (Playwright and `node:test`): every page loads without errors, internal links and anchors resolve, images load, mobile menu, tabs, course search, lightbox, contact form (success, failure, validation), FAQ | ⏳ |
-| 3 | **Continuous integration**: a GitHub Actions workflow that runs the site tests and backend tests on every pull request and push to `main` | ⏳ |
-| 4 | **Accessibility audit and fixes**: axe-core on every page at phone and desktop sizes; fix contrast, names, landmarks and heading order; keyboard checks | ⏳ |
+| 1 | **Privacy policy page**: what the contact form, WhatsApp links and learning portal collect, where it goes, and how to ask for deletion; linked from every footer, the contact form and the portal | ✅ |
+| 2 | **Automated tests for the public site** (Playwright and `node:test`): every page loads without errors, internal links and anchors resolve, images load, mobile menu, tabs, course search, lightbox, contact form (success, failure, validation), FAQ | ✅ |
+| 3 | **Continuous integration**: a GitHub Actions workflow that runs the site tests and backend tests on every pull request and push to `main` | ✅ |
+| 4 | **Accessibility audit and fixes**: axe-core on every page at phone and desktop sizes; fix contrast, names, landmarks and heading order; keyboard checks | ✅ |
 | 5 | **SEO completeness**: canonical and social tags on `learning.html`, Course and Breadcrumb structured data, sitemap covering every public page, consistent titles | ⏳ |
 
 ## P1: high value

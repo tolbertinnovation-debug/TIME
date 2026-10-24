@@ -276,8 +276,16 @@
       var idx = Math.round(row.scrollLeft / w);
       for (var j = 0; j < dots.children.length; j++) dots.children[j].classList.toggle("on", j === idx);
     }
+    // Make the row keyboard-scrollable only while it actually scrolls (phones)
+    function focusable() {
+      if (row.scrollWidth > row.clientWidth + 1) row.setAttribute("tabindex", "0");
+      else row.removeAttribute("tabindex");
+    }
+    row.setAttribute("aria-label", "Swipe for more");
     row.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", focusable);
     update();
+    focusable();
   });
 
   // Live search across every course on the Programs page

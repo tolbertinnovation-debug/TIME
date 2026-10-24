@@ -72,7 +72,7 @@ main { overflow: clip; }
 .way .btn { margin-top: auto; }
 .story { border-left: 4px solid var(--olive); }
 .timeline li { padding-bottom: 34px; }
-.timeline h4 { line-height: 1.5; }
+.timeline h4, .timeline h3.h4 { line-height: 1.5; }
 .book { box-shadow: 0 5px 20px rgba(23,37,29,.04); }
 .cta::before { background: linear-gradient(100deg,rgba(23,49,28,.97),rgba(23,49,28,.88) 50%,rgba(23,49,28,.4)); }
 .site-footer { border-top: 5px solid #829c46; }
@@ -200,3 +200,10 @@ body.nav-open .site-header { transform: none; }
 .prose.policy a { color: var(--red); font-weight: 600; }
 .footer-bottom a { color: inherit; text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
 .footer-bottom a:hover { color: var(--white); }
+
+/* Accessibility */
+h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
+.footer-brand .brand-name { color: #e8685d; }
+.crumbs a { text-decoration: underline; text-underline-offset: 3px; }
+.grid.swipe:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+.card .num { color: #879268; }

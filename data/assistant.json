@@ -1,0 +1,744 @@
+{
+  "version": 1,
+  "greeting": [
+    "Hello! I'm the TIME Assistant. I can answer questions about our programs, fees, the 2027 intake, class times and how to register.",
+    "Pick a topic below or type your question."
+  ],
+  "quick": [
+    {
+      "label": "Fees",
+      "ask": "How much are the fees?"
+    },
+    {
+      "label": "2027 dates",
+      "ask": "When do classes start?"
+    },
+    {
+      "label": "How to apply",
+      "ask": "How do I register?"
+    },
+    {
+      "label": "Programs",
+      "ask": "What programs do you offer?"
+    },
+    {
+      "label": "Class times",
+      "ask": "When are classes held?"
+    },
+    {
+      "label": "Location",
+      "ask": "Where are you located?"
+    },
+    {
+      "label": "Talk to a person",
+      "ask": "I want to talk to a person"
+    }
+  ],
+  "intents": [
+    {
+      "id": "human",
+      "keywords": [
+        "talk to a person",
+        "speak to someone",
+        "agent",
+        "real person",
+        "call me",
+        "talk to someone",
+        "speak to a person",
+        "customer service",
+        "talk to you",
+        "a human",
+        "talk to a human",
+        "speak to a human"
+      ],
+      "answer": [
+        "Happy to connect you with our team.",
+        "WhatsApp: +231 888 901 848 · Phone: +231 777 891 104 · Email: tinstitute312@gmail.com",
+        "The office is open Monday – Friday, 8:00 AM – 4:00 PM."
+      ],
+      "handoff": true
+    },
+    {
+      "id": "installments",
+      "keywords": [
+        "installment",
+        "instalment",
+        "pay in part",
+        "part payment",
+        "pay small small",
+        "two payment",
+        "pay later"
+      ],
+      "answer": [
+        "Yes, for the \"C\" Certificate in Elementary Education: two equal installments of US$40 (LRD 6,800), the first when you register and the second before the exit examination.",
+        "For other courses, admissions will give you the approved payment schedule. All tuition must be paid before the exit examination."
+      ],
+      "links": [
+        {
+          "label": "Payment rules",
+          "href": "admissions.html#fees"
+        }
+      ]
+    },
+    {
+      "id": "discount",
+      "keywords": [
+        "discount",
+        "scholarship",
+        "free",
+        "reduce",
+        "reduction",
+        "cheaper",
+        "half price",
+        "sponsor",
+        "financial help",
+        "financial aid"
+      ],
+      "answer": [
+        "TIME Inc. may grant a 50% tuition discount, subject to eligibility and approval, to eligible staff of Phìtìa Academy (PHICA), approved groups enrolling together, and students who meet the early-payment conditions.",
+        "The discount covers tuition only, not registration, exam, materials or certificate charges. Confirm your eligibility with admissions before registering."
+      ],
+      "links": [
+        {
+          "label": "Discount details",
+          "href": "admissions.html#fees"
+        }
+      ]
+    },
+    {
+      "id": "other-fees",
+      "keywords": [
+        "registration fee",
+        "application fee",
+        "exam fee",
+        "examination fee",
+        "other fee",
+        "additional",
+        "extra",
+        "hidden",
+        "charges",
+        "materials",
+        "what does tuition cover"
+      ],
+      "answer": [
+        "Besides tuition:",
+        "• Registration/application fee: US$15, where applicable.",
+        "• Exit examination fee: US$10 (LRD 1,700), paid before the examination date.",
+        "Tuition covers instruction only unless stated in writing. Admissions will tell you before you enroll whether materials, exams, certificate processing or internship costs are extra."
+      ],
+      "links": [
+        {
+          "label": "All fees",
+          "href": "admissions.html#fees"
+        }
+      ]
+    },
+    {
+      "id": "phica-fees",
+      "keywords": [
+        "phica fee",
+        "phica cost",
+        "school fees for my child",
+        "child school fee",
+        "nursery fee",
+        "pupil",
+        "academy fee"
+      ],
+      "answer": [
+        "At Phìtìa Academy (PHICA), many pupils attend tuition-free or receive significant financial help. Families who can contribute pay US$60 or less (Nursery – Grade 6).",
+        "To enrol your child, visit the school or call +231 777 891 104."
+      ],
+      "links": [
+        {
+          "label": "About PHICA",
+          "href": "phica.html"
+        }
+      ]
+    },
+    {
+      "id": "certificate",
+      "keywords": [
+        "get my certificate",
+        "graduate",
+        "graduation",
+        "certificate issued",
+        "receive my certificate",
+        "transcript",
+        "exit exam",
+        "examination"
+      ],
+      "answer": [
+        "Certificates and diplomas are issued when all academic, attendance, exam and payment requirements are met.",
+        "All tuition must be paid, and financial clearance obtained, before the exit examination. The exit exam fee is US$10 (LRD 1,700)."
+      ],
+      "links": [
+        {
+          "label": "Payment rules",
+          "href": "admissions.html#fees"
+        }
+      ]
+    },
+    {
+      "id": "online",
+      "keywords": [
+        "online",
+        "distance",
+        "remote",
+        "portal",
+        "learning portal",
+        "e-learning",
+        "elearning",
+        "login",
+        "log in",
+        "sign in",
+        "account",
+        "password",
+        "zoom"
+      ],
+      "answer": [
+        "Special Education Support Training (Cohort #1) is delivered 60% online and 40% in person through the TIME Learning portal.",
+        "To get in: create a student account, verify your email address and request enrolment in your course. Once TIME approves it, your materials, assignments and schedule appear in your account."
+      ],
+      "links": [
+        {
+          "label": "Online Learning",
+          "href": "learning.html"
+        }
+      ]
+    },
+    {
+      "id": "special-education",
+      "keywords": [
+        "special education",
+        "special needs",
+        "inclusive",
+        "disability",
+        "cohort"
+      ],
+      "answer": [
+        "Special Education Support Training (Cohort #1) is a 10-week program delivered 60% online and 40% in person, through the TIME Learning portal. For its fees, ask admissions."
+      ],
+      "links": [
+        {
+          "label": "Special Education",
+          "href": "programs-special-education.html"
+        }
+      ]
+    },
+    {
+      "id": "c-certificate",
+      "keywords": [
+        "c certificate",
+        "\"c\" certificate",
+        "elementary",
+        "teacher certificate",
+        "teaching certificate",
+        "become a teacher",
+        "teacher training"
+      ],
+      "answer": [
+        "The \"C\" Certificate in Elementary Education prepares elementary teachers in core subject areas and professional teaching practice.",
+        "It runs for 9 months and costs US$80 (LRD 13,600), payable in 2 installments of US$40."
+      ],
+      "links": [
+        {
+          "label": "\"C\" Certificate",
+          "href": "programs-c-certificate.html"
+        }
+      ]
+    },
+    {
+      "id": "science-lab",
+      "keywords": [
+        "science",
+        "laboratory",
+        "lab",
+        "senior high",
+        "chemistry",
+        "physics",
+        "biology",
+        "practical"
+      ],
+      "answer": [
+        "Laboratory Practical Training for Senior High Science Teachers runs for 10 weeks, plus a 2-month supervised internship.",
+        "Its tuition is confirmed by the administration before registration."
+      ],
+      "links": [
+        {
+          "label": "Science lab training",
+          "href": "programs-science-lab.html"
+        }
+      ]
+    },
+    {
+      "id": "diploma",
+      "keywords": [
+        "diploma"
+      ],
+      "answer": [
+        "We offer 10 diploma courses. Each runs for 10 weeks and costs US$175 per course (LRD 29,750)."
+      ],
+      "links": [
+        {
+          "label": "Diploma courses",
+          "href": "programs-diploma.html"
+        }
+      ]
+    },
+    {
+      "id": "professional",
+      "keywords": [
+        "professional",
+        "professional certificate",
+        "certificate course",
+        "short course"
+      ],
+      "answer": [
+        "We offer 11 professional certificate courses. Each runs for 10 weeks and costs US$125 per course (LRD 21,250)."
+      ],
+      "links": [
+        {
+          "label": "Professional certificates",
+          "href": "programs-professional.html"
+        },
+        {
+          "label": "Search all courses",
+          "href": "programs.html#courses"
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "keywords": [
+        "skills",
+        "english",
+        "research skills",
+        "records keeping",
+        "record keeping",
+        "writing"
+      ],
+      "answer": [
+        "Skills courses include Standard English, Research Skills and Records Keeping, at US$125 per course (LRD 21,250). Duration is confirmed for each course."
+      ],
+      "links": [
+        {
+          "label": "Skills courses",
+          "href": "programs-skills.html"
+        }
+      ]
+    },
+    {
+      "id": "accredited",
+      "keywords": [
+        "accredited",
+        "accreditation",
+        "recognized",
+        "recognised",
+        "ministry",
+        "moe",
+        "government",
+        "legit",
+        "registered",
+        "license",
+        "licensed",
+        "approved"
+      ],
+      "answer": [
+        "Yes. TIME Inc. is an accredited supplementary teacher-training institution under the Bureau of Teacher Education, Ministry of Education, Liberia. It was established and registered with the Government of Liberia in January 2021."
+      ],
+      "links": [
+        {
+          "label": "About TIME Inc.",
+          "href": "about.html"
+        }
+      ]
+    },
+    {
+      "id": "lecturers",
+      "keywords": [
+        "lecturer",
+        "lecturers",
+        "teacher",
+        "teachers",
+        "instructor",
+        "faculty",
+        "staff",
+        "who teaches",
+        "professor"
+      ],
+      "answer": [
+        "Our lecturers hold qualifications ranging from master's to PhD degrees."
+      ],
+      "links": [
+        {
+          "label": "Leadership & Faculty",
+          "href": "team.html"
+        }
+      ]
+    },
+    {
+      "id": "phica",
+      "keywords": [
+        "phica",
+        "phitia",
+        "academy",
+        "my child",
+        "children school",
+        "nursery",
+        "kindergarten",
+        "junior high",
+        "primary school"
+      ],
+      "answer": [
+        "Phìtìa Academy (PHICA) is TIME Inc.'s sister school: a government-registered nursery, elementary and junior high school in Tower Hill, Margibi County, founded to support children whose lives were disrupted by the Ebola crisis.",
+        "Many pupils attend tuition-free or receive significant help. Families who can contribute pay US$60 or less (Nursery – Grade 6). To enrol a child, visit the school or call +231 777 891 104."
+      ],
+      "links": [
+        {
+          "label": "Phìtìa Academy",
+          "href": "phica.html"
+        }
+      ]
+    },
+    {
+      "id": "donate",
+      "keywords": [
+        "donate",
+        "donation",
+        "give",
+        "giving",
+        "support",
+        "sponsor a child",
+        "contribute",
+        "fund",
+        "help children",
+        "books",
+        "supplies"
+      ],
+      "answer": [
+        "Thank you for wanting to help! Gifts provide textbooks and supplies for rural schools, benches and chalkboards, scholarships at Phìtìa Academy, teacher training and salaries, and water and sanitation at PHICA.",
+        "Books and supplies are welcome too. The quickest way to start is to message us on WhatsApp."
+      ],
+      "links": [
+        {
+          "label": "Donate",
+          "href": "donate.html"
+        },
+        {
+          "label": "Give via WhatsApp",
+          "href": "https://wa.me/231888901848?text=Hello%20TIME%20Inc.%2C%20I%20would%20like%20to%20donate."
+        }
+      ]
+    },
+    {
+      "id": "volunteer",
+      "keywords": [
+        "volunteer",
+        "partner",
+        "partnership",
+        "work with you",
+        "job",
+        "jobs",
+        "vacancy",
+        "employment",
+        "collaborate",
+        "ngo",
+        "church"
+      ],
+      "answer": [
+        "You can join outreach trips, teach a class, mentor students, or lend professional skills in health, finance, media or education. Churches, schools, NGOs, businesses and development partners are welcome to partner with us."
+      ],
+      "links": [
+        {
+          "label": "Volunteer",
+          "href": "contact.html?topic=Volunteering#contact-form"
+        },
+        {
+          "label": "Become a partner",
+          "href": "contact.html?topic=Becoming%20a%20partner#contact-form"
+        }
+      ]
+    },
+    {
+      "id": "location",
+      "keywords": [
+        "where",
+        "location",
+        "located",
+        "address",
+        "campus",
+        "direction",
+        "directions",
+        "map",
+        "find you",
+        "office"
+      ],
+      "answer": [
+        "Classes and registration are at the Phìtìa Academy (PHICA) campus: Slagbaawein Oldfield, Live Smart Community, Tower Hill, behind Christian Aid Ministries, Robertsfield Highway, Margibi County, Liberia.",
+        "Open Monday – Friday, 8:00 AM – 4:00 PM."
+      ],
+      "links": [
+        {
+          "label": "Get directions",
+          "href": "https://www.google.com/maps/search/?api=1&query=Tower+Hill+Robertsfield+Highway+Margibi+Liberia"
+        },
+        {
+          "label": "Contact page",
+          "href": "contact.html"
+        }
+      ]
+    },
+    {
+      "id": "schedule",
+      "keywords": [
+        "schedule",
+        "times",
+        "timetable",
+        "saturday",
+        "weekend",
+        "weekday",
+        "evening",
+        "afternoon",
+        "days",
+        "hours",
+        "what time",
+        "class time",
+        "held",
+        "classes held",
+        "office open",
+        "opening hours"
+      ],
+      "answer": [
+        "Depending on the program, classes run on weekday afternoons, on Saturdays, or both:",
+        "• Weekday track: Monday, Wednesday & Friday, 3:00 PM – 6:00 PM",
+        "• Saturday track: Saturday only, 8:00 AM – 3:00 PM",
+        "Registered students get their exact timetable before classes begin. The office is open Monday – Friday, 8:00 AM – 4:00 PM."
+      ],
+      "links": [
+        {
+          "label": "Class schedule",
+          "href": "admissions.html#schedule"
+        }
+      ]
+    },
+    {
+      "id": "dates",
+      "keywords": [
+        "when",
+        "start",
+        "begin",
+        "deadline",
+        "date",
+        "intake",
+        "next class",
+        "2027",
+        "january",
+        "march",
+        "october",
+        "semester",
+        "resume"
+      ],
+      "answer": [
+        "2027 intake:",
+        "• Registration deadline: Monday, January 4, 2027",
+        "• Classes begin: Monday, March 8, 2027",
+        "• Next intake: Thursday, October 14, 2027",
+        "These dates apply unless TIME Inc. issues an official notice changing them."
+      ],
+      "links": [
+        {
+          "label": "Intake dates",
+          "href": "admissions.html"
+        }
+      ]
+    },
+    {
+      "id": "apply",
+      "keywords": [
+        "register",
+        "registration",
+        "apply",
+        "application",
+        "enroll",
+        "enrol",
+        "enrollment",
+        "enrolment",
+        "admission",
+        "sign up",
+        "join",
+        "requirements",
+        "how do i start"
+      ],
+      "answer": [
+        "How to apply:",
+        "1. Choose your program.",
+        "2. Confirm your fees and timetable with admissions (call or WhatsApp).",
+        "3. Register by January 4, 2027 at the Phìtìa Academy campus, Monday – Friday, 8:00 AM – 4:00 PM, and pay the US$15 registration fee where applicable.",
+        "4. Pay your tuition through an official TIME Inc. payment channel and keep every receipt.",
+        "5. Start classes on March 8, 2027.",
+        "Admissions lines: +231 880 902 568 · +231 776 037 641 · +231 777 714 784 · +231 778 138 548"
+      ],
+      "links": [
+        {
+          "label": "How to apply",
+          "href": "admissions.html#apply"
+        },
+        {
+          "label": "Register on WhatsApp",
+          "href": "https://wa.me/231888901848?text=Hello%20TIME%20Inc.%2C%20I%20would%20like%20to%20register%20for%20a%20course."
+        }
+      ]
+    },
+    {
+      "id": "fees",
+      "keywords": [
+        "fee",
+        "fees",
+        "cost",
+        "price",
+        "tuition",
+        "how much",
+        "pay",
+        "payment",
+        "money",
+        "lrd",
+        "us$",
+        "dollar",
+        "afford"
+      ],
+      "answer": [
+        "Approved tuition fees:",
+        "• \"C\" Certificate in Elementary Education (9 months): US$80 (LRD 13,600), or 2 installments of US$40",
+        "• Professional certificate courses: US$125 per course (LRD 21,250)",
+        "• Diploma courses: US$175 per course (LRD 29,750)",
+        "• Skills courses (Standard English, Research Skills, Records Keeping): US$125 per course (LRD 21,250)",
+        "• Science lab training: confirmed by the administration before registration",
+        "Other fees: registration US$15 where applicable, and the exit exam US$10 (LRD 1,700). A 50% tuition discount may apply if you qualify."
+      ],
+      "links": [
+        {
+          "label": "Full fee table",
+          "href": "admissions.html#fees"
+        }
+      ]
+    },
+    {
+      "id": "programs",
+      "keywords": [
+        "program",
+        "programs",
+        "programme",
+        "course",
+        "courses",
+        "study",
+        "offer",
+        "learn",
+        "class",
+        "classes",
+        "subjects"
+      ],
+      "answer": [
+        "We offer:",
+        "• \"C\" Certificate in Elementary Education (9 months)",
+        "• Laboratory Practical Training for Senior High Science Teachers (10 weeks + internship)",
+        "• 11 professional certificate courses (10 weeks each)",
+        "• 10 diploma courses (10 weeks each)",
+        "• Skills courses: Standard English, Research Skills, Records Keeping",
+        "• Special Education Support Training (60% online)"
+      ],
+      "links": [
+        {
+          "label": "All programs",
+          "href": "programs.html"
+        },
+        {
+          "label": "Ask about a course",
+          "href": "https://wa.me/231888901848?text=Hello%20TIME%20Inc.%2C%20I%20have%20a%20question%20about%20a%20course."
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "keywords": [
+        "who are you",
+        "what is time",
+        "founder",
+        "history",
+        "mission",
+        "vision",
+        "what do you do",
+        "about time",
+        "about you",
+        "about the institute"
+      ],
+      "answer": [
+        "TIME Inc. (Technical Institute for Many Empowerment) is a Liberian, government-registered institution for teacher education, skills training and humanitarian outreach to women, children and rural communities. It was established in January 2021. Our motto: \"When we can help, let us help.\""
+      ],
+      "links": [
+        {
+          "label": "About us",
+          "href": "about.html"
+        },
+        {
+          "label": "Our founder",
+          "href": "founder.html"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "keywords": [
+        "contact",
+        "phone",
+        "number",
+        "email",
+        "whatsapp",
+        "reach",
+        "call"
+      ],
+      "answer": [
+        "Call +231 777 891 104, WhatsApp +231 888 901 848, or email tinstitute312@gmail.com.",
+        "Admissions lines: +231 880 902 568 · +231 776 037 641 · +231 777 714 784 · +231 778 138 548"
+      ],
+      "links": [
+        {
+          "label": "Contact form",
+          "href": "contact.html#contact-form"
+        }
+      ]
+    },
+    {
+      "id": "greeting",
+      "keywords": [
+        "hello",
+        "hi",
+        "hey",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "greetings"
+      ],
+      "answer": [
+        "Hello! How can I help you today? You can ask about fees, the 2027 intake, programs, class times or how to register."
+      ]
+    },
+    {
+      "id": "thanks",
+      "keywords": [
+        "thank",
+        "thanks",
+        "thank you",
+        "ok thanks",
+        "bye",
+        "goodbye"
+      ],
+      "answer": [
+        "You're welcome! If you need anything else, I'm here. When we can help, let us help."
+      ]
+    }
+  ],
+  "fallback": "I'm not sure about that one yet. Our team can answer it for you on WhatsApp, or you can send a message.",
+  "related": "This might help:",
+  "course": "Yes, we offer {course}, part of our {program} courses.",
+  "notListed": "I couldn’t find that on our course list. You can browse all our programs, or ask our team whether it’s available."
+}

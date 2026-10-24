@@ -1,0 +1,15 @@
+{
+  "name": "time-website",
+  "private": true,
+  "type": "module",
+  "description": "Automated checks for the TIME Inc. static website. The learning portal backend has its own package in backend/.",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 \"tests/*.test.mjs\"",
+    "test:backend": "npm --prefix backend test",
+    "serve": "node tests/serve.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.63.0"
+  }
+}

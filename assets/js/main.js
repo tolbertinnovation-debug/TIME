@@ -175,7 +175,7 @@
 
   // Contact form: deliver through FormSubmit (the site is static, so there is no server of our own).
   // If that fails, offer the visitor a prepared email or WhatsApp message instead.
-  var form = document.getElementById("contact-form");
+  var form = document.querySelector("form#contact-form");
   if (form) {
     var to = form.getAttribute("data-to");
     var note = form.querySelector(".form-status");
@@ -276,8 +276,16 @@
       var idx = Math.round(row.scrollLeft / w);
       for (var j = 0; j < dots.children.length; j++) dots.children[j].classList.toggle("on", j === idx);
     }
+    // Make the row keyboard-scrollable only while it actually scrolls (phones)
+    function focusable() {
+      if (row.scrollWidth > row.clientWidth + 1) row.setAttribute("tabindex", "0");
+      else row.removeAttribute("tabindex");
+    }
+    row.setAttribute("aria-label", "Swipe for more");
     row.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", focusable);
     update();
+    focusable();
   });
 
   // Live search across every course on the Programs page

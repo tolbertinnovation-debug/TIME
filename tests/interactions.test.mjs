@@ -187,3 +187,21 @@ test('news filters show one topic at a time and can return to all stories', asyn
   assert.equal(await page.locator('.news-item:not([hidden])').count(), total);
   await page.close();
 });
+
+test('the outreach video is self-hosted, light on data and described in text', async () => {
+  const page = await openPage(ctx, 'impact.html#video', PHONE);
+  const video = page.locator('#video video');
+  assert.equal(await video.getAttribute('preload'), 'none', 'nothing downloads until play is pressed');
+  assert.ok(await video.getAttribute('controls') !== null);
+  assert.match(await page.locator('#video-desc').textContent(), /What the video shows/);
+  assert.equal(await video.getAttribute('aria-describedby'), 'video-desc');
+  for (const src of [await video.getAttribute('poster'), await page.locator('#video source').getAttribute('src')]) {
+    const r = await page.request.get(`${ctx.url}/${src}`);
+    assert.equal(r.status(), 200, src);
+  }
+  const size = (await page.request.get(`${ctx.url}/assets/video/outreach-2026.mp4`)).body().then((b) => b.length);
+  assert.ok((await size) < 4 * 1024 * 1024, 'video stays under 4 MB for visitors on mobile data');
+  assert.ok(await page.locator('#video video').isVisible());
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});

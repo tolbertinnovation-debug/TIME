@@ -2,7 +2,7 @@
 // already visited, and shows a helpful offline page otherwise.
 // The TIME Learning study guides are cached like the rest of the site so students can keep studying
 // offline. The account workspace (sign-in, courses, submissions, grades) is never cached.
-const VERSION = "2026-10-24-9";
+const VERSION = "2026-10-24-10";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 const IMAGES = "images-v1";
@@ -10,8 +10,8 @@ const MAX_IMAGES = 80;
 
 const CORE = [
   "./", "index.html", "programs.html", "admissions.html", "contact.html", "faq.html", "offline.html",
-  "assets/css/style.css?v=20261024-momo", "assets/css/pages.css?v=20261024-momo", "assets/js/main.js?v=20261024-momo",
-  "assets/js/assistant.js?v=20261024-momo", "data/assistant.json",
+  "assets/css/style.css?v=20261024-video", "assets/css/pages.css?v=20261024-video", "assets/js/main.js?v=20261024-video",
+  "assets/js/assistant.js?v=20261024-video", "data/assistant.json",
   "assets/fonts/dm-sans-latin.woff2", "assets/fonts/manrope-latin.woff2", "assets/img/time-logo-128.png",
 ];
 

@@ -40,7 +40,7 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 ## P2: nice to have
 | # | Feature | Status |
 |---|---|---|
-| 11 | News and events page (needs real dates and items from TIME) | ⛔ |
+| 11 | News and events page: 7 stories drawn from facts already on the site, topic filters, the recurring registration and class schedule, and a WhatsApp sign-up. Exact dates for undated items and upcoming events are still needed from TIME. | ✅ |
 | 12 | Graduate testimonials (needs real quotes and permission) | ⛔ |
 | 13 | Shared header and footer kept in one place (`partials/` + `npm run layout`; tests catch drift). This found and fixed a missing "Online Learning" link on the About page. | ✅ |
 

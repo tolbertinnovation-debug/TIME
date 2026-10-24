@@ -170,3 +170,20 @@ test('"Join our team" and "Become a partner" preselect the form topic', async ()
   assert.equal(await page.inputValue('#f-topic'), 'Volunteering');
   await page.close();
 });
+
+test('news filters show one topic at a time and can return to all stories', async () => {
+  const page = await openPage(ctx, 'news.html', PHONE);
+  const items = page.locator('.news-item');
+  const total = await items.count();
+  assert.ok(total >= 5);
+  await page.click('.news-filter[data-filter="outreach"]');
+  assert.equal(await page.getAttribute('.news-filter[data-filter="outreach"]', 'aria-pressed'), 'true');
+  assert.equal(await page.getAttribute('.news-filter[data-filter="all"]', 'aria-pressed'), 'false');
+  const shown = await page.locator('.news-item:not([hidden])').count();
+  assert.ok(shown > 0 && shown < total);
+  assert.equal(await page.locator('.news-item:not([hidden]):not([data-category="outreach"])').count(), 0);
+  assert.match(await page.locator('.news-count').textContent(), /stor(y|ies) about Outreach/);
+  await page.click('.news-filter[data-filter="all"]');
+  assert.equal(await page.locator('.news-item:not([hidden])').count(), total);
+  await page.close();
+});

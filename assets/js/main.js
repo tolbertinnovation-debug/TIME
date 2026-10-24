@@ -384,6 +384,26 @@
     });
   }
 
+  // News: filter stories by topic
+  var newsFilters = document.querySelectorAll(".news-filter");
+  if (newsFilters.length) {
+    var newsItems = document.querySelectorAll(".news-item");
+    var newsCount = document.querySelector(".news-count");
+    Array.prototype.forEach.call(newsFilters, function (btn) {
+      btn.addEventListener("click", function () {
+        var cat = btn.getAttribute("data-filter");
+        var shown = 0;
+        Array.prototype.forEach.call(newsFilters, function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+        Array.prototype.forEach.call(newsItems, function (item) {
+          var match = cat === "all" || item.getAttribute("data-category") === cat;
+          item.hidden = !match;
+          if (match) shown++;
+        });
+        newsCount.textContent = cat === "all" ? "" : shown + (shown === 1 ? " story" : " stories") + " about " + btn.textContent;
+      });
+    });
+  }
+
   // Print every FAQ answer, then put the page back as it was
   var printOpened = [];
   window.addEventListener("beforeprint", function () {

@@ -17,18 +17,18 @@ test('program pages are up to date with data/programs.json (run `npm run program
 test('program page course lists match the Programs page', () => {
   const programs = read('programs.html');
   for (const p of DATA) {
-    let onPage;
-    if (p.panel === 'cohort-1') {
-      const section = programs.slice(programs.indexOf('id="cohort-1"'), programs.indexOf('</section>', programs.indexOf('id="cohort-1"')));
-      onPage = [...section.matchAll(/<article class="card[^"]*">[\s\S]*?<h3>([\s\S]*?)<\/h3>/g)].map((m) => decode(m[1]));
-    } else {
-      const start = programs.indexOf(`id="${p.panel}"`);
-      const list = programs.slice(programs.indexOf('<ul class="course-list">', start), programs.indexOf('</ul>', start));
-      onPage = [...list.matchAll(/<li><span class="n">\d+<\/span><span>([^<]*)/g)].map((m) => decode(m[1]));
-    }
-    assert.deepEqual(p.courses.map((c) => c.name), onPage, p.slug);
     assert.ok(programs.includes(`href="${p.file}"`), `programs.html links to ${p.file}`);
+    if (p.panel === 'cohort-1') continue; // Cohort #1 lives on its own page (data/programs.json is the source)
+    const start = programs.indexOf(`id="${p.panel}"`);
+    const list = programs.slice(programs.indexOf('<ul class="course-list">', start), programs.indexOf('</ul>', start));
+    const onPage = [...list.matchAll(/<li><span class="n">\d+<\/span><span>([^<]*)/g)].map((m) => decode(m[1]));
+    assert.deepEqual(p.courses.map((c) => c.name), onPage, p.slug);
   }
+});
+
+test('every Cohort #1 lecturer is listed on the Leadership & Faculty page', () => {
+  const team = read('team.html');
+  for (const c of DATA.find((p) => p.slug === 'special-education').courses) assert.ok(team.includes(`<h3>${c.lecturer}</h3>`), c.lecturer);
 });
 
 test('the search index is up to date (run `npm run search`)', () => {
@@ -107,8 +107,8 @@ test('typing updates results and the address without reloading', async () => {
   await page.close();
 });
 
-test('tuition on each program page matches the fee table on the Programs page', () => {
-  const programs = read('programs.html');
+test('tuition on each program page matches the fee table on the Admissions page', () => {
+  const programs = read('admissions.html');
   const table = programs.slice(programs.indexOf('<table class="fee-table">'), programs.indexOf('</table>'));
   for (const p of DATA) {
     const row = table.match(new RegExp(`<tr><th scope="row"><a href="${p.file}">[\\s\\S]*?</tr>`))?.[0];
@@ -126,7 +126,7 @@ test('tuition on each program page matches the fee table on the Programs page', 
 
 test('the 2027 intake dates are the same everywhere they appear', () => {
   const dates = { '2027-01-04': /January 4|Jan 4/, '2027-03-08': /March 8|Mar 8/, '2027-10-14': /October 14|Oct 14/ };
-  for (const file of ['programs.html', 'faq.html', 'news.html', 'index.html', ...DATA.filter((p) => !p.online).map((p) => p.file)]) {
+  for (const file of ['admissions.html', 'programs.html', 'faq.html', 'news.html', 'index.html', ...DATA.filter((p) => !p.online).map((p) => p.file)]) {
     const html = read(file);
     for (const [iso, words] of Object.entries(dates)) {
       for (const m of html.matchAll(new RegExp(`<time datetime="${iso}">([^<]*)</time>`, 'g'))) assert.match(m[1], words, `${file}: ${m[1]}`);

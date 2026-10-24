@@ -458,7 +458,7 @@ h4 { font-size: 1.1rem; }
 .person.ink .avatar { background: var(--ink); }
 .person .avatar.photo-avatar { overflow: hidden; }
 .person .avatar.photo-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-.person .role { font-family: var(--font-label); letter-spacing: .1em; text-transform: uppercase; font-size: .78rem; font-weight: 700; color: var(--red); margin-bottom: 8px; display: block; }
+.person .role, .faculty-card .role { font-family: var(--font-label); letter-spacing: .1em; text-transform: uppercase; font-size: .78rem; font-weight: 700; color: var(--red); margin-bottom: 8px; display: block; }
 
 /* ---------- Gallery ---------- */
 .gallery { columns: 3 280px; column-gap: 16px; }

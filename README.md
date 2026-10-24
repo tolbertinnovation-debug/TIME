@@ -11,9 +11,12 @@ A fast, mobile-first static site: plain HTML, CSS and a small JavaScript file. I
 | `index.html` | Home: hero, impact stats, what we do, programs, PHICA, stories, founder |
 | `about.html` | History of TIME Inc., mission, vision, values, founders |
 | `founder.html` | Biography of Dr. Philip V. Saywrayne, III |
-| `programs.html` | All certificate & diploma courses, schedules, registration |
+| `programs.html` | Program overview (links to each program page), why TIME, course search |
 | `phica.html` | Phìtìa Academy profile, needs and appeal |
 | `impact.html` | Focus areas, success stories, photo gallery |
+| `admissions.html` | Fees & admissions: 2027 dates, fee table, other fees, discounts, payment rules, how to apply, class schedules, where to register |
+| `team.html` | Leadership & faculty: founders, PHICA principal, Cohort #1 lecturers |
+| `gallery.html` | Photo gallery with the full-screen viewer |
 | `programs-*.html` | One page per program (generated from `data/programs.json`) |
 | `search.html` | Site search across pages, courses and FAQ answers |
 | `news.html` | News & events: stories with topic filters, registration and class schedule |

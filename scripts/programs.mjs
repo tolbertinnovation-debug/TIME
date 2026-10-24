@@ -1,5 +1,5 @@
 // Builds one page per program (programs-*.html) from data/programs.json.
-// The page head, class schedule and shared layout come from programs.html and partials/,
+// The page head comes from programs.html, the class schedule from admissions.html and the layout from partials/,
 // so the program pages always match the rest of the site.
 // `npm run programs` writes the pages; `npm run programs -- --check` reports stale ones (used by the tests).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -219,8 +219,9 @@ function head(base, p) {
 
 export function build(p) {
   const base = readFileSync(join(ROOT, 'programs.html'), 'utf8');
-  const i = base.indexOf('<div class="schedule">');
-  const schedule = base.slice(i, base.indexOf('</div>\n        </div>', i) + '</div>\n        </div>'.length);
+  const admissions = readFileSync(join(ROOT, 'admissions.html'), 'utf8');
+  const i = admissions.indexOf('<div class="schedule">');
+  const schedule = admissions.slice(i, admissions.indexOf('</div>\n        </div>', i) + '</div>\n        </div>'.length);
   const [top, rest] = base.split('<main id="main">');
   const bottom = rest.slice(rest.indexOf('</main>'));
   const page = head(top.slice(0, top.indexOf('</head>') + 7), p) + top.slice(top.indexOf('</head>') + 7).replace('data-page="programs"', 'data-page="program"')

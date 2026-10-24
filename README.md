@@ -15,6 +15,8 @@ A fast, mobile-first static site: plain HTML, CSS and a small JavaScript file. I
 | `phica.html` | Phìtìa Academy profile, needs and appeal |
 | `impact.html` | Focus areas, success stories, photo gallery |
 | `contact.html` | Donate / volunteer / partner, contact details, message form |
+| `donate.html` | What a gift provides, how to give, in-kind donations, where support goes |
+| `faq.html` | Frequently asked questions (admissions, online learning, PHICA, supporting TIME) |
 
 Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (full-size photos plus `thumb-*` versions for grids).
 
@@ -29,5 +31,7 @@ Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (fu
 
 - **Text:** open the page's `.html` file and edit the text between the tags.
 - **Photos:** add a JPG to `assets/img/` (ideally no wider than 1600px) and point an `<img src="...">` at it, with `width` and `height` set to the photo's pixel size. For gallery items, also add a smaller `thumb-` copy. Pages serve smaller WebP copies from `assets/img/webp/` (`name-480.webp`, `name-960.webp`, `name-1600.webp`) through a `<picture>` tag; copy the markup of an existing photo and create the WebP files for new ones (for example with `cwebp -q 72 -resize 960 0 photo.jpg -o webp/photo-960.webp`). Without them the JPG still shows, just more slowly.
+- **Donating:** to add Mobile Money numbers or an online giving link, copy one of the "way" boxes under *How to give* in `donate.html` (there is a commented example there).
+- **FAQ:** each question in `faq.html` is a `<details>` block. When you add or change one, update the matching entry in the `FAQPage` data at the bottom of the page so Google shows the same answer.
 - **Contact details** appear in the top bar and footer of every page, and on `contact.html` and `programs.html`.
 - **Contact form:** messages are delivered to `tinstitute312@gmail.com` through [FormSubmit](https://formsubmit.co), a free service that needs no account. The **first** message sent after publishing triggers an "Activate Form" email to that inbox; click the link once and every message after that arrives directly. Until then, and whenever sending fails, visitors are offered a prepared email or WhatsApp message instead. To change the receiving address, edit `data-to` on the form in `contact.html`.

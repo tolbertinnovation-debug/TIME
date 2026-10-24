@@ -127,14 +127,15 @@
     lb.innerHTML =
       '<button class="lb-btn lb-close" aria-label="Close">&times;</button>' +
       '<button class="lb-btn lb-prev" aria-label="Previous photo">&#8249;</button>' +
-      '<figure><img alt=""><figcaption></figcaption></figure>' +
+      '<figure><picture><source type="image/webp" sizes="100vw"><img alt=""></picture><figcaption></figcaption></figure>' +
       '<button class="lb-btn lb-next" aria-label="Next photo">&#8250;</button>';
     document.body.appendChild(lb);
-    var img = lb.querySelector("img"), cap = lb.querySelector("figcaption"), idx = 0, lastFocus = null;
+    var img = lb.querySelector("img"), webp = lb.querySelector("source"), cap = lb.querySelector("figcaption"), idx = 0, lastFocus = null;
 
     function show(i) {
       idx = (i + items.length) % items.length;
       var it = items[idx];
+      webp.srcset = it.getAttribute("data-lightbox-webp") || "";
       img.src = it.getAttribute("data-lightbox");
       img.alt = it.getAttribute("data-alt") || "";
       cap.textContent = it.getAttribute("data-caption") || "";
@@ -172,23 +173,71 @@
     });
   }
 
-  // Contact form: compose an email (the site is static, so there is no server to post to)
+  // Contact form: deliver through FormSubmit (the site is static, so there is no server of our own).
+  // If that fails, offer the visitor a prepared email or WhatsApp message instead.
   var form = document.getElementById("contact-form");
   if (form) {
+    var to = form.getAttribute("data-to");
+    var note = form.querySelector(".form-status");
+    var submit = form.querySelector("button[type='submit']");
+    var submitLabel = submit.innerHTML;
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
       var d = new FormData(form);
+      if (d.get("_honey")) return;
       var subject = "[" + d.get("topic") + "] Message from " + d.get("name");
       var body =
         d.get("message") + "\n\n" +
         "— " + d.get("name") + "\n" +
         (d.get("phone") ? "Phone: " + d.get("phone") + "\n" : "") +
         "Email: " + d.get("email");
-      window.location.href = "mailto:" + form.getAttribute("data-to") +
-        "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-      var note = form.querySelector(".form-status");
-      if (note) note.textContent = "Your email app should now open with your message ready to send. If it doesn't, write to us directly at " + form.getAttribute("data-to") + ".";
+
+      function failed() {
+        note.innerHTML = "";
+        note.appendChild(document.createTextNode("We couldn't send your message just now. Please "));
+        var mail = document.createElement("a");
+        mail.href = "mailto:" + to + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        mail.textContent = "send it by email";
+        note.appendChild(mail);
+        note.appendChild(document.createTextNode(" or "));
+        var wa = document.createElement("a");
+        wa.href = "https://wa.me/231888901848?text=" + encodeURIComponent(subject + "\n\n" + body);
+        wa.target = "_blank";
+        wa.rel = "noopener";
+        wa.textContent = "on WhatsApp";
+        note.appendChild(wa);
+        note.appendChild(document.createTextNode("."));
+      }
+
+      submit.disabled = true;
+      submit.textContent = "Sending…";
+      note.textContent = "";
+      fetch("https://formsubmit.co/ajax/" + to, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: d.get("name"),
+          email: d.get("email"),
+          phone: d.get("phone"),
+          topic: d.get("topic"),
+          message: d.get("message"),
+          _subject: subject,
+          _replyto: d.get("email"),
+          _template: "table"
+        })
+      })
+        .then(function (r) { return r.json().then(function (j) { return r.ok && String(j.success) === "true"; }); })
+        .then(function (ok) {
+          if (!ok) return failed();
+          form.reset();
+          note.textContent = "Thank you, your message has been sent. We'll reply as soon as we can.";
+        })
+        .catch(failed)
+        .then(function () {
+          submit.disabled = false;
+          submit.innerHTML = submitLabel;
+        });
     });
   }
 

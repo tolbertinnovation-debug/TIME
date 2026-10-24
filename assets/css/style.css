@@ -49,6 +49,7 @@ body {
 }
 
 img { max-width: 100%; height: auto; display: block; }
+picture { display: contents; }
 a { color: var(--olive-deep); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 a:hover { color: var(--red); }
 p { margin: 0 0 1.1em; }

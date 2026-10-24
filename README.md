@@ -28,6 +28,6 @@ Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (fu
 ## Editing
 
 - **Text:** open the page's `.html` file and edit the text between the tags.
-- **Photos:** add a JPG to `assets/img/` (ideally no wider than 1600px) and point an `<img src="...">` at it. For gallery items, also add a smaller `thumb-` copy.
+- **Photos:** add a JPG to `assets/img/` (ideally no wider than 1600px) and point an `<img src="...">` at it, with `width` and `height` set to the photo's pixel size. For gallery items, also add a smaller `thumb-` copy. Pages serve smaller WebP copies from `assets/img/webp/` (`name-480.webp`, `name-960.webp`, `name-1600.webp`) through a `<picture>` tag; copy the markup of an existing photo and create the WebP files for new ones (for example with `cwebp -q 72 -resize 960 0 photo.jpg -o webp/photo-960.webp`). Without them the JPG still shows, just more slowly.
 - **Contact details** appear in the top bar and footer of every page, and on `contact.html` and `programs.html`.
-- **Contact form:** the site is static, so the form opens the visitor's email app with the message already written, addressed to `tinstitute312@gmail.com`. To receive messages directly instead, point the form at a service such as Formspree.
+- **Contact form:** messages are delivered to `tinstitute312@gmail.com` through [FormSubmit](https://formsubmit.co), a free service that needs no account. The **first** message sent after publishing triggers an "Activate Form" email to that inbox; click the link once and every message after that arrives directly. Until then, and whenever sending fails, visitors are offered a prepared email or WhatsApp message instead. To change the receiving address, edit `data-to` on the form in `contact.html`.

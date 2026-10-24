@@ -8,10 +8,7 @@ A fast, mobile-first static site: plain HTML, CSS and a small JavaScript file. I
 
 | File | Content |
 | --- | --- |
-| `index.html` | Entry point: four choices (A. TIME Inc., B. Phìtìa Academy, C. Consultation, D. Books & Publications) |
-| `time.html` | TIME Inc.: hero, impact stats, what we do, programs, stories, founder |
-| `consultation.html` | Consultation: education and agriculture |
-| `books.html` | Book production, sales & publications |
+| `index.html` | Home: hero, impact stats, what we do, programs, PHICA, stories, founder |
 | `about.html` | History of TIME Inc., mission, vision, values, founders |
 | `founder.html` | Biography of Dr. Philip V. Saywrayne, III |
 | `programs.html` | Program overview (links to each program page), why TIME, course search |

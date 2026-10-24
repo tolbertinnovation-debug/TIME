@@ -1,3 +1,8 @@
+/* Self-hosted fonts (SIL Open Font License, see assets/fonts/). Latin subset only. */
+@font-face { font-family: "DM Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(../fonts/dm-sans-latin.woff2) format("woff2"); }
+@font-face { font-family: "Manrope"; font-style: normal; font-weight: 500 800; font-display: swap; src: url(../fonts/manrope-latin.woff2) format("woff2"); }
+@font-face { font-family: "Fraunces"; font-style: italic; font-weight: 500; font-display: swap; src: url(../fonts/fraunces-italic-500-latin.woff2) format("woff2"); }
+
 /* ==========================================================================
    TIME Inc. — Technical Institute for Many Empowerment
    Palette is drawn from the TIME logo (olive roof, red wordmark, black type)

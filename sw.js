@@ -1,7 +1,7 @@
 // Service worker: lets visitors on slow or patchy connections reopen pages they have
 // already visited, and shows a helpful offline page otherwise.
 // The learning portal (accounts, courses, uploads) is never cached: it always uses the network.
-const VERSION = "2026-10-24-3";
+const VERSION = "2026-10-24-4";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 const IMAGES = "images-v1";
@@ -9,7 +9,7 @@ const MAX_IMAGES = 80;
 
 const CORE = [
   "./", "index.html", "programs.html", "contact.html", "faq.html", "offline.html",
-  "assets/css/style.css?v=20261024-news", "assets/css/pages.css?v=20261024-news", "assets/js/main.js?v=20261024-news",
+  "assets/css/style.css?v=20261024-search", "assets/css/pages.css?v=20261024-search", "assets/js/main.js?v=20261024-search",
   "assets/fonts/dm-sans-latin.woff2", "assets/fonts/manrope-latin.woff2", "assets/img/time-logo-128.png",
 ];
 
@@ -45,6 +45,17 @@ async function page(request) {
   }
 }
 
+// Data such as the search index: use the latest copy, fall back to the saved one offline.
+async function data(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) (await caches.open(PAGES)).put(request, response.clone());
+    return response;
+  } catch {
+    return (await caches.match(request)) || Response.error();
+  }
+}
+
 // Versioned CSS/JS and fonts never change at the same URL: serve from cache when present.
 async function asset(request) {
   const cached = await caches.match(request);
@@ -76,6 +87,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   if (request.mode === "navigate") return event.respondWith(page(request));
+  if (url.pathname.endsWith(".json")) return event.respondWith(data(request));
   if (/\.(css|js|woff2)$/.test(url.pathname)) return event.respondWith(asset(request));
   if (/\.(jpg|jpeg|png|webp|svg)$/.test(url.pathname)) return event.respondWith(image(request));
 });

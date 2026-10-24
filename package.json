@@ -7,7 +7,9 @@
     "test": "node --test --test-concurrency=1 \"tests/*.test.mjs\"",
     "test:backend": "npm --prefix backend test",
     "serve": "node tests/serve.mjs",
-    "layout": "node scripts/layout.mjs"
+    "layout": "node scripts/layout.mjs",
+    "programs": "node scripts/programs.mjs",
+    "search": "node scripts/search-index.mjs"
   },
   "devDependencies": {
     "axe-core": "4.10.3",

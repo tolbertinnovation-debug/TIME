@@ -261,3 +261,51 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 .event p { margin: 0 0 8px; color: var(--ink-2); }
 @media (max-width: 640px) { .event { grid-template-columns: 1fr; gap: 8px; padding: 20px; } }
 @media print { .news-filters, .news-count { display: none !important; } .news-item[hidden] { display: block !important; } }
+
+/* Program pages */
+.program-overview { align-items: start; }
+.h3-size { font-size: clamp(1.4rem, 2.6vw, 1.8rem); margin-top: 32px; }
+.program-facts { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow); }
+.program-facts dl { margin: 0 0 24px; display: grid; gap: 0; }
+.program-facts dl div { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.program-facts dt { font-family: var(--font-label); text-transform: uppercase; letter-spacing: .1em; font-size: .74rem; font-weight: 700; color: var(--olive-deep); margin-bottom: 4px; }
+.program-facts dd { margin: 0; font-weight: 600; }
+.program-facts .btn-row { flex-direction: column; align-items: stretch; }
+.program-facts .btn { justify-content: center; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; counter-reset: none; }
+.step { display: flex; gap: 20px; align-items: flex-start; padding: 22px 24px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.step-n { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--olive-deep); color: var(--white); font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; }
+.step p { margin: 0; color: var(--ink-2); }
+.step a, .callout a, .program-overview a:not(.btn) { color: var(--red); font-weight: 600; }
+.faq-more-link { max-width: 820px; margin: 0 auto; }
+.faq-more-link a { color: var(--red); font-weight: 600; }
+.program-link { display: inline-flex; margin-top: 10px; }
+@media (max-width: 560px) { .step { padding: 18px; gap: 14px; } .program-facts { padding: 22px; } }
+
+/* Site search */
+.site-header .brand { margin-right: auto; }
+.search-link { flex: none; display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; color: var(--ink); border: 1px solid var(--line); background: var(--white); }
+.search-link svg { width: 20px; height: 20px; }
+.search-link:hover { color: var(--red); border-color: var(--red); }
+.search-link:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+@media (min-width: 1181px) { .search-link { order: 3; } .site-header .nav { order: 2; } }
+.site-search label { display: block; font-weight: 700; margin-bottom: 8px; }
+.site-search-row { display: flex; gap: 10px; }
+.site-search-row input { flex: 1; min-width: 0; padding: 14px 18px; font: inherit; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+.site-search-row input:focus { outline: none; border-color: var(--olive); box-shadow: 0 0 0 4px rgba(127,140,28,.16); }
+.search-status { margin: 14px 0 18px; color: var(--muted); min-height: 1.4em; }
+.search-results { list-style: none; margin: 0 0 40px; padding: 0; display: grid; gap: 12px; }
+.search-results li { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+.search-results a { font-weight: 700; font-size: 1.08rem; color: var(--ink); text-decoration: none; }
+.search-results a:hover, .search-results a:focus-visible { color: var(--red); text-decoration: underline; }
+.search-type { display: inline-block; margin-left: 8px; font-family: var(--font-label); font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--olive-deep); vertical-align: middle; }
+.search-results p { margin: 6px 0 0; color: var(--ink-2); font-size: .95rem; }
+.search-results mark { background: #f3f0b8; color: inherit; padding: 0 2px; border-radius: 3px; }
+.search-suggest ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.search-suggest a { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink); text-decoration: none; font-weight: 600; font-size: .92rem; }
+.search-suggest a:hover { border-color: var(--red); color: var(--red); }
+@media (max-width: 420px) { .site-search-row { flex-direction: column; } }
+@media print { .search-link, .site-search, .search-suggest { display: none !important; } }
+/* Make room for the search button on mid-size screens */
+.brand-name { white-space: nowrap; }
+@media (min-width: 1181px) and (max-width: 1340px) { .site-header .brand-sub { display: none; } }

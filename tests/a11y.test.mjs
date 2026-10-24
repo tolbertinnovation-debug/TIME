@@ -7,7 +7,8 @@ import { DESKTOP, PHONE, SITE_PAGES, openPage, settle, useBrowser } from './help
 const axeSource = readFileSync(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
 const ctx = useBrowser();
 
-for (const file of SITE_PAGES) {
+// learning.html is the public study portal; the sign-in pages depend on the live account service.
+for (const file of [...SITE_PAGES, 'learning.html']) {
   for (const [label, viewport] of [['phone', PHONE], ['desktop', DESKTOP]]) {
     test(`${file} has no WCAG 2.1 A/AA violations on ${label}`, async () => {
       // bypassCSP lets the audit script be injected; it does not change how the page renders.

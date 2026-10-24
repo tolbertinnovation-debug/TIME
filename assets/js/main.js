@@ -175,7 +175,7 @@
 
   // Contact form: deliver through FormSubmit (the site is static, so there is no server of our own).
   // If that fails, offer the visitor a prepared email or WhatsApp message instead.
-  var form = document.getElementById("contact-form");
+  var form = document.querySelector("form#contact-form");
   if (form) {
     var to = form.getAttribute("data-to");
     var note = form.querySelector(".form-status");

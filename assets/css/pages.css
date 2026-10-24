@@ -188,3 +188,15 @@ body.nav-open .site-header { transform: none; }
 
 /* Donate */
 .way p a { color: inherit; font-weight: 600; }
+
+/* Text-only page hero (privacy) and policy text */
+.page-hero-plain::before { background: linear-gradient(110deg, #17251d 0%, #23382b 100%); }
+.page-hero-plain .lead { max-width: 60ch; }
+.policy-section { scroll-margin-top: 110px; }
+.policy-section + .policy-section { margin-top: 40px; padding-top: 36px; border-top: 1px solid var(--line); }
+.prose.policy h2 { font-size: clamp(1.4rem, 2.6vw, 1.8rem); margin-top: 0; }
+.prose.policy ul:not(.check-list) { padding-left: 22px; color: var(--ink-2); }
+.prose.policy li { margin-bottom: 8px; }
+.prose.policy a { color: var(--red); font-weight: 600; }
+.footer-bottom a { color: inherit; text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
+.footer-bottom a:hover { color: var(--white); }

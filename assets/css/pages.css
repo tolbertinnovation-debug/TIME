@@ -475,3 +475,14 @@ a.card.area-link { display: block; text-decoration: none; color: var(--ink); tra
 a.card.area-link:hover { transform: translateY(-3px); }
 a.card.area-link p { color: var(--muted); margin-bottom: 0; }
 .area-more { margin-top: 28px; }
+
+/* Books page: featured books with covers */
+.book-features { display: grid; gap: clamp(28px, 4vw, 48px); }
+.book-feature { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: center; padding: clamp(20px, 3vw, 32px); background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+.book-feature picture { display: block; }
+.book-feature img { display: block; width: 100%; height: auto; border-radius: var(--radius); }
+.book-feature h3 { margin: 0 0 4px; }
+.book-sub { margin: 0 0 14px; font-weight: 700; color: var(--red-deep); }
+.book-status { font-size: .9rem; color: var(--muted); }
+.book-more { margin-top: clamp(24px, 3vw, 36px); }
+@media (max-width: 760px) { .book-feature { grid-template-columns: 1fr; } .book-feature picture { max-width: 240px; } }

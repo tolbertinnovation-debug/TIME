@@ -250,3 +250,17 @@ test('area pages link to the contact form with a matching topic', async () => {
     await page.close();
   }
 });
+
+test('the books page shows both book covers with order buttons', async () => {
+  const page = await openPage(ctx, 'books.html', PHONE);
+  await settle(page);
+  const books = page.locator('.book-feature');
+  assert.equal(await books.count(), 2);
+  for (const [i, title] of [[0, 'Mastering School Leadership'], [1, 'The Pains, Sorrows, and Disappointments in Marriage']]) {
+    assert.match(await books.nth(i).locator('h3').textContent(), new RegExp(title));
+    assert.ok(await books.nth(i).locator('img').evaluate((img) => img.complete && img.naturalWidth > 0), `${title} cover loads`);
+    assert.match(await books.nth(i).locator('a[href^="https://wa.me/"]').getAttribute('href'), /order/);
+  }
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});

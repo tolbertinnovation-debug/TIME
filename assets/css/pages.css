@@ -557,3 +557,51 @@ a.card.area-link p { color: var(--muted); margin-bottom: 0; }
 }
 @media print { .bh-stage { display: none; } .books-hero { background: none; aspect-ratio: auto; } .bh-card { background: none; } }
 .book-feature { scroll-margin-top: 110px; }
+
+/* About page hero: classroom photo with slow zoom, light sweep and floating badges */
+.about-hero { min-height: clamp(560px, 82vh, 780px); display: flex; align-items: flex-end; padding: clamp(110px, 14vw, 160px) 0 clamp(40px, 6vw, 72px); }
+.about-hero { background: #0c140e; }
+.about-hero .bg { left: 0; }
+.about-hero .bg img { opacity: 1; object-position: center 30%; animation: ahZoom 22s ease-in-out infinite alternate; transform-origin: 40% 35%; }
+.about-hero::before { background: linear-gradient(90deg, rgba(12,20,14,.88) 0%, rgba(12,20,14,.62) 42%, rgba(12,20,14,.15) 75%), linear-gradient(0deg, rgba(12,20,14,.85) 0%, rgba(12,20,14,0) 45%); }
+.ah-light { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255,236,170,.16) 45%, transparent 60%); background-size: 250% 100%; animation: ahSweep 9s ease-in-out infinite; mix-blend-mode: screen; }
+.ah-grid { width: 100%; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: end; }
+.about-hero h1 { max-width: 14ch; }
+.about-hero h1 em { font-style: normal; color: #e3ec8f; background: linear-gradient(90deg, #c9d65a, #e3ec8f) no-repeat 0 92% / 0% 8px; padding-bottom: 4px; animation: ahUnderline 1.1s .9s cubic-bezier(.2,.7,.2,1) forwards; }
+.about-hero .lead { max-width: 52ch; }
+.about-hero .btn-row { margin-top: 26px; }
+.ah-text > * { animation: ahUp .8s cubic-bezier(.2,.7,.2,1) both; }
+.ah-text > :nth-child(2) { animation-delay: .08s; }
+.ah-text > :nth-child(3) { animation-delay: .16s; }
+.ah-text > :nth-child(4) { animation-delay: .28s; }
+.ah-text > :nth-child(5) { animation-delay: .4s; }
+.ah-badges { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; justify-items: end; }
+.ah-badge { display: flex; align-items: center; gap: 12px; max-width: 290px; padding: 14px 18px; border-radius: 18px; background: rgba(14,22,16,.55); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 16px 40px rgba(0,0,0,.35); animation: ahPop .7s cubic-bezier(.2,.8,.2,1.2) both, ahFloat 6s ease-in-out infinite; }
+.ah-badge strong { font-family: var(--font-display); font-size: 1.7rem; line-height: 1; color: #e3ec8f; }
+.ah-badge span { font-size: .9rem; line-height: 1.35; color: rgba(255,255,255,.92); }
+.ah-b1 { animation-delay: .6s, 1.3s; }
+.ah-b2 { animation-delay: .8s, 1.5s; margin-right: 36px; animation-duration: .7s, 7s; }
+.ah-b3 { animation-delay: 1s, 1.7s; animation-duration: .7s, 8s; }
+@keyframes ahZoom { from { transform: scale(1); } to { transform: scale(1.08); } }
+@keyframes ahSweep { 0%, 100% { background-position: 120% 0; } 50% { background-position: -20% 0; } }
+@keyframes ahUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes ahUnderline { to { background-size: 100% 8px; } }
+@keyframes ahPop { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes ahFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@media (max-width: 900px) {
+  .about-hero { --ph: min(76vw, 560px); min-height: 0; padding: calc(var(--ph) - 70px) 0 36px; align-items: flex-start; }
+  .about-hero .bg { inset: 0 0 auto 0; height: var(--ph); }
+  .about-hero .bg img { object-position: center 35%; }
+  .about-hero::before { background: linear-gradient(180deg, rgba(12,20,14,0) 0, rgba(12,20,14,0) calc(var(--ph) - 190px), #0c140e calc(var(--ph) - 10px), #0c140e 100%); }
+  .ah-light { height: var(--ph); }
+  .ah-grid { grid-template-columns: 1fr; }
+  .ah-badges { grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: stretch; gap: 8px; }
+  .ah-badge { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 12px; max-width: none; margin: 0 !important; }
+  .ah-badge strong { font-size: 1.3rem; }
+  .ah-badge span { font-size: .74rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-hero .bg img, .ah-light, .ah-text > *, .ah-badge { animation: none !important; }
+  .about-hero h1 em { animation: none; background-size: 100% 8px; }
+}
+@media print { .ah-light, .ah-badges { display: none; } }

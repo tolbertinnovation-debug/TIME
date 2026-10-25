@@ -438,3 +438,6 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 .home-video { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); margin-bottom: clamp(36px, 5vw, 56px); }
 .home-video h3 { margin-top: 0; }
 @media (max-width: 900px) { .home-video { grid-template-columns: 1fr; } }
+.chat-links a.chat-live { display: inline-flex; align-items: center; gap: 6px; background: #0e7a3d; border-color: #0e7a3d; color: var(--white); }
+.chat-links a.chat-live:hover { background: #0a6331; }
+.chat-links a.chat-live svg { width: 16px; height: 16px; }

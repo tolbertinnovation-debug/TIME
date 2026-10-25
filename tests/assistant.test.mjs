@@ -103,13 +103,15 @@ test('the website knowledge is up to date and covers every public page', () => {
   for (const p of knowledge.passages) assert.ok(p.t.length > 0 && p.h.length > 0 && !/[<>]/.test(p.t), `clean passage: ${p.u}`);
 });
 
-test('questions it cannot answer go to a person on WhatsApp with the question filled in', async () => {
+test('questions it cannot answer go to a live WhatsApp chat with the question filled in', async () => {
   const page = await openChat();
   await page.fill('#chat-q', 'Do you offer nursing?');
   await page.click('.chat-send');
   const wa = lastReply(page).locator('a[href^="https://wa.me/231888901848"]');
   await wa.waitFor();
   assert.match(await wa.getAttribute('href'), /text=.*nursing/);
+  assert.equal((await wa.textContent()).trim(), 'Chat live on WhatsApp');
+  assert.equal(await wa.getAttribute('class'), 'chat-live', 'shown as the main button');
   assert.equal(await wa.getAttribute('target'), '_blank');
   assert.equal(await wa.getAttribute('rel'), 'noopener');
   assert.equal(await lastReply(page).locator('a[href*="contact.html"]').count(), 1);
@@ -131,6 +133,18 @@ test('the official Mobile Money number is the same on every page and in the chat
   await page.press('#chat-q', 'Enter');
   await page.locator('.chat-msg.user', { hasText: 'How do I pay?' }).waitFor();
   assert.match(await lastReply(page).textContent(), /0888 901 848[\s\S]*Philip V\. Saywrayne/);
+  await page.close();
+});
+
+test('anything unrecognised offers a live WhatsApp chat', async () => {
+  const page = await openChat();
+  for (const question of ['qwerty zxcv', 'Do you do agriculture consultation?', 'I want to talk to a person']) {
+    await page.fill('#chat-q', question);
+    await page.press('#chat-q', 'Enter');
+    await page.locator('.chat-msg.user', { hasText: question }).waitFor();
+    await page.waitForFunction(() => document.querySelector('.chat-log').lastElementChild.classList.contains('bot'));
+    assert.equal(await lastReply(page).locator('a.chat-live[href^="https://wa.me/231888901848"]').count(), 1, question);
+  }
   await page.close();
 });
 

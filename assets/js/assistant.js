@@ -51,7 +51,7 @@
   }
   function handoffLinks(question) {
     return [
-      { label: "Ask on WhatsApp", href: whatsapp(question) },
+      { label: "Chat live on WhatsApp", href: whatsapp(question), live: true },
       { label: "Send a message", href: "contact.html?topic=General%20enquiry#contact-form" }
     ];
   }
@@ -142,7 +142,7 @@
     return {
       head: top.h,
       lines: [excerpt(top.t, focus || [], 440)],
-      links: links.concat([{ label: "Ask on WhatsApp", href: whatsapp(question) }]),
+      links: links.concat([{ label: "Chat live on WhatsApp", href: whatsapp(question), live: true }]),
       intent: "site"
     };
   }
@@ -234,6 +234,17 @@
 
   // --- rendering -------------------------------------------------------------------
 
+  var SVG = "http://www.w3.org/2000/svg";
+  function waIcon() {
+    var svg = document.createElementNS(SVG, "svg"), path = document.createElementNS(SVG, "path");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    path.setAttribute("fill", "currentColor");
+    path.setAttribute("d", "M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .1-3.2-.7-2.7-1.1-4.4-3.8-4.6-4-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.2 1.4z");
+    svg.appendChild(path);
+    return svg;
+  }
+
   function render(msg) {
     var box = el("div", "chat-msg " + msg.who);
     if (msg.who === "user") box.appendChild(el("p", "", msg.text));
@@ -245,8 +256,9 @@
       var list = el("ul", "chat-links");
       msg.links.forEach(function (link) {
         if (!/^(https:\/\/|[a-z0-9-]+\.html)/.test(link.href)) return;
-        var li = el("li"), a = el("a", "", link.label);
+        var li = el("li"), a = el("a", link.live ? "chat-live" : "", link.label);
         a.href = link.href;
+        if (link.live) a.insertBefore(waIcon(), a.firstChild);
         if (/^https:/.test(link.href)) { a.target = "_blank"; a.rel = "noopener"; }
         li.appendChild(a);
         list.appendChild(li);

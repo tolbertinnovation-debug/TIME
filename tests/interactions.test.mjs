@@ -218,3 +218,35 @@ test('the home page shows the outreach video without downloading it up front', a
   assert.deepEqual(page.problems, []);
   await page.close();
 });
+
+test('the home page has four area buttons, each leading to its own page', async () => {
+  const page = await openPage(ctx, 'index.html', PHONE);
+  const links = page.locator('.areas a.area');
+  assert.equal(await links.count(), 4);
+  const expected = [
+    ['time-inc.html', /TIME Inc\.[\s\S]*rolling basis[\s\S]*Registration is in progress/],
+    ['phica.html', /Phìtìa Academy/],
+    ['consultation.html', /Consultation[\s\S]*Education[\s\S]*Agriculture/],
+    ['books.html', /Book Production, Sales & Publications/],
+  ];
+  for (let i = 0; i < 4; i++) {
+    assert.equal(await links.nth(i).getAttribute('href'), expected[i][0]);
+    assert.match(await links.nth(i).textContent(), expected[i][1]);
+  }
+  await links.nth(2).click();
+  await page.waitForURL(/consultation\.html$/);
+  assert.match(await page.locator('h1').textContent(), /Consultation/);
+  assert.ok(await page.locator('#education').isVisible() && await page.locator('#agriculture').count() === 1);
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});
+
+test('area pages link to the contact form with a matching topic', async () => {
+  for (const [file, topic] of [['consultation.html', 'Education consultation'], ['consultation.html', 'Agriculture consultation'], ['books.html', 'Books and publications']]) {
+    const page = await openPage(ctx, file, PHONE);
+    const href = await page.locator(`a[href^="contact.html?topic=${encodeURIComponent(topic)}"]`).first().getAttribute('href');
+    await page.goto(`${ctx.url}/${href}`);
+    assert.equal(await page.inputValue('#f-topic'), topic, `${file} → ${topic}`);
+    await page.close();
+  }
+});

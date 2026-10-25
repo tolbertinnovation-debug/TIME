@@ -441,3 +441,37 @@ h2.h4, h3.h4 { font-size: 1.1rem; line-height: 1.12; margin-bottom: .5em; }
 .chat-links a.chat-live { display: inline-flex; align-items: center; gap: 6px; background: #0e7a3d; border-color: #0e7a3d; color: var(--white); }
 .chat-links a.chat-live:hover { background: #0a6331; }
 .chat-links a.chat-live svg { width: 16px; height: 16px; }
+
+/* Home page: the four areas (TIME Inc., PHICA, Consultation, Books) */
+.areas { padding: clamp(28px, 4vw, 44px) 0 clamp(20px, 3vw, 32px); }
+.areas-title { font-size: clamp(1.25rem, 2.2vw, 1.6rem); margin: 0 0 16px; letter-spacing: -.02em; }
+.areas-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.area { display: flex; align-items: flex-start; gap: 12px; height: 100%; padding: 18px 16px; border-radius: var(--radius); background: var(--olive-deep); color: var(--white); text-decoration: none; box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease; }
+.area:hover, .area:focus-visible { transform: translateY(-3px); box-shadow: var(--shadow-lg); color: var(--white); }
+.area.navy { background: var(--navy); }
+.area.red { background: var(--red-deep); }
+.area.ink { background: var(--ink); }
+.area-letter { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--white); color: var(--ink); font: 800 1.15rem/1 var(--font-body); }
+.area-body { flex: 1; min-width: 0; }
+.area-title { display: block; font-weight: 800; font-size: 1.08rem; line-height: 1.25; margin: 2px 0 8px; }
+.area-go { flex: none; align-self: center; }
+.area .area-ticks li { color: var(--white); font-size: .9rem; }
+.area-ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.area-ticks li { display: flex; gap: 8px; align-items: flex-start; line-height: 1.4; }
+.area-ticks svg { flex: none; width: 18px; height: 18px; margin-top: 2px; color: #9fd36b; }
+.card .area-ticks svg, .split .area-ticks svg { color: #2f8a3e; }
+@media (max-width: 1100px) { .areas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .areas-grid { grid-template-columns: 1fr; } .area { padding: 14px; } }
+@media print { .areas { display: none; } }
+
+/* Area pages */
+.area-date-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 12px; }
+.area-date-list li { padding: 12px 14px; border-radius: var(--radius); background: var(--olive-soft); }
+.area-date-label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--olive-deep); }
+.area-date-list time { font-weight: 700; font-size: 1.05rem; color: var(--ink); }
+.split .area-ticks { margin: 16px 0 22px; }
+.split .area-ticks li { font-size: 1.02rem; }
+a.card.area-link { display: block; text-decoration: none; color: var(--ink); transition: transform .2s ease; }
+a.card.area-link:hover { transform: translateY(-3px); }
+a.card.area-link p { color: var(--muted); margin-bottom: 0; }
+.area-more { margin-top: 28px; }

@@ -29,7 +29,7 @@ The TIME Inc. website is a tested, accessible, secure, offline-capable site, liv
 | **Security** | A Content-Security-Policy and referrer policy on public pages (no inline or third-party scripts), and `noopener` on every new-tab link. |
 | **Print** | Programs, Admissions, FAQ, Donate and Privacy print cleanly. |
 | **Maintainability** | The shared header, menu, footer and contact bars live in `partials/` (`npm run layout`), and program pages and the search index are generated (`npm run programs`, `npm run search`). Tests fail if any of these fall out of date. README covers editing, testing and asset versioning. |
-| **Tests and CI** | 197 browser and static tests (`npm test`) covering rendering, links, interactions, forms, accessibility, SEO data, fees and dates consistency, layout sync, search, the chat assistant, offline behaviour and print. GitHub Actions runs them, plus the portal's 174 backend tests and build, on every pull request and push to `main`. |
+| **Tests and CI** | 198 browser and static tests (`npm test`) covering rendering, links, interactions, forms, accessibility, SEO data, fees and dates consistency, layout sync, search, the chat assistant, offline behaviour and print. GitHub Actions runs them, plus the portal's 174 backend tests and build, on every pull request and push to `main`. |
 
 Every change went through a pull request with green CI, was merged, and was checked on the live site.
 
@@ -45,7 +45,7 @@ These can't be done without your information or accounts. Details are in `FEATUR
 
 ## Worth reviewing at TIME Inc.
 - Agriculture consultation details (what is offered and for whom); the page currently invites enquiries only.
-- The other nine book titles, prices, and whether TIME produces books for other authors.
+- The other ten book titles, prices, and whether TIME produces books for other authors.
 - Rolling enrollment is shown alongside the January 4, 2027 deadline for the March start.
 - The signature and approval lines on the fee schedule were blank in the copy provided. It was published as final.
 - The LRD amounts for the US$125 and US$175 courses are calculated at US$1 = LRD 170. The schedule only states LRD amounts for the "C" Certificate and the exam fee.

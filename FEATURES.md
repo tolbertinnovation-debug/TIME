@@ -63,6 +63,8 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 22 | **Outreach video** on the home page ("Stories from the field") and Our Impact (`#video`), linked from the Photo Gallery: self-hosted MP4 compressed from 5.2 MB to 3 MB, downloads only when play is pressed, with a poster image and a text description of what it shows. | ✅ |
 
+| 23 | **Four areas on the home page**: "Where would you like to go?" buttons for A. TIME Inc. (rolling enrollment, registration in progress), B. Phìtìa Academy, C. Consultation (Education, Agriculture) and D. Book Production, Sales & Publications. Each opens a page with only that area: `time-inc.html`, `phica.html`, `consultation.html`, `books.html`. Footer links and contact-form topics added. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

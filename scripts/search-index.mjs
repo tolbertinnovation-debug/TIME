@@ -41,6 +41,14 @@ export function buildIndex() {
         description: `${p.name.replace(/"/g, '“')}. ${p.summary}${c.lecturer ? ` Lecturer: ${c.lecturer}.` : ''}`, headings: [p.short], text: '' });
     }
   }
+  // Each featured book is its own result, linking straight to it on the Books page.
+  const books = readFileSync(join(ROOT, 'books.html'), 'utf8');
+  for (const m of books.matchAll(/<article class="book-feature[^"]*" id="([^"]+)">([\s\S]*?)<\/article>/g)) {
+    const title = text(m[2].match(/<h3>([\s\S]*?)<\/h3>/)[1]);
+    const sub = text(m[2].match(/<p class="book-sub">([\s\S]*?)<\/p>/)?.[1] || '');
+    const about = [...m[2].matchAll(/<p>([\s\S]*?)<\/p>/g)].map((x) => text(x[1])).join(' ');
+    entries.push({ type: 'book', url: `books.html#${m[1]}`, title, description: `${sub ? `${sub}. ` : ''}By Dr. Philip V. Saywrayne, III. ${about}`.slice(0, 300), headings: ['Books', 'Publications'], text: '' });
+  }
   const faq = readFileSync(join(ROOT, 'faq.html'), 'utf8');
   for (const m of faq.matchAll(/<details><summary>([\s\S]*?)<\/summary><div class="answer">([\s\S]*?)<\/div><\/details>/g)) {
     const q = text(m[1]);

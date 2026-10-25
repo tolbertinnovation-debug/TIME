@@ -413,7 +413,7 @@
     var searchStatus = document.getElementById("search-status");
     var searchIndex = null;
     var fold = function (s) { return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); };
-    var LABELS = { page: "Page", course: "Course", faq: "Question" };
+    var LABELS = { page: "Page", course: "Course", faq: "Question", book: "Book" };
 
     function highlight(el, str, words) {
       var parts = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).filter(Boolean);

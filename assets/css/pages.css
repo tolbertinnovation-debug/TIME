@@ -556,3 +556,4 @@ a.card.area-link p { color: var(--muted); margin-bottom: 0; }
   .bh-petals { display: none; }
 }
 @media print { .bh-stage { display: none; } .books-hero { background: none; aspect-ratio: auto; } .bh-card { background: none; } }
+.book-feature { scroll-margin-top: 110px; }

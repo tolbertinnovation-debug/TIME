@@ -864,8 +864,8 @@
       ]
     }
   ],
-  "fallback": "I'm not sure about that one yet. Our team can answer it for you on WhatsApp, or you can send a message.",
+  "fallback": "I don’t have the answer to that yet, but our team does. Tap “Chat live on WhatsApp” to talk to a real person: your question will already be typed in for you.",
   "related": "This might help:",
   "course": "Yes, we offer {course}, part of our {program} courses.",
-  "notListed": "I couldn’t find that on our course list. You can browse all our programs, or ask our team whether it’s available."
+  "notListed": "I couldn’t find that on our course list. Browse all our programs, or chat live with our team on WhatsApp to ask whether it’s available."
 }

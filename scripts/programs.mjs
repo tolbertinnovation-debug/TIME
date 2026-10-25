@@ -19,7 +19,7 @@ const WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
 // Responsive photo markup using the WebP sizes generated for every photo.
 function photo(name, alt, sizes, extra = '') {
   const widths = [480, 960, 1600];
-  const html = readFileSync(join(ROOT, 'impact.html'), 'utf8') + readFileSync(join(ROOT, 'index.html'), 'utf8') + readFileSync(join(ROOT, 'about.html'), 'utf8');
+  const html = ['impact.html', 'index.html', 'about.html', 'gallery.html'].map((f) => readFileSync(join(ROOT, f), 'utf8')).join('');
   const srcset = html.match(new RegExp(`srcset="([^"]*webp/${name}-480\\.webp[^"]*)"`))?.[1]
     || widths.map((w) => `assets/img/webp/${name}-${w}.webp ${w}w`).filter((c) => existsSync(join(ROOT, c.split(' ')[0]))).join(', ');
   const dims = html.match(new RegExp(`src="assets/img/${name}\\.jpg" width="(\\d+)" height="(\\d+)"`));
@@ -82,13 +82,18 @@ function main(p, schedule) {
         </div>`
     : `        <p class="lead reveal">Training schedules vary by program. Confirm the duration and timetable for your course with admissions.</p>\n        ${schedule}`;
   return `
-    <section class="page-hero">
-      <div class="bg">${photo(p.image, '', '100vw', ' style="object-position:center 35%"')}</div>
-      <div class="wrap">
-        <p class="crumbs"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="programs.html">Programs</a> &nbsp;/&nbsp; ${esc(plain(p.short))}</p>
-        <span class="eyebrow light">${esc(p.category)}</span>
-        <h1>${name}</h1>
-        <p class="lead">${esc(p.lead)}</p>
+    <section class="page-hero hero-plus">
+      <div class="hp-glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="wrap hp-grid">
+        <div class="hp-text">
+          <p class="crumbs"><a href="index.html">Home</a> &nbsp;/&nbsp; <a href="programs.html">Programs</a> &nbsp;/&nbsp; ${esc(plain(p.short))}</p>
+          <span class="eyebrow light">${esc(p.category)}</span>
+          <h1>${name}</h1>
+          <p class="lead">${esc(p.lead)}</p>
+          <div class="btn-row"><a class="btn btn-light" href="#enrol">How to enrol ${ARROW}</a><a class="btn btn-outline-light" href="https://wa.me/231888901848?text=${encodeURIComponent(`Hello TIME Inc., I would like to know more about ${plain(p.short)}.`)}" target="_blank" rel="noopener">Ask on WhatsApp</a></div>
+          <ul class="hp-facts">${p.facts.slice(0, 2).map(([k, v]) => `<li><strong>${esc(k)}</strong><span>${esc(v.split(' (')[0].split(', in ')[0])}</span></li>`).join('')}</ul>
+        </div>
+        <figure class="hp-photo">${photo(p.image, p.imageAlt, '(max-width: 900px) 100vw, 460px', ' fetchpriority="high"')}<figcaption class="hp-chip">${esc(p.credential)}</figcaption></figure>
       </div>
     </section>
     <nav class="page-links" aria-label="Explore this page"><div class="wrap"><span class="page-links-label">On this page</span><a href="#overview">Overview</a><a href="#courses">Courses</a><a href="#schedule">${p.online ? 'Delivery' : 'Schedule'}</a><a href="#enrol">How to enrol</a><a href="#questions">Questions</a></div></nav>

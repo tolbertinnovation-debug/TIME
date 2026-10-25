@@ -561,6 +561,64 @@
     if (tick()) var timer = setInterval(function () { if (!tick()) clearInterval(timer); }, 30000);
   });
 
+  // Reading progress bar and a back-to-top button
+  var progress = document.createElement("div");
+  progress.className = "scroll-progress";
+  progress.setAttribute("aria-hidden", "true");
+  var toTop = document.createElement("button");
+  toTop.type = "button";
+  toTop.className = "to-top";
+  toTop.setAttribute("aria-label", "Back to top");
+  toTop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  document.body.appendChild(progress);
+  document.body.appendChild(toTop);
+  var progressTick = false;
+  function updateProgress() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ")";
+    toTop.classList.toggle("show", window.scrollY > 900);
+    progressTick = false;
+  }
+  window.addEventListener("scroll", function () { if (!progressTick) { progressTick = true; requestAnimationFrame(updateProgress); } }, { passive: true });
+  updateProgress();
+  toTop.addEventListener("click", function () {
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    var skip = document.querySelector(".skip-link");
+    if (skip) skip.focus({ preventScroll: true });
+  });
+
+  // "On this page" links highlight the section in view
+  var pageLinks = document.querySelector(".page-links .wrap");
+  if (pageLinks && "IntersectionObserver" in window) {
+    var spyLinks = Array.prototype.filter.call(pageLinks.querySelectorAll('a[href^="#"]'), function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        spyLinks.forEach(function (a) {
+          var on = a.getAttribute("href") === "#" + entry.target.id;
+          if (on) {
+            a.setAttribute("aria-current", "location");
+            var left = a.offsetLeft - pageLinks.clientWidth / 2 + a.clientWidth / 2;
+            if (pageLinks.scrollWidth > pageLinks.clientWidth) pageLinks.scrollTo({ left: left, behavior: "smooth" });
+          } else a.removeAttribute("aria-current");
+        });
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    spyLinks.forEach(function (a) { spy.observe(document.getElementById(a.getAttribute("href").slice(1))); });
+  }
+
+  // Cards: a soft spotlight follows the pointer (mouse only)
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.addEventListener("pointermove", function (e) {
+      var card = e.target.closest && e.target.closest(".card, .img-card, .step, .way");
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    }, { passive: true });
+  }
+
   // Live search across every course on the Programs page
   var q = document.getElementById("course-q");
   var tabs = document.getElementById("course-tabs");

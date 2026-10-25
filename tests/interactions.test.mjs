@@ -280,3 +280,17 @@ test('the Fees & Admissions hero counts down to the registration deadline', asyn
   assert.deepEqual(page.problems, []);
   await page.close();
 });
+
+test('reading progress, back-to-top and the "On this page" highlight work', async () => {
+  const page = await openPage(ctx, 'index.html', DESKTOP);
+  const toTop = page.locator('.to-top');
+  assert.ok(!(await toTop.evaluate((b) => b.classList.contains('show'))));
+  await page.evaluate(() => window.scrollTo(0, 2400));
+  await page.waitForFunction(() => document.querySelector('.to-top').classList.contains('show'));
+  assert.notEqual(await page.locator('.scroll-progress').evaluate((e) => e.style.transform), 'scaleX(0)');
+  await page.waitForFunction(() => document.querySelector('.page-links a[aria-current="location"]'));
+  await toTop.click();
+  await page.waitForFunction(() => window.scrollY < 50);
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});

@@ -63,6 +63,23 @@ async function search(q) {
   return page;
 }
 
+test('the search icon on the Books page opens search, and books open straight to the book', async () => {
+  const start = await openPage(ctx, 'books.html', PHONE);
+  await start.click('.search-link');
+  await start.waitForURL(/search\.html$/);
+  await start.close();
+  for (const [q, id] of [['mastering', 'book-mastering-school-leadership'], ['marriage', 'book-pains-sorrows-marriage']]) {
+    const page = await search(q);
+    const first = page.locator('#search-results li').first();
+    assert.equal(await first.locator('a').getAttribute('href'), `books.html#${id}`, q);
+    assert.equal(await first.locator('.search-type').textContent(), 'Book');
+    await first.locator('a').click();
+    await page.waitForURL(new RegExp(`books\\.html#${id}$`));
+    assert.ok(await page.locator(`#${id}`).isVisible());
+    await page.close();
+  }
+});
+
 test('search finds courses first and links to their program page', async () => {
   const page = await search('quickbooks');
   const first = page.locator('#search-results li').first();

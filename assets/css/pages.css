@@ -661,3 +661,54 @@ a.card.area-link p { color: var(--muted); margin-bottom: 0; }
   .ph-caps { display: none; }
 }
 @media print { .ph-shine, .ph-caps { display: none; } }
+
+/* Fees & Admissions hero: photo, countdown card */
+.admissions-hero { background: #0e1d14; min-height: clamp(520px, 72vh, 700px); padding: clamp(56px, 7vw, 90px) 0; }
+.admissions-hero .bg { left: 0; }
+.admissions-hero .bg img { opacity: 1; object-position: 62% 40%; }
+.admissions-hero::before { background: linear-gradient(90deg, rgba(10,22,14,.94) 0%, rgba(10,22,14,.78) 38%, rgba(10,22,14,.25) 70%, rgba(10,22,14,.1) 100%); }
+.adh-grid { width: 100%; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .9fr); gap: clamp(24px, 4vw, 64px); align-items: center; }
+.admissions-hero h1 { max-width: 13ch; }
+.admissions-hero .lead { max-width: 48ch; }
+.admissions-hero .btn-row { margin-top: 26px; }
+.adh-card { justify-self: end; width: min(100%, 380px); padding: 24px; border-radius: 22px; background: rgba(12,24,16,.62); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 24px 60px rgba(0,0,0,.4); color: var(--white); animation: phPop .8s .5s cubic-bezier(.2,.8,.2,1.15) both, ahFloat 7s 1.4s ease-in-out infinite; }
+.adh-card-label { margin: 0 0 10px; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #dceab1; }
+.adh-countdown { display: flex; gap: 10px; margin: 0 0 18px; font-weight: 700; font-size: 1.2rem; }
+.adh-cd-unit { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 6px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+.adh-cd-unit strong { font-family: var(--font-display); font-size: clamp(1.7rem, 3vw, 2.2rem); line-height: 1; color: #e3ec8f; font-variant-numeric: tabular-nums; }
+.adh-cd-unit small { margin-top: 4px; font-size: .74rem; color: rgba(255,255,255,.8); text-transform: uppercase; letter-spacing: .06em; }
+.adh-dates { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.adh-dates li { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,.12); font-size: .95rem; }
+.adh-dates span { color: rgba(255,255,255,.78); }
+.adh-dates time, .adh-dates strong { font-weight: 700; color: var(--white); }
+.adh-card-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #e3ec8f; text-decoration: none; }
+.adh-card-link:hover { color: var(--white); }
+@media (max-width: 900px) {
+  .adh-grid { grid-template-columns: 1fr; }
+  .adh-card { justify-self: stretch; width: auto; }
+  .admissions-hero::before { background: linear-gradient(0deg, rgba(10,22,14,.96) 0%, rgba(10,22,14,.85) 55%, rgba(10,22,14,.45) 100%); }
+}
+
+/* Every photo hero: full-width photo, slow zoom, light sweep and text that animates in.
+   (About, Books and Programs have their own designs above.) */
+.page-hero:not(.page-hero-plain) .bg { left: 0; }
+.page-hero:not(.page-hero-plain) .bg img { opacity: 1; animation: heroZoom 24s ease-in-out infinite alternate; }
+.page-hero:not(.page-hero-plain):not(.about-hero):not(.programs-hero):not(.books-hero):not(.admissions-hero)::before { background: linear-gradient(90deg, rgba(16,32,22,.94) 0%, rgba(16,32,22,.8) 40%, rgba(16,32,22,.3) 72%, rgba(16,32,22,.12) 100%); }
+.page-hero:not(.page-hero-plain):not(.books-hero)::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(115deg, transparent 32%, rgba(255,236,170,.12) 46%, transparent 60%); background-size: 260% 100%; animation: heroSweep 10s ease-in-out infinite; }
+.page-hero .wrap { z-index: 1; }
+.page-hero:not(.books-hero) .wrap > :not(.adh-card):not(.ah-badges), .page-hero .wrap > div > :is(p, span, h1, .btn-row) { animation: heroUp .8s cubic-bezier(.2,.7,.2,1) both; }
+.page-hero .wrap > :nth-child(2), .page-hero .wrap > div > :nth-child(2) { animation-delay: .08s; }
+.page-hero .wrap > :nth-child(3), .page-hero .wrap > div > :nth-child(3) { animation-delay: .16s; }
+.page-hero .wrap > :nth-child(4), .page-hero .wrap > div > :nth-child(4) { animation-delay: .26s; }
+.page-hero .wrap > :nth-child(5), .page-hero .wrap > div > :nth-child(5) { animation-delay: .36s; }
+.page-hero h1 em { font-style: normal; color: #e3ec8f; }
+@keyframes heroZoom { from { transform: scale(1); } to { transform: scale(1.07); } }
+@keyframes heroSweep { 0%, 100% { background-position: 120% 0; } 50% { background-position: -20% 0; } }
+@keyframes heroUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) {
+  .page-hero:not(.page-hero-plain):not(.about-hero):not(.programs-hero):not(.books-hero):not(.admissions-hero)::before { background: linear-gradient(0deg, rgba(14,32,21,.97) 0%, rgba(14,32,21,.86) 50%, rgba(14,32,21,.35) 100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-hero .bg img, .page-hero::after, .page-hero .wrap > *, .page-hero .wrap > div > *, .adh-card { animation: none !important; }
+}
+@media print { .page-hero::after { display: none; } }

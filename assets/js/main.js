@@ -539,6 +539,28 @@
     });
   }
 
+  // Countdown to a deadline (Fees & Admissions hero). The date stays visible without JavaScript.
+  document.querySelectorAll("[data-countdown]").forEach(function (box) {
+    var end = Date.parse(box.getAttribute("data-countdown"));
+    if (isNaN(end)) return;
+    var parts = [["days", "day"], ["hours", "hour"], ["minutes", "minute"]].map(function (u) {
+      var cell = document.createElement("span"), num = document.createElement("strong"), label = document.createElement("small");
+      cell.className = "adh-cd-unit";
+      cell.appendChild(num); cell.appendChild(label);
+      return { num: num, label: label, names: u, cell: cell };
+    });
+    function tick() {
+      var left = end - Date.now();
+      if (left <= 0) { box.textContent = "Registration for this intake has closed. Ask admissions about the next intake."; return false; }
+      var values = [Math.floor(left / 864e5), Math.floor(left / 36e5) % 24, Math.floor(left / 6e4) % 60];
+      parts.forEach(function (p, i) { p.num.textContent = values[i]; p.label.textContent = values[i] === 1 ? p.names[1] : p.names[0]; });
+      return true;
+    }
+    box.textContent = "";
+    parts.forEach(function (p) { box.appendChild(p.cell); });
+    if (tick()) var timer = setInterval(function () { if (!tick()) clearInterval(timer); }, 30000);
+  });
+
   // Live search across every course on the Programs page
   var q = document.getElementById("course-q");
   var tabs = document.getElementById("course-tabs");

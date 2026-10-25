@@ -264,3 +264,19 @@ test('the books page shows both book covers with order buttons', async () => {
   assert.deepEqual(page.problems, []);
   await page.close();
 });
+
+test('the Fees & Admissions hero counts down to the registration deadline', async () => {
+  const page = await openPage(ctx, 'admissions.html', PHONE);
+  const units = page.locator('.adh-countdown .adh-cd-unit');
+  const left = Date.parse('2027-01-04T16:00:00Z') - Date.now();
+  if (left > 0) {
+    assert.equal(await units.count(), 3);
+    assert.equal(Number(await units.first().locator('strong').textContent()), Math.floor(left / 864e5));
+    assert.match(await units.first().locator('small').textContent(), /^days?$/);
+  } else {
+    assert.match(await page.locator('.adh-countdown').textContent(), /closed/);
+  }
+  assert.ok((await page.locator('.adh-dates').textContent()).includes('Mon, Jan 4, 2027'));
+  assert.deepEqual(page.problems, []);
+  await page.close();
+});

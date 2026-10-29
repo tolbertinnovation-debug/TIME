@@ -8,7 +8,7 @@ import { ROOT, pages } from './layout.mjs';
 import { DATA as PROGRAMS } from './programs.mjs';
 
 const OUT = join(ROOT, 'assets/search-index.json');
-const SKIP = new Set(['404.html', 'offline.html', 'search.html']);
+const SKIP = new Set(['404.html', 'offline.html', 'search.html', 'learning.html']);
 
 const decode = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
   .replace(/&#39;|&rsquo;|&lsquo;/g, '’').replace(/&ldquo;|&rdquo;/g, '"').replace(/&ndash;/g, '–').replace(/&mdash;/g, '—').replace(/&hellip;/g, '…');

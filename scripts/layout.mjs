@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const PORTAL = new Set(['learning.html', 'account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']);
+const PORTAL = new Set(['account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']);
 
 // Each region runs from its opening tag to its closing marker.
 const REGIONS = [

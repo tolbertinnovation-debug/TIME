@@ -65,6 +65,8 @@ Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Bl
 
 | 23 | **Four areas on the home page**: "Where would you like to go?" buttons for A. TIME Inc. (rolling enrollment, registration in progress), B. Phìtìa Academy, C. Consultation (Education, Agriculture) and D. Book Production, Sales & Publications. Each opens a page with only that area: `time-inc.html`, `phica.html`, `consultation.html`, `books.html`. Footer links and contact-form topics added. | ✅ |
 
+| 24 | **TIME Learning academy rebuilt** (`learning.html`): the site's own header, footer and design; academy home with subjects, popular courses, learning paths, how it works, lecturers and FAQ; course library with search (titles, lecturers, unit names), subject chips, path filter and sorting; course pages with outline and tools; a course player with unit table of contents, progress bar, practice checks with unlimited retries, notes, focus mode, text size and arrow-key navigation; My learning (progress, streak, saved courses, achievements); printable learning records for finished courses and paths. Keeps every earlier feature (learning plan, assignment drafts, downloads, backup/restore, offline use) and reads existing saved progress and backups. | ✅ |
+
 ## Blocked: needs information or accounts from TIME Inc.
 | Item | What is needed |
 |---|---|

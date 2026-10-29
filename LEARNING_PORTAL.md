@@ -163,4 +163,4 @@ The account workspace bundle (`assets/learning/account.bundle.js`) is now 214 KB
 
 Against the live Neon Auth service, the old and new bundles made identical requests (`get-session`, `sign-in/email`) and showed identical screens and errors on all four portal pages. The 174 backend tests pass.
 
-The website service worker now caches the public study portal (`learning.html`, `assets/learning/portal.js`, `courses.js` and `portal.css`), so draft study guides, notes and practice checks work offline after a first visit. Account pages and the account bundle are never cached: offline sign-in attempts show the offline page.
+The website service worker now caches the public academy (`learning.html`, `assets/learning/academy.js`, `academy.css` and `courses.js`), so draft study guides, notes and practice checks work offline after a first visit. Account pages and the account bundle are never cached: offline sign-in attempts show the offline page.

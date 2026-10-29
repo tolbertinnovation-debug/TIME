@@ -1,0 +1,70 @@
+/* Account workspace theme: the sign-in, student, lecturer and administrator screens, in the
+   TIME Learning academy design. Layered over workspace.css (generated, scoped portal styles). */
+.ws-band { position: relative; overflow: hidden; padding: 26px 0 30px; color: var(--white); background: radial-gradient(90% 140% at 90% 0%, #2d5a2c 0%, transparent 55%), linear-gradient(135deg, #0d1d14 0%, #17301f 55%, #2a1a12 100%); }
+.ws-band::before { content: ""; position: absolute; inset: 0; background: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1.2px) 0 0 / 22px 22px; -webkit-mask-image: linear-gradient(90deg, #000 20%, transparent 80%); mask-image: linear-gradient(90deg, #000 20%, transparent 80%); }
+.ws-band .wrap { position: relative; }
+.ws-band-title { margin: 6px 0 0; font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 700; letter-spacing: -.03em; color: var(--white); }
+.ws-wrap { position: relative; padding-top: 36px; padding-bottom: 70px; }
+.ws-noscript { max-width: 640px; margin: 20px auto; padding: 16px; border-radius: 14px; background: #fff8e2; }
+
+#workspace { --ink: #1b1c17; --muted: #5b5f52; --line: rgba(23,37,29,.12); max-width: 1180px; margin: 0 auto; min-height: 50vh; font-size: 1rem; line-height: 1.65; color: var(--ink); outline: none; }
+#workspace h1, #workspace h2, #workspace h3, #workspace h4 { font-family: var(--font-display); letter-spacing: -.03em; color: var(--ink); }
+#workspace h1 { font-size: clamp(1.9rem, 3.4vw, 2.8rem); }
+#workspace a { color: var(--olive-deep); }
+#workspace .eyebrow { color: var(--red); font-size: .74rem; letter-spacing: .14em; }
+
+/* Surfaces */
+#workspace .panel, #workspace .portal-card, #workspace .stat, #workspace .course-card, #workspace .module, #workspace .week, #workspace .calendar-panel, #workspace .dashboard-update, #workspace details, #workspace .verification-success {
+  background: rgba(255,255,255,.88); border: 1px solid rgba(255,255,255,.8); border-radius: 20px;
+  box-shadow: 0 0 0 1px rgba(23,37,29,.07), 0 14px 34px rgba(23,37,29,.08);
+}
+@media (min-width: 900px) { #workspace .panel, #workspace .portal-card, #workspace .stat { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); } }
+#workspace .panel, #workspace .portal-card { transition: box-shadow .3s ease, transform .3s ease; }
+#workspace .portal-card:hover { transform: translateY(-4px); box-shadow: 0 0 0 1px rgba(127,140,28,.35), 0 22px 48px rgba(23,37,29,.13); }
+#workspace .portal-card { border-top: 5px solid var(--olive); }
+#workspace .portal-card:nth-child(2) { border-top-color: var(--red); }
+#workspace .portal-card:nth-child(3) { border-top-color: var(--navy); }
+#workspace .stat strong { font-family: var(--font-display); color: var(--olive-deep); }
+#workspace .hero-panel { border-radius: 22px; background: radial-gradient(90% 140% at 100% 0%, #5c6612 0%, transparent 55%), linear-gradient(135deg, #17301f, #2a1a12); }
+#workspace .notice { border-radius: 14px; background: rgba(255,248,226,.92); border: 1px solid #efe1a8; }
+#workspace .callout { border-radius: 16px; background: linear-gradient(135deg, rgba(238,243,228,.95), rgba(255,255,255,.9)); border-left: 5px solid var(--olive); }
+#workspace .pill { border-radius: 999px; background: var(--olive-soft); color: var(--olive-deep); font-weight: 700; }
+#workspace .empty { border-radius: 16px; border: 1px dashed var(--line); background: rgba(255,255,255,.6); }
+
+/* Buttons in the site's style */
+#workspace .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 999px; border: 1.5px solid var(--olive-deep); background: var(--olive-deep); color: var(--white); font-weight: 700; text-decoration: none; box-shadow: 0 10px 24px rgba(67,94,37,.18); transition: transform .2s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease; }
+#workspace .btn:hover { background: #2f4a1a; border-color: #2f4a1a; color: var(--white); transform: translateY(-1px); }
+#workspace .btn.secondary { background: rgba(255,255,255,.9); color: var(--olive-deep); box-shadow: none; }
+#workspace .btn.secondary:hover { background: var(--olive-soft); color: var(--olive-deep); }
+#workspace .btn.light { background: var(--white); border-color: var(--white); color: var(--ink); }
+#workspace .btn:active { transform: translateY(1px) scale(.98); }
+
+/* Forms */
+#workspace label { font-weight: 700; color: var(--ink); }
+#workspace input:not([type=checkbox]):not([type=radio]):not([type=file]), #workspace select, #workspace textarea { min-height: 46px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.95); color: var(--ink); transition: border-color .2s ease, box-shadow .2s ease; }
+#workspace input:focus, #workspace select:focus, #workspace textarea:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(127,140,28,.18); outline: none; }
+#workspace input[type=checkbox], #workspace input[type=radio] { accent-color: var(--olive-deep); }
+#workspace button:focus-visible, #workspace a:focus-visible { outline: 3px solid #2b9ad6; outline-offset: 3px; }
+
+/* Progress, tables, calendar */
+#workspace .progress { border-radius: 8px; background: rgba(23,37,29,.09); }
+#workspace .progress span { border-radius: 8px; background: linear-gradient(90deg, var(--olive), #c9d65a); }
+#workspace .report-table { border-radius: 14px; overflow: hidden; }
+#workspace .report-table th { background: var(--olive-soft); color: var(--olive-deep); }
+#workspace .calendar-day[aria-current=date] { box-shadow: inset 0 0 0 2px var(--olive); }
+#workspace .calendar-day.selected { background: var(--olive-deep); color: var(--white); }
+
+/* Loading screen */
+#workspace .workspace-loading { background: rgba(255,255,255,.9); border-radius: 24px; box-shadow: 0 0 0 1px rgba(23,37,29,.07), 0 20px 50px rgba(23,37,29,.1); }
+#workspace .loading-brand { color: var(--red); }
+#workspace .loading-track span { background: linear-gradient(90deg, var(--olive), #c9d65a, var(--red)); }
+
+/* Status messages outside the workspace */
+#toast { border-radius: 14px; background: #17301f; color: var(--white); box-shadow: 0 16px 40px rgba(0,0,0,.3); }
+.request-indicator { border-radius: 999px; background: rgba(255,255,255,.95); box-shadow: 0 10px 30px rgba(23,37,29,.18); }
+@media (max-width: 760px) {
+  .ws-band { padding: 18px 0 22px; }
+  .ws-wrap { padding-top: 24px; }
+  #toast { bottom: calc(86px + env(safe-area-inset-bottom)) !important; }
+}
+@media print { .ws-band, .ac-nav { display: none !important; } .ws-wrap { margin: 0; } }

@@ -115,3 +115,19 @@ test('focus mode hides everything but the lesson, and the assignment draft count
   assert.deepEqual(page.problems, []);
   await page.close();
 });
+
+test('the account pages use the site design and keep everything the live sign-in needs', async () => {
+  const { readFileSync } = await import('node:fs');
+  for (const file of ['account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']) {
+    const html = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+    for (const need of ['id="workspace"', 'id="toast"', 'id="request-indicator"', 'id="request-message"', 'id="loading-detail"', 'class="skip-link skip"', 'account.bundle.js', 'workspace.css', 'class="site-header"', 'class="ac-nav"', 'name="robots" content="noindex"']) {
+      assert.ok(html.includes(need), `${file} has ${need}`);
+    }
+    assert.ok(!html.includes('portal.css'), `${file} no longer loads the old stylesheet`);
+  }
+  assert.match(readFileSync(new URL('../student-login.html', import.meta.url), 'utf8'), /<body data-page="workspace" data-portal="student">/);
+  const { execFileSync } = await import('node:child_process');
+  const before = readFileSync(new URL('../assets/learning/workspace.css', import.meta.url), 'utf8');
+  execFileSync('node', ['scripts/workspace-css.mjs'], { cwd: new URL('..', import.meta.url) });
+  assert.equal(readFileSync(new URL('../assets/learning/workspace.css', import.meta.url), 'utf8'), before, 'run: node scripts/workspace-css.mjs');
+});

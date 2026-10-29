@@ -6,7 +6,8 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const PORTAL = new Set(['account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']);
+// The account workspace pages belong to Online Learning in the main menu.
+const MENU_PAGE = { 'account.html': 'learning.html', 'student-login.html': 'learning.html', 'lecturer-login.html': 'learning.html', 'admin-login.html': 'learning.html' };
 
 // Each region runs from its opening tag to its closing marker.
 const REGIONS = [
@@ -16,12 +17,12 @@ const REGIONS = [
   { name: 'tail', start: '<nav class="action-bar"', end: '</aside>' },
 ];
 
-export const pages = () => readdirSync(ROOT).filter((f) => f.endsWith('.html') && !PORTAL.has(f)).sort();
+export const pages = () => readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
 
 function partial(name, page) {
   let html = readFileSync(join(ROOT, 'partials', `${name}.html`), 'utf8').trimEnd();
   // Mark the current page in the main menu (not the Support Us button).
-  if (name === 'header') html = html.replace(new RegExp(`<a href="${page.replace('.', '\\.')}">`), `<a href="${page}" aria-current="page">`);
+  if (name === 'header') { const m = MENU_PAGE[page] || page; html = html.replace(new RegExp(`<a href="${m.replace('.', '\\.')}">`), `<a href="${m}" aria-current="page">`); }
   return html;
 }
 

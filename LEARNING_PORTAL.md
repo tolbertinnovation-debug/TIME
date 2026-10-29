@@ -164,3 +164,7 @@ The account workspace bundle (`assets/learning/account.bundle.js`) is now 214 KB
 Against the live Neon Auth service, the old and new bundles made identical requests (`get-session`, `sign-in/email`) and showed identical screens and errors on all four portal pages. The 174 backend tests pass.
 
 The website service worker now caches the public academy (`learning.html`, `assets/learning/academy.js`, `academy.css` and `courses.js`), so draft study guides, notes and practice checks work offline after a first visit. Account pages and the account bundle are never cached: offline sign-in attempts show the offline page.
+
+## Workspace design (October 2026)
+
+The account pages (`account.html`, `student-login.html`, `lecturer-login.html`, `admin-login.html`) now use the main website's header, footer and TIME Learning academy menu, kept in sync by `npm run layout`. The workspace logic and the live Neon service are unchanged. Styles: `assets/learning/workspace.css` is generated from `portal.css` by `node scripts/workspace-css.mjs` (every rule scoped to `#workspace`), and `assets/learning/workspace-theme.css` applies the academy look. The pages must keep `#workspace`, `#toast`, `#request-indicator`, `#request-message`, `#loading-detail`, a `.skip` link and `body[data-portal]`, which `account.bundle.js` uses; a test checks this.

@@ -10,7 +10,7 @@ import { ROOT, pages } from './layout.mjs';
 import { DATA as PROGRAMS } from './programs.mjs';
 
 const OUT = join(ROOT, 'data/assistant-knowledge.json');
-const SKIP = new Set(['404.html', 'offline.html', 'search.html']);
+const SKIP = new Set(['404.html', 'offline.html', 'search.html', 'account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']);
 const MAX = 520; // characters per passage
 
 const decode = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')

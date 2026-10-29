@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 // The account workspace pages belong to Online Learning in the main menu.
-const MENU_PAGE = { 'account.html': 'learning.html', 'student-login.html': 'learning.html', 'lecturer-login.html': 'learning.html', 'admin-login.html': 'learning.html' };
+export const MENU_PAGE = { 'online-learning.html': 'learning.html', 'verify.html': 'admissions.html', 'account.html': 'learning.html', 'student-login.html': 'learning.html', 'lecturer-login.html': 'learning.html', 'admin-login.html': 'learning.html' };
 
 // Each region runs from its opening tag to its closing marker.
 const REGIONS = [

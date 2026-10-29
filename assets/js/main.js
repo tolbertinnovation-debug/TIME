@@ -305,6 +305,132 @@
     });
   }
 
+  // Online application (admissions.html#apply-online): same delivery as the contact form
+  var apply = document.querySelector("form#apply-form");
+  if (apply) {
+    var aTo = apply.getAttribute("data-to");
+    var aNote = apply.querySelector(".form-status");
+    var aSubmit = apply.querySelector("button[type='submit']");
+    var aLabel = aSubmit.innerHTML;
+    var aFields = Array.prototype.slice.call(apply.querySelectorAll("input[required], select[required], input[type=email], textarea[maxlength]"));
+    var aNames = { "a-name": "your full name", "a-phone": "a phone or WhatsApp number" };
+    function aProblem(f) {
+      if (f.validity.valueMissing) return f.tagName === "SELECT" ? "Please choose a course." : "Please enter " + (aNames[f.id] || "this field") + ".";
+      if (f.validity.typeMismatch) return "Please enter a valid email address, like name@example.com.";
+      if (f.id === "a-phone" && (f.value.match(/\d/g) || []).length < 7) return "Please enter a full phone number, like 0888 123 456.";
+      if (f.validity.tooLong) return "Please shorten this to " + f.maxLength + " characters.";
+      return "";
+    }
+    function aShow(f, msg) {
+      var id = f.id + "-error", err = document.getElementById(id);
+      if (msg) {
+        if (!err) { err = document.createElement("p"); err.className = "field-error"; err.id = id; f.insertAdjacentElement("afterend", err); }
+        err.textContent = msg;
+        f.setAttribute("aria-invalid", "true");
+        f.setAttribute("aria-describedby", id);
+      } else {
+        if (err) err.remove();
+        f.removeAttribute("aria-invalid");
+        f.removeAttribute("aria-describedby");
+      }
+    }
+    aFields.forEach(function (f) {
+      f.addEventListener(f.tagName === "SELECT" ? "change" : "input", function () { if (f.getAttribute("aria-invalid")) aShow(f, aProblem(f)); });
+    });
+    // Preselect the course from links such as admissions.html?course=QuickBooks#apply-online
+    var wantCourse = new URLSearchParams(window.location.search).get("course");
+    var courseSelect = document.getElementById("a-course");
+    if (wantCourse && courseSelect) {
+      Array.prototype.some.call(courseSelect.options, function (o) {
+        if (o.value && o.text.toLowerCase().indexOf(wantCourse.toLowerCase()) === 0) { courseSelect.value = o.value; return true; }
+      });
+    }
+    apply.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var first = null;
+      aFields.forEach(function (f) { var m = aProblem(f); aShow(f, m); if (m && !first) first = f; });
+      if (first) { first.focus(); return; }
+      var d = new FormData(apply);
+      if (d.get("_honey")) return;
+      var subject = "[Application] " + d.get("course") + " – " + d.get("name");
+      var lines = [
+        "Course: " + d.get("course"), "Intake: " + d.get("intake"), "Schedule: " + d.get("track"),
+        "Name: " + d.get("name"), "Phone: " + d.get("phone"), "Email: " + (d.get("email") || "—"),
+        "County: " + (d.get("county") || "—"), "Current work: " + (d.get("work") || "—")
+      ];
+      if (d.get("notes")) lines.push("", d.get("notes"));
+      var body = lines.join("\n");
+      function failed() {
+        aNote.className = "form-status";
+        aNote.textContent = "We couldn't send your application just now. Please ";
+        var mail = document.createElement("a");
+        mail.href = "mailto:" + aTo + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        mail.textContent = "send it by email";
+        var wa = document.createElement("a");
+        wa.href = "https://wa.me/231888901848?text=" + encodeURIComponent(subject + "\n\n" + body);
+        wa.target = "_blank";
+        wa.rel = "noopener";
+        wa.textContent = "on WhatsApp";
+        aNote.append(mail, " or ", wa, ".");
+      }
+      aSubmit.disabled = true;
+      aSubmit.textContent = "Sending…";
+      aNote.className = "form-status";
+      aNote.textContent = "";
+      fetch("https://formsubmit.co/ajax/" + aTo, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: d.get("name"), phone: d.get("phone"), email: d.get("email"), course: d.get("course"),
+          intake: d.get("intake"), schedule: d.get("track"), county: d.get("county"), work: d.get("work"),
+          notes: d.get("notes"), _subject: subject, _replyto: d.get("email") || undefined, _template: "table"
+        })
+      })
+        .then(function (r) { return r.json().then(function (j) { return r.ok && String(j.success) === "true"; }); })
+        .then(function (ok) {
+          if (!ok) return failed();
+          var who = d.get("name").split(" ")[0];
+          apply.reset();
+          aNote.className = "form-status ok";
+          aNote.textContent = "Thank you, " + who + ". Your application for " + d.get("course") + " has been sent. Our admissions office will contact you on " + d.get("phone") + " within a few working days to confirm your place and how to pay.";
+          aNote.setAttribute("tabindex", "-1");
+          aNote.focus();
+        })
+        .catch(failed)
+        .then(function () { aSubmit.disabled = false; aSubmit.innerHTML = aLabel; });
+    });
+  }
+
+  // Certificate check request (verify.html): opens WhatsApp or email with the details filled in
+  var verify = document.querySelector("form#verify-form");
+  if (verify) {
+    verify.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var missing = null;
+      Array.prototype.forEach.call(verify.querySelectorAll("[required]"), function (f) {
+        var id = f.id + "-error", err = document.getElementById(id);
+        if (!f.value.trim()) {
+          if (!err) { err = document.createElement("p"); err.className = "field-error"; err.id = id; f.insertAdjacentElement("afterend", err); }
+          err.textContent = "Please fill in this field.";
+          f.setAttribute("aria-invalid", "true");
+          f.setAttribute("aria-describedby", id);
+          if (!missing) missing = f;
+        } else if (err) { err.remove(); f.removeAttribute("aria-invalid"); f.removeAttribute("aria-describedby"); }
+      });
+      if (missing) { missing.focus(); return; }
+      var d = new FormData(verify);
+      var text = "Certificate check request\n\nName on certificate: " + d.get("name") +
+        "\nCertificate number: " + (d.get("code") || "—") + "\nProgram: " + (d.get("program") || "—") +
+        "\nYear: " + (d.get("year") || "—") + "\n\nRequested by: " + d.get("org");
+      var byEmail = e.submitter && e.submitter.value === "email";
+      var url = byEmail
+        ? "mailto:tinstitute312@gmail.com?subject=" + encodeURIComponent("Certificate check: " + d.get("name")) + "&body=" + encodeURIComponent(text)
+        : "https://wa.me/231888901848?text=" + encodeURIComponent(text);
+      verify.querySelector(".form-status").textContent = "Your " + (byEmail ? "email app" : "WhatsApp") + " should open with the details filled in. Send the message and we will reply with confirmation.";
+      if (byEmail) window.location.href = url; else window.open(url, "_blank", "noopener");
+    });
+  }
+
   // Offline support: keep visited pages available on slow or patchy connections
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {

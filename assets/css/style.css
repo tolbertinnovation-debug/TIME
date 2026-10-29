@@ -147,6 +147,9 @@ h4 { font-size: 1.1rem; }
 .topbar .accred { font-family: var(--font-label); letter-spacing: .06em; text-transform: uppercase; font-size: .78rem; color: #c9d65a; }
 @media (max-width: 860px) { .topbar .accred { display: none; } }
 @media (max-width: 560px) { .topbar-info .hide-sm { display: none; } }
+.topbar-end { display: inline-flex; align-items: center; gap: 18px; }
+.topbar .topbar-login { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.1); font-weight: 600; font-size: .84rem; white-space: nowrap; }
+.topbar .topbar-login:hover { background: rgba(255,255,255,.18); }
 
 .site-header {
   position: sticky; top: 0; z-index: 100;

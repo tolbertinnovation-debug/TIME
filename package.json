@@ -10,7 +10,8 @@
     "layout": "node scripts/layout.mjs",
     "programs": "node scripts/programs.mjs",
     "search": "node scripts/search-index.mjs",
-    "assistant": "node scripts/assistant-knowledge.mjs"
+    "assistant": "node scripts/assistant-knowledge.mjs",
+    "catalogue": "node scripts/catalogue.mjs"
   },
   "devDependencies": {
     "axe-core": "4.10.3",

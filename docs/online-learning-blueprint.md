@@ -279,6 +279,7 @@ Moodle **course categories** = Schools → Programs. Moodle **courses** = one pe
 | 4 | Second installment | Due 8 weeks from the first payment; access suspended if unpaid, restored on payment or an authorized payment arrangement; policy communicated at registration (§1.4) |
 | 6 | County study centres | To be set up in the target counties once approved, with suitable facilities and operational readiness; locations published once confirmed |
 | 7 | Sponsor information | Summarized termly (or agreed-interval) reports with the student's informed consent; no confidential detail (§3) |
+| 8 | Scope of these rules | They apply to **all TIME courses** (certificates and diplomas), not only postgraduate ones (confirmed 31 Oct 2026) |
 
 **Still open**
 
@@ -286,7 +287,6 @@ Moodle **course categories** = Schools → Programs. Moodle **courses** = one pe
 2. The confirmed delivery mode for each course (`delivery_modes` in `catalogue.json` is still a proposal).
 3. Moodle hosting (MoodleCloud plan or VPS) and the LMS web address, e.g. `learn.time-liberia.com`.
 4. Study centre locations, contacts and facilitators.
-5. Wording: the decisions mention "postgraduate courses" and "the university's academic policies", but TIME's catalogue lists certificates and diplomas. Do the rules apply to all TIME courses, or only to a postgraduate track (perhaps run with a partner university)?
 
 ---
 

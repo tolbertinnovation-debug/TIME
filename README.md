@@ -30,4 +30,6 @@ Assets live in `assets/css/style.css`, `assets/js/main.js` and `assets/img/` (fu
 - **Text:** open the page's `.html` file and edit the text between the tags.
 - **Photos:** add a JPG to `assets/img/` (ideally no wider than 1600px) and point an `<img src="...">` at it. For gallery items, also add a smaller `thumb-` copy.
 - **Contact details** appear in the top bar and footer of every page, and on `contact.html` and `programs.html`.
+- **404 page:** `404.html` uses root-relative paths (`/TIME/...`) so it renders correctly at any missing URL. If the site moves to a custom domain served from the root, change `/TIME/` to `/` in that file.
+- **Cache busting:** after editing CSS or JS, bump the `?v=` date on the `style.css`, `pages.css` and `main.js` links in every page.
 - **Contact form:** the site is static, so the form opens the visitor's email app with the message already written, addressed to `tinstitute312@gmail.com`. To receive messages directly instead, point the form at a service such as Formspree.

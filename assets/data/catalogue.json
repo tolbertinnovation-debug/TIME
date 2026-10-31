@@ -1,0 +1,795 @@
+{
+  "_about": "Single source of truth for TIME Inc. programs and courses. Titles and program groupings match programs.html. school_id and delivery_modes are PROPOSALS from docs/online-learning-blueprint.md awaiting approval by TIME leadership; every 'TODO' needs real content. next_cohorts entries look like {\"start_date\":\"2027-01-10\",\"track\":\"weekday|saturday\",\"mode\":\"online|blended|on-campus\",\"seats\":30}.",
+  "status": {
+    "schools": "proposed",
+    "delivery_modes": "proposed"
+  },
+  "delivery_modes": {
+    "on-campus": "Classes at the Margibi campus, materials posted online",
+    "blended": "Weekly online lessons plus a monthly in-person session at campus or a county hub",
+    "online": "Fully online with live sessions and an online final assessment"
+  },
+  "tracks": {
+    "weekday": "Monday, Wednesday & Friday, 3:00 PM – 6:00 PM",
+    "saturday": "Saturday, 8:00 AM – 3:00 PM"
+  },
+  "schools": [
+    {
+      "id": "teacher-education",
+      "name": "School of Teacher Education"
+    },
+    {
+      "id": "health-community-environment",
+      "name": "School of Health, Community & Environment"
+    },
+    {
+      "id": "business-leadership-media",
+      "name": "School of Business, Leadership & Media"
+    },
+    {
+      "id": "ministry",
+      "name": "School of Ministry"
+    }
+  ],
+  "programs": [
+    {
+      "id": "c-cert-elementary",
+      "name": "Certificate in Elementary Education (\"C\" Certificate)",
+      "award": "\"C\" Certificate",
+      "summary": "Prepares elementary teachers in core subject areas and professional pedagogy.",
+      "duration_weeks": "TODO",
+      "installments": 2
+    },
+    {
+      "id": "c-cert-senior-high-science",
+      "name": "\"C\" Certificate: Lab Training & Elementary Education for Senior High School Science Teachers",
+      "award": "\"C\" Certificate",
+      "summary": "Hands-on laboratory training and teaching methods for science teachers.",
+      "duration_weeks": 10,
+      "installments": 2
+    },
+    {
+      "id": "other-skills",
+      "name": "Other Skills Areas",
+      "award": "Certificate",
+      "summary": "Foundational academic and administrative skills for teachers, students and school staff.",
+      "duration_weeks": 10,
+      "installments": "TODO"
+    },
+    {
+      "id": "professional-certificates",
+      "name": "Professional Certificate Programs",
+      "award": "Professional Certificate",
+      "summary": "Community health, safety, counseling and ethics for practitioners and community workers.",
+      "duration_weeks": 10,
+      "installments": "TODO"
+    },
+    {
+      "id": "diplomas",
+      "name": "Diploma Programs",
+      "award": "Diploma",
+      "summary": "Career-building diplomas in education, finance, leadership, ministry and media.",
+      "duration_weeks": 10,
+      "installments": "TODO"
+    }
+  ],
+  "courses": [
+    {
+      "id": "mathematics-and-integrated-science",
+      "title": "Mathematics and Integrated Science",
+      "program_id": "c-cert-elementary",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": "TODO",
+      "delivery_modes": [
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "language-arts-and-social-studies",
+      "title": "Language Arts & Social Studies",
+      "program_id": "c-cert-elementary",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": "TODO",
+      "delivery_modes": [
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "early-childhood-education",
+      "title": "Early Childhood Education",
+      "program_id": "c-cert-elementary",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": "TODO",
+      "delivery_modes": [
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "geography-and-government-studies",
+      "title": "Geography and Government Studies",
+      "program_id": "c-cert-elementary",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": "TODO",
+      "delivery_modes": [
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "lab-physics",
+      "title": "Physics",
+      "program_id": "c-cert-senior-high-science",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "lab-chemistry",
+      "title": "Chemistry",
+      "program_id": "c-cert-senior-high-science",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "lab-mathematics",
+      "title": "Mathematics",
+      "program_id": "c-cert-senior-high-science",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "lab-biology",
+      "title": "Biology",
+      "program_id": "c-cert-senior-high-science",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "lab-economics",
+      "title": "Economics",
+      "program_id": "c-cert-senior-high-science",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "\"C\" Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "english-grammar-and-composition",
+      "title": "English Grammar & Composition",
+      "program_id": "other-skills",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "research-skills-development-and-presentation",
+      "title": "Research Skills Development & Presentation",
+      "program_id": "other-skills",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "school-based-recordkeeping-and-management",
+      "title": "School-Based Recordkeeping and Management",
+      "program_id": "other-skills",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "substance-abuse-prevention-education",
+      "title": "Substance Abuse Prevention / Education",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "ipc-education",
+      "title": "IPC Education",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "emergency-community-education",
+      "title": "Emergency Community Education",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "community-surveillance-and-reporting",
+      "title": "Community Surveillance & Reporting",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "community-health-facility-management",
+      "title": "Community Health Facility Management",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "guidance-and-psychosocial-counseling",
+      "title": "Guidance & Psychosocial Counseling",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "community-health-and-engagement",
+      "title": "Community Health and Engagement",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "gis-for-environmental-mapping",
+      "title": "GIS for Environmental Mapping",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "environmental-health-and-safety",
+      "title": "Environmental Health and Safety",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "professional-ethics",
+      "title": "Professional Ethics",
+      "program_id": "professional-certificates",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "drugstore-operations-and-medication-knowledge",
+      "title": "Drugstore Operations & Medication Knowledge",
+      "program_id": "professional-certificates",
+      "school_id": "health-community-environment",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Professional Certificate",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "phonics-education",
+      "title": "Phonics Education",
+      "program_id": "diplomas",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "quickbooks",
+      "title": "QuickBooks",
+      "program_id": "diplomas",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "monitoring-and-evaluation-mande",
+      "title": "Monitoring & Evaluation (M&E)",
+      "program_id": "diplomas",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "gender-and-peace-studies",
+      "title": "Gender & Peace Studies",
+      "program_id": "diplomas",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "biblical-interpretation-greek-i-and-ii",
+      "title": "Biblical Interpretation, Greek I & II",
+      "program_id": "diplomas",
+      "school_id": "ministry",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "church-leadership-and-administration",
+      "title": "Church Leadership and Administration",
+      "program_id": "diplomas",
+      "school_id": "ministry",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "school-leadership-and-management",
+      "title": "School Leadership & Management",
+      "program_id": "diplomas",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "school-finance",
+      "title": "School Finance",
+      "program_id": "diplomas",
+      "school_id": "teacher-education",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "internal-auditing",
+      "title": "Internal Auditing",
+      "program_id": "diplomas",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "blended",
+        "on-campus"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    },
+    {
+      "id": "professional-journalism",
+      "title": "Professional Journalism",
+      "program_id": "diplomas",
+      "school_id": "business-leadership-media",
+      "summary": "TODO",
+      "who_for": "TODO",
+      "outcomes": [],
+      "entry_requirements": "TODO",
+      "duration_weeks": 10,
+      "delivery_modes": [
+        "online",
+        "blended"
+      ],
+      "fee": {
+        "amount": "TODO",
+        "currency": "TODO"
+      },
+      "certificate_awarded": "Diploma",
+      "next_cohorts": [],
+      "lms_course_url": "TODO"
+    }
+  ]
+}

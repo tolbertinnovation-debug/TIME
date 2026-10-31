@@ -38,7 +38,7 @@ flowchart TD
 
 **Why the Course and the Cohort are separate:** content is written once and reused for every intake. Grades, attendance and payments belong to the cohort.
 
-### 1.2 Proposed schools (mapping the current 24 courses) **[Decide]**
+### 1.2 Proposed schools (mapping the 33 course entries on `programs.html`) **[Decide]**
 
 | School | Programs and courses (from `programs.html`) |
 |---|---|
@@ -233,7 +233,7 @@ Moodle **course categories** = Schools → Programs. Moodle **courses** = one pe
 
 ### Phase 1: Structure the data (this repo)
 
-> **Prompt 1 — Catalogue data model:** Create `assets/data/catalogue.json` with the hierarchy `schools[] → programs[] → courses[]`, using the grouping in `docs/online-learning-blueprint.md` §1.2 and the 24 courses currently on `programs.html`. Each course needs: `id` (slug), `title`, `school_id`, `program_id`, `summary`, `who_for`, `outcomes[]`, `entry_requirements`, `duration_weeks` (10), `delivery_modes[]` (from §1.3), `fee`, `installments` (2), `certificate_awarded`, `next_cohorts[]` (`{start_date, track: weekday|saturday, mode, seats}`), `lms_course_url`. Use `"TODO"` for unknown values. Re-render the tabs on `programs.html` from this file, grouped by School then Program, and show delivery-mode badges. Keep the existing search, keyboard tabs and a `<noscript>` fallback list.
+> **Prompt 1 — Catalogue data model:** Create `assets/data/catalogue.json` with the hierarchy `schools[] → programs[] → courses[]`, using the grouping in `docs/online-learning-blueprint.md` §1.2 and the 33 course entries currently on `programs.html`. Each course needs: `id` (slug), `title`, `school_id`, `program_id`, `summary`, `who_for`, `outcomes[]`, `entry_requirements`, `duration_weeks` (10), `delivery_modes[]` (from §1.3), `fee`, `installments` (2), `certificate_awarded`, `next_cohorts[]` (`{start_date, track: weekday|saturday, mode, seats}`), `lms_course_url`. Use `"TODO"` for unknown values. Re-render the tabs on `programs.html` from this file, grouped by School then Program, and show delivery-mode badges. Keep the existing search, keyboard tabs and a `<noscript>` fallback list.
 
 > **Prompt 2 — Online Learning page:** Create `online-learning.html` using the existing page template (header, page-hero, page-links, footer, action bar). Sections: How blended learning works (the 3 delivery modes as cards); A 10-week course at a glance (the table from §1.4); What you need (phone or computer, data estimate per week, the Moodle app for offline study); County learning hubs (Margibi campus, Bong, Grand Bassa — TODO addresses); Student journey (the steps from §4 as a numbered timeline); FAQ in `<details>`. Add it to the nav on every page, the footer, the sitemap, and add a "Student Login" link in the top bar pointing at `TODO_LMS_URL`.
 
@@ -262,3 +262,14 @@ Moodle **course categories** = Schools → Programs. Moodle **courses** = one pe
 5. Moodle hosting (MoodleCloud plan or VPS) and the LMS web address, e.g. `learn.time-liberia.com`.
 6. Locations and facilitators for the county hubs.
 7. Sponsor visibility: is consent wording and progress-only visibility acceptable?
+
+---
+
+## 9. Progress
+
+| Item | Status |
+|---|---|
+| Prompt 1: course catalogue data | **Data file done** (`assets/data/catalogue.json`, all 33 entries). Rendering `programs.html` from it waits for the decisions in §8. |
+| Prompt 4: Moodle import files | **Done** (`lms/build-moodle-csv.mjs`, `lms/out/*.csv`, `lms/README.md`) |
+| Prompt 5: course shell template | **Done** (`lms/course-template.md`) |
+| Prompts 2, 3, 6, 7 | Waiting on the LMS address, staff list and the §8 decisions |

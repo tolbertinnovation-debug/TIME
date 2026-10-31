@@ -36,21 +36,27 @@ Each week uses the same pattern:
 
 | Week | Extra |
 |---|---|
-| 5 | **Assignment 1** · Mid-course check-in survey (Feedback) · Reminder: 2nd installment due |
-| 9 | **Assignment 2** |
-| 10 | Review session · **Final exam or project** · Course evaluation (Feedback) · Certificate (`mod_customcert`, unlocked when the course is completed) |
+| 3 | **Assignment 1** (or practical activity) |
+| 5 | **Midterm examination or assessment** · Mid-course check-in survey (Feedback) |
+| 8 | **Assignment 2** (or practical activity) |
+| 10 | Review session · **Final exam or course project** · Course evaluation (Feedback) · Certificate (`mod_customcert`, unlocked when the course is completed) |
 
-Teacher-education courses also have a **Teaching practicum** assignment in week 10. A hub facilitator or instructor observes a lesson, and the observation form is uploaded as the submission.
+Payment reminders aren't tied to a course week. The 2nd installment is due 8 weeks after each student's first payment, so Finance tracks it per student (see `lms/README.md`).
+
+Teacher-education courses also have a **Teaching practicum** assignment in week 10. A study centre facilitator or instructor observes a lesson, and the observation form is uploaded as the submission.
 
 ## Gradebook
 
-| Category | Weight |
-|---|---|
-| Weekly quizzes (weeks 1–10) | 10% |
-| Discussions | 10% |
-| Assignment 1 | 15% |
-| Assignment 2 | 15% |
-| Final exam / project | 40% |
-| Attendance & participation | 10% |
+100-point system (decided 31 Oct 2026, pending formal approval). Use Moodle's "Natural" aggregation with these category maximums:
 
-**Course completion** (pending approval by TIME leadership): final grade of at least 60%, attendance of at least 75%, all fees cleared, and practicum marked complete for teacher-education courses. Set these under *Course completion* so the certificate unlocks automatically, and release certificates only after the Coordinator → Dean → Executive Director sign-off.
+| Category | Points | Contains |
+|---|---|---|
+| Continuous assessment | 30 | Weekly quizzes, discussions, participation/attendance |
+| Assignments & practical activities | 20 | Assignment 1, Assignment 2, lab work or practicum tasks |
+| Midterm examination or assessment | 20 | Week 5 midterm |
+| Final examination or course project | 30 | Week 10 final |
+| **Total** | **100** | |
+
+Set the course total's **grade to pass to 70**.
+
+**Course completion:** a total of at least 70/100, all required assessments completed, course-specific requirements met (e.g. teaching practicum, lab work), and fees cleared. Set these under *Course completion* so the certificate unlocks automatically, and release certificates only after the Coordinator → Dean → Executive Director sign-off.

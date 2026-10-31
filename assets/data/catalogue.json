@@ -1,17 +1,69 @@
 {
-  "_about": "Single source of truth for TIME Inc. programs and courses. Titles and program groupings match programs.html. school_id and delivery_modes are PROPOSALS from docs/online-learning-blueprint.md awaiting approval by TIME leadership; every 'TODO' needs real content. next_cohorts entries look like {\"start_date\":\"2027-01-10\",\"track\":\"weekday|saturday\",\"mode\":\"online|blended|on-campus\",\"seats\":30}.",
+  "_about": "Single source of truth for TIME Inc. programs and courses. Titles and program groupings match programs.html. school_id and each course's delivery_modes are PROPOSALS from docs/online-learning-blueprint.md awaiting approval by TIME leadership; every 'TODO' needs real content. next_cohorts entries look like {\"start_date\":\"2027-01-10\",\"track\":\"weekday|saturday\",\"mode\":\"online|blended|on-campus\",\"seats\":30}.",
   "status": {
     "schools": "proposed",
-    "delivery_modes": "proposed"
+    "delivery_modes": "online/blended decided 2026-10-31; mode per course proposed",
+    "policies": "decided 2026-10-31, pending formal approval"
   },
   "delivery_modes": {
-    "on-campus": "Classes at the Margibi campus, materials posted online",
-    "blended": "Weekly online lessons plus a monthly in-person session at campus or a county hub",
+    "blended": "Weekly online lessons plus scheduled face-to-face sessions at the Margibi campus or a county study centre",
     "online": "Fully online with live sessions and an online final assessment"
   },
   "tracks": {
     "weekday": "Monday, Wednesday & Friday, 3:00 PM – 6:00 PM",
     "saturday": "Saturday, 8:00 AM – 3:00 PM"
+  },
+  "policies": {
+    "grading": {
+      "total_points": 100,
+      "components": [
+        {
+          "name": "Continuous assessment",
+          "points": 30
+        },
+        {
+          "name": "Assignments & practical activities",
+          "points": 20
+        },
+        {
+          "name": "Midterm examination or assessment",
+          "points": 20
+        },
+        {
+          "name": "Final examination or course project",
+          "points": 30
+        }
+      ],
+      "pass_mark_percent": 70,
+      "completion": "Pass mark met, all required assessments completed, course-specific requirements met, fees cleared"
+    },
+    "payment": {
+      "installments": 2,
+      "second_installment_due_days_after_first_payment": 56,
+      "on_late_payment": "Platform and course-material access temporarily suspended; restored when the balance is paid or an authorized payment arrangement is approved",
+      "reminders_days_before_due": [
+        14,
+        3
+      ]
+    },
+    "sponsor_reporting": {
+      "requires_student_consent": true,
+      "frequency": "End of each term or agreed interval",
+      "may_include": [
+        "Enrolment status",
+        "Attendance or participation",
+        "Assignment completion",
+        "Assessment results or overall grades",
+        "Academic standing",
+        "Programme completion status"
+      ],
+      "never_without_authorization": [
+        "Individual assignments",
+        "Detailed academic records",
+        "Personal communications",
+        "Other confidential information"
+      ]
+    }
   },
   "schools": [
     {
@@ -169,7 +221,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -190,7 +242,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -211,7 +263,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -232,7 +284,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -253,7 +305,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -274,8 +326,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -318,8 +369,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -340,8 +390,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -362,8 +411,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -384,8 +432,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -406,8 +453,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -428,8 +474,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -450,8 +495,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -472,8 +516,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -494,8 +537,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -516,8 +558,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -560,8 +601,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -582,8 +622,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -648,8 +687,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -692,8 +730,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -714,8 +751,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -736,8 +772,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",
@@ -758,8 +793,7 @@
       "entry_requirements": "TODO",
       "duration_weeks": 10,
       "delivery_modes": [
-        "blended",
-        "on-campus"
+        "blended"
       ],
       "fee": {
         "amount": "TODO",

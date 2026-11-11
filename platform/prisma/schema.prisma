@@ -1,0 +1,197 @@
+// TIME Learning database. Stage 1: accounts, roles, the catalogue, approvals and the activity log.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  LECTURER
+  FACILITATOR // study centre facilitator
+  REGISTRAR
+  FINANCE
+  LEADERSHIP // Dean, Executive Director
+  ADMIN // system administrator
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+// ---- Accounts (the first four models follow Better Auth's schema) ----
+
+model User {
+  id            String     @id
+  name          String
+  email         String     @unique
+  emailVerified Boolean    @default(false)
+  image         String?
+  phone         String?
+  role          Role       @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  sessions          Session[]
+  accounts          Account[]
+  activity          AuditLog[]
+  approvalsMade     ApprovalRequest[] @relation("requester")
+  approvalsDecided  ApprovalRequest[] @relation("decider")
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---- Catalogue: School -> Program -> Course (imported from the website's data/catalogue.json) ----
+
+model School {
+  id      String   @id // slug, e.g. "teacher-education"
+  title   String
+  short   String
+  blurb   String
+  sort    Int      @default(0)
+  courses Course[]
+
+  @@map("school")
+}
+
+model Program {
+  id      String   @id // slug, e.g. "c-certificate"
+  title   String
+  sort    Int      @default(0)
+  courses Course[]
+
+  @@map("program")
+}
+
+enum DeliveryMode {
+  ONLINE
+  BLENDED
+  ON_CAMPUS
+}
+
+model Course {
+  id                String       @id // slug
+  title             String
+  schoolId          String
+  school            School       @relation(fields: [schoolId], references: [id])
+  programId         String
+  program           Program      @relation(fields: [programId], references: [id])
+  duration          String?
+  tuitionUsd        Int?
+  installments      Int          @default(1)
+  deliveryMode      DeliveryMode
+  deliveryConfirmed Boolean      @default(false)
+  active            Boolean      @default(true)
+  sort              Int          @default(0)
+
+  @@index([schoolId])
+  @@index([programId])
+  @@map("course")
+}
+
+// ---- Approvals: one inbox for every decision that needs sign-off ----
+
+enum ApprovalType {
+  STAFF_ACCESS // a person asks for a staff role
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model ApprovalRequest {
+  id            String         @id @default(cuid())
+  type          ApprovalType
+  status        ApprovalStatus @default(PENDING)
+  requestedById String
+  requestedBy   User           @relation("requester", fields: [requestedById], references: [id], onDelete: Cascade)
+  // What is being asked for, e.g. { "role": "LECTURER" }
+  payload       Json
+  note          String?
+  decidedById   String?
+  decidedBy     User?          @relation("decider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt     DateTime?
+  decisionNote  String?
+  createdAt     DateTime       @default(now())
+
+  @@index([status, createdAt])
+  @@index([requestedById])
+  @@map("approval_request")
+}
+
+// ---- Activity log: who did what, when. Rows are only ever added. ----
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  // Kept even if the account is later removed
+  actorLabel String
+  action     String // e.g. "user.role_changed"
+  entityType String?
+  entityId   String?
+  summary    String
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_log")
+}

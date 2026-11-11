@@ -105,7 +105,7 @@ test("rejecting needs a reason, and the reason is shown to the person who asked"
   await admin.context().close();
 });
 
-test("an administrator changes a role; a registrar sees accounts but cannot change them or see activity", async () => {
+test("an administrator changes a role; a registrar sees accounts but cannot change them, see activity or see staff access requests", async () => {
   const admin = await person(ctx, { width: 1280, height: 900 });
   await signIn(admin, ADMIN);
   await admin.goto(`${URL_BASE}/admin/users?q=joe`);
@@ -122,10 +122,12 @@ test("an administrator changes a role; a registrar sees accounts but cannot chan
   await registrar.goto(`${URL_BASE}/admin/users`);
   assert.equal(new URL(registrar.url()).pathname, "/admin/users");
   assert.equal(await registrar.locator("tbody select, tbody button").count(), 0, "read-only for the registrar");
-  for (const path of ["/admin/activity", "/admin/approvals"]) {
-    await registrar.goto(URL_BASE + path);
-    assert.equal(new URL(registrar.url()).pathname, "/dashboard", path);
-  }
+  await registrar.goto(`${URL_BASE}/admin/activity`);
+  assert.equal(new URL(registrar.url()).pathname, "/dashboard", "the registrar cannot read the activity log");
+  // The registrar has an approvals inbox for applications, but staff access requests never appear in it.
+  await registrar.goto(`${URL_BASE}/admin/approvals?show=decided`);
+  assert.equal(new URL(registrar.url()).pathname, "/admin/approvals");
+  assert.equal(await registrar.locator("article").count(), 0);
   await admin.context().close();
   await registrar.context().close();
 });

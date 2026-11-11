@@ -23,8 +23,16 @@ export const CAPABILITIES = {
   "users.view": ["ADMIN", "LEADERSHIP", "REGISTRAR"],
   // Change roles, suspend and restore accounts
   "users.manage": ["ADMIN"],
-  // See every approval request and its outcome
-  "approvals.view": ["ADMIN", "LEADERSHIP"],
+  // See every approval request and its outcome, whatever its type
+  "approvals.viewAll": ["ADMIN", "LEADERSHIP"],
+  // Create intakes, study centres and classes; assign class staff
+  "setup.manage": ["ADMIN", "REGISTRAR"],
+  // See classes and who is enrolled in them
+  "enrolments.view": ["ADMIN", "REGISTRAR", "LEADERSHIP"],
+  // Set a new password for another person
+  "users.resetPassword": ["ADMIN"],
+  // Apply to join a class
+  "classes.apply": ["STUDENT"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Capability = keyof typeof CAPABILITIES;
@@ -34,20 +42,33 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   STAFF_ACCESS: "Staff access",
+  APPLICATION: "Application",
+  ENROLMENT_CHANGE: "Withdrawal or deferral",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   STAFF_ACCESS: ["ADMIN"],
+  APPLICATION: ["REGISTRAR"],
+  ENROLMENT_CHANGE: ["REGISTRAR"],
 };
 
 export function canDecide(role: Role, type: ApprovalType): boolean {
   return role === "ADMIN" || APPROVERS[type].includes(role);
 }
+
+// The approval types a role sees in the inbox: all of them for administrators and leadership,
+// otherwise only the types that role decides.
+export function visibleApprovalTypes(role: Role): ApprovalType[] {
+  if (can(role, "approvals.viewAll")) return [...APPROVAL_TYPES];
+  return APPROVAL_TYPES.filter((t) => APPROVERS[t].includes(role));
+}
+
+export const seesApprovals = (role: Role) => visibleApprovalTypes(role).length > 0;
 
 // Roles a person may ask for. Administrator access is only ever given directly by another administrator.
 export const REQUESTABLE_ROLES = ["LECTURER", "FACILITATOR", "REGISTRAR", "FINANCE", "LEADERSHIP"] as const satisfies readonly Role[];

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import { signOutAction } from "@/app/actions";
+import { NavLink } from "@/components/nav-link";
 import { can, ROLE_LABEL } from "@/lib/permissions";
 import { getCurrentUser } from "@/lib/session";
 
@@ -32,17 +33,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {user ? (
               <>
                 <nav className="nav" aria-label="Main">
-                  <Link href="/dashboard">Home</Link>
-                  <Link href="/catalogue">Programs</Link>
-                  {can(user.role, "admin.area") && <Link href="/admin">Administration</Link>}
+                  <NavLink href="/dashboard">Home</NavLink>
+                  {can(user.role, "classes.apply") && <NavLink href="/my-classes">My classes</NavLink>}
+                  {can(user.role, "classes.apply") && <NavLink href="/apply">Apply</NavLink>}
+                  {(user.role === "LECTURER" || user.role === "FACILITATOR") && <NavLink href="/teach">My classes</NavLink>}
+                  <NavLink href="/catalogue">Programs</NavLink>
+                  {can(user.role, "admin.area") && <NavLink href="/admin">Administration</NavLink>}
                 </nav>
                 <span className="who">{user.name} · {ROLE_LABEL[user.role]}</span>
                 <form action={signOutAction}><button className="btn ghost sm" type="submit">Sign out</button></form>
               </>
             ) : (
               <nav className="nav" aria-label="Main">
-                <Link href="/sign-in">Sign in</Link>
-                <Link href="/sign-up">Create account</Link>
+                <NavLink href="/sign-in">Sign in</NavLink>
+                <NavLink href="/sign-up">Create account</NavLink>
               </nav>
             )}
           </div>

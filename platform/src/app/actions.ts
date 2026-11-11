@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
+import { back, firstProblem, UserProblem } from "@/lib/action-helpers";
+import { studentNumber } from "@/lib/academics";
 import { auth } from "@/lib/auth";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
@@ -14,14 +17,6 @@ import {
   type ApprovalType, type Role,
 } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
-
-// Send the person back to a page with a message shown at the top.
-function back(path: string, kind: "error" | "ok", message: string, extra: Record<string, string> = {}): never {
-  const q = new URLSearchParams({ [kind]: message, ...extra });
-  redirect(`${path}${path.includes("?") ? "&" : "?"}${q}`);
-}
-
-const firstProblem = (error: z.ZodError) => error.issues[0]?.message ?? "Please check the form.";
 
 // ---- Accounts ----
 
@@ -114,9 +109,10 @@ export async function requestStaffAccessAction(form: FormData) {
 export async function cancelRequestAction(form: FormData) {
   const user = await requireUser();
   const id = String(form.get("id") ?? "");
+  const returnTo = { apply: "/apply", classes: "/my-classes" }[String(form.get("from"))] ?? "/account/staff-access";
   const done = await prisma.approvalRequest.updateMany({ where: { id, requestedById: user.id, status: "PENDING" }, data: { status: "CANCELLED" } });
   if (done.count) await audit({ actor: user, action: "approval.cancelled", summary: `${user.name} cancelled their request`, entityType: "approval", entityId: id });
-  back("/account/staff-access", done.count ? "ok" : "error", done.count ? "Your request was cancelled." : "That request can no longer be cancelled.");
+  back(returnTo, done.count ? "ok" : "error", done.count ? "Your request was cancelled." : "That request can no longer be cancelled.");
 }
 
 // ---- Deciding approvals ----
@@ -141,29 +137,76 @@ export async function decideApprovalAction(form: FormData) {
   if (decision === "REJECTED" && !note) back("/admin/approvals", "error", "Give a short reason when you reject a request.");
 
   // The status check inside the update means two people can never decide the same request.
-  const applied = await prisma.$transaction(async (tx) => {
-    const updated = await tx.approvalRequest.updateMany({
-      where: { id, status: "PENDING" },
-      data: { status: decision, decidedById: user.id, decidedAt: new Date(), decisionNote: note },
+  let applied = false;
+  let effect: string | null = null;
+  let problem: string | null = null;
+  try {
+    applied = await prisma.$transaction(async (tx) => {
+      const updated = await tx.approvalRequest.updateMany({
+        where: { id, status: "PENDING" },
+        data: { status: decision, decidedById: user.id, decidedAt: new Date(), decisionNote: note },
+      });
+      if (!updated.count) return false;
+      if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload);
+      return true;
     });
-    if (!updated.count) return false;
-    if (decision === "APPROVED" && type === "STAFF_ACCESS") {
-      const role = (request.payload as { role?: unknown }).role;
-      if (!isRole(role) || !(REQUESTABLE_ROLES as readonly Role[]).includes(role)) throw new Error("The request names a role that cannot be granted.");
-      await tx.user.update({ where: { id: request.requestedById }, data: { role } });
-    }
-    return true;
-  });
+  } catch (e) {
+    if (!(e instanceof UserProblem)) throw e;
+    problem = e.message;
+  }
+  if (problem) back("/admin/approvals", "error", problem);
   if (!applied) back("/admin/approvals", "error", "Someone has already decided that request.");
 
   const verb = decision === "APPROVED" ? "approved" : "rejected";
   await audit({
     actor: user, action: `approval.${verb}`,
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
-    entityType: "approval", entityId: id, meta: { type, payload: request.payload, note: note ?? null },
+    entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
+  if (effect) await audit({ actor: user, action: "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
+}
+
+// What an approval does once it is granted. Runs inside the same transaction as the decision,
+// so a request is never marked approved without its effect.
+async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, requesterId: string, payload: Prisma.JsonValue): Promise<string | null> {
+  const data = (payload ?? {}) as Record<string, unknown>;
+  if (type === "STAFF_ACCESS") {
+    const role = data.role;
+    if (!isRole(role) || !(REQUESTABLE_ROLES as readonly Role[]).includes(role)) throw new UserProblem("The request names a role that cannot be granted.");
+    await tx.user.update({ where: { id: requesterId }, data: { role } });
+    return null;
+  }
+  if (type === "APPLICATION") {
+    const cls = await tx.courseClass.findUnique({
+      where: { id: String(data.classId) },
+      include: { course: true, intake: true, _count: { select: { enrolments: { where: { status: "ACTIVE" } } } } },
+    });
+    if (!cls) throw new UserProblem("That class no longer exists.");
+    if (cls.capacity !== null && cls._count.enrolments >= cls.capacity) throw new UserProblem("That class is full. Raise its capacity or reject the application.");
+    await tx.enrolment.upsert({
+      where: { userId_classId: { userId: requesterId, classId: cls.id } },
+      create: { userId: requesterId, classId: cls.id },
+      update: { status: "ACTIVE" },
+    });
+    const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
+    let number = student.studentNumber;
+    if (!number) {
+      const [{ n }] = await tx.$queryRaw<{ n: bigint }[]>`SELECT nextval('student_number_seq') AS n`;
+      number = studentNumber(new Date().getUTCFullYear(), Number(n));
+    }
+    await tx.user.update({ where: { id: requesterId }, data: { studentNumber: number, county: typeof data.county === "string" ? data.county : student.county } });
+    return `${student.name} (${number}) was enrolled in ${cls.course.title}, ${cls.intake.name}`;
+  }
+  if (type === "ENROLMENT_CHANGE") {
+    const status = data.change === "DEFER" ? "DEFERRED" : "WITHDRAWN";
+    const changed = await tx.enrolment.updateMany({ where: { id: String(data.enrolmentId), userId: requesterId, status: "ACTIVE" }, data: { status } });
+    if (!changed.count) throw new UserProblem("That enrolment is no longer active.");
+    const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
+    return `${student.name}'s enrolment was ${status === "DEFERRED" ? "deferred" : "withdrawn"}`;
+  }
+  return null;
 }
 
 // ---- Managing accounts ----

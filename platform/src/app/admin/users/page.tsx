@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { changeRoleAction, setStatusAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
@@ -16,7 +17,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
   const role = isRole(params.role) ? params.role : null;
   const page = Math.max(1, Number(params.page) || 1);
   const where: Prisma.UserWhereInput = {
-    ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }] } : {}),
+    ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { studentNumber: { contains: q, mode: "insensitive" } }] } : {}),
     ...(role ? { role } : {}),
   };
   const [users, total] = await Promise.all([
@@ -32,7 +33,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
         <Notices params={params} />
         <form className="inline-form" method="get" role="search">
           <label className="skip" htmlFor="q">Search by name or email</label>
-          <input id="q" name="q" type="search" placeholder="Name or email" defaultValue={q} />
+          <input id="q" name="q" type="search" placeholder="Name, email or student no." defaultValue={q} />
           <label className="skip" htmlFor="role-filter">Role</label>
           <select id="role-filter" name="role" defaultValue={role ?? ""}>
             <option value="">All roles</option>
@@ -43,12 +44,13 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
         <p className="muted small">{total} {total === 1 ? "account" : "accounts"}</p>
       </div>
       <div className="table-wrap"><table>
-        <thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Status</th><th>Role</th>{manage && <th>Account</th>}</tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Student no.</th><th>Joined</th><th>Status</th><th>Role</th>{manage && <th>Account</th>}</tr></thead>
         <tbody>
           {users.map((u) => (
             <tr key={u.id}>
               <td>{u.name}{u.id === me.id && <span className="muted small"> (you)</span>}</td>
               <td>{u.email}</td>
+              <td className="nowrap">{u.studentNumber ?? "—"}</td>
               <td className="nowrap">{formatDate(u.createdAt)}</td>
               <td><span className={`pill ${u.status === "ACTIVE" ? "ok" : "bad"}`}>{u.status === "ACTIVE" ? "Active" : "Suspended"}</span></td>
               <td>
@@ -66,17 +68,20 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
               {manage && (
                 <td>
                   {u.id !== me.id && (
+                    <div className="row">
+                    <Link className="btn ghost sm" href={`/admin/users/${u.id}/password`}>New password</Link>
                     <form action={setStatusAction}>
                       <input type="hidden" name="userId" value={u.id} />
                       <input type="hidden" name="status" value={u.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE"} />
                       <button className={`btn sm ${u.status === "ACTIVE" ? "danger" : "ghost"}`} type="submit">{u.status === "ACTIVE" ? "Suspend" : "Restore"}</button>
                     </form>
+                    </div>
                   )}
                 </td>
               )}
             </tr>
           ))}
-          {users.length === 0 && <tr><td colSpan={manage ? 6 : 5}>No accounts match.</td></tr>}
+          {users.length === 0 && <tr><td colSpan={manage ? 7 : 6}>No accounts match.</td></tr>}
         </tbody>
       </table></div>
       {total > PAGE && (

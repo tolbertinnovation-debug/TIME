@@ -3,32 +3,39 @@ import { decideApprovalAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
-import { APPROVAL_LABEL, canDecide, isRole, ROLE_LABEL, type ApprovalType } from "@/lib/permissions";
-import { requireCapability } from "@/lib/session";
+import { classLabel } from "@/lib/academics";
+import { APPROVAL_LABEL, canDecide, isRole, ROLE_LABEL, visibleApprovalTypes, type ApprovalType } from "@/lib/permissions";
+import { requireApprovalsAccess } from "@/lib/session";
 
 export const metadata = { title: "Approvals" };
 
 const STATUS = { PENDING: ["wait", "Waiting"], APPROVED: ["ok", "Approved"], REJECTED: ["bad", "Rejected"], CANCELLED: ["plain", "Cancelled"] } as const;
 
 // What the request asks for, in plain words.
-function describe(type: ApprovalType, payload: unknown): string {
-  if (type === "STAFF_ACCESS") {
-    const role = (payload as { role?: unknown }).role;
-    return isRole(role) ? `Asks for the ${ROLE_LABEL[role]} role` : "Asks for a staff role";
+function describe(type: ApprovalType, payload: unknown, classes: Map<string, string>): string {
+  const data = (payload ?? {}) as Record<string, unknown>;
+  if (type === "STAFF_ACCESS") return isRole(data.role) ? `Asks for the ${ROLE_LABEL[data.role]} role` : "Asks for a staff role";
+  const cls = classes.get(String(data.classId)) ?? "a class that was removed";
+  if (type === "APPLICATION") {
+    const extra = [data.county && `lives in ${data.county}`, data.work && `works as ${data.work}`].filter(Boolean).join(", ");
+    return `Applies to ${cls}${extra ? ` (${extra})` : ""}`;
   }
+  if (type === "ENROLMENT_CHANGE") return `Asks to ${data.change === "DEFER" ? "defer" : "withdraw from"} ${cls}`;
   return APPROVAL_LABEL[type];
 }
 
 export default async function Approvals({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const me = await requireCapability("approvals.view");
+  const me = await requireApprovalsAccess();
   const params = await searchParams;
   const decided = params.show === "decided";
   const requests = await prisma.approvalRequest.findMany({
-    where: decided ? { status: { not: "PENDING" } } : { status: "PENDING" },
+    where: { type: { in: visibleApprovalTypes(me.role) }, status: decided ? { not: "PENDING" } : "PENDING" },
     orderBy: { createdAt: decided ? "desc" : "asc" },
     include: { requestedBy: true, decidedBy: true },
     take: 100,
   });
+  const classIds = [...new Set(requests.map((r) => (r.payload as { classId?: unknown } | null)?.classId).filter((v): v is string => typeof v === "string"))];
+  const classes = new Map((await prisma.courseClass.findMany({ where: { id: { in: classIds } }, include: { course: true, intake: true } })).map((c) => [c.id, classLabel(c)]));
   return (
     <div className="stack lg">
       <div className="stack">
@@ -51,7 +58,7 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
               <h2>{r.requestedBy.name} <span className="muted small">· {r.requestedBy.email}</span></h2>
               <span className={`pill ${cls}`}>{label}</span>
             </div>
-            <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>
+            <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload, classes)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>
             {r.note && <p>"{r.note}"</p>}
             {r.status !== "PENDING" && r.status !== "CANCELLED" && (
               <p className="small muted">{label} by {r.decidedBy?.name ?? "a removed account"}{r.decidedAt ? ` on ${formatDateTime(r.decidedAt)}` : ""}{r.decisionNote ? `: "${r.decisionNote}"` : ""}</p>
@@ -70,7 +77,7 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
               </form>
             )}
             {r.status === "PENDING" && mine && <p className="small muted">This is your own request, so another administrator must decide it.</p>}
-            {r.status === "PENDING" && !canDecide(me.role, type) && <p className="small muted">You can see this request, but a system administrator decides it.</p>}
+            {r.status === "PENDING" && !canDecide(me.role, type) && <p className="small muted">You can see this request, but you are not the person who decides it.</p>}
           </article>
         );
       })}

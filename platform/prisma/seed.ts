@@ -8,6 +8,7 @@ type CatalogueCourse = {
   id: string; title: string; school_id: string; program_id: string; program: string;
   duration: string | null; tuition_usd: number | null; installments: number | null;
   delivery_mode: "online" | "blended" | "on-campus"; delivery_confirmed: boolean;
+  next_cohorts?: { register_by: string | null; start_date: string }[];
 };
 type Catalogue = { schools: { id: string; title: string; short: string; blurb: string }[]; courses: CatalogueCourse[] };
 
@@ -34,7 +35,16 @@ async function main() {
     };
     await prisma.course.upsert({ where: { id: c.id }, create: { id: c.id, ...data }, update: data });
   }
-  console.log(`Catalogue loaded: ${cat.schools.length} schools, ${programs.size} programs, ${cat.courses.length} courses.`);
+  // Intakes come from the start dates the website publishes. They start as "planned"; staff open them.
+  const intakes = new Map<string, string | null>();
+  for (const c of cat.courses) for (const k of c.next_cohorts ?? []) if (!intakes.has(k.start_date)) intakes.set(k.start_date, k.register_by);
+  const monthYear = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
+  for (const [start, registerBy] of intakes) {
+    const name = monthYear.format(new Date(start));
+    const data = { startDate: new Date(start), registerBy: registerBy ? new Date(registerBy) : null };
+    await prisma.intake.upsert({ where: { name }, create: { name, ...data }, update: data });
+  }
+  console.log(`Catalogue loaded: ${cat.schools.length} schools, ${programs.size} programs, ${cat.courses.length} courses, ${intakes.size} intakes.`);
 }
 
 main().finally(() => prisma.$disconnect());

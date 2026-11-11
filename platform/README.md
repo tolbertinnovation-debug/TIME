@@ -2,7 +2,7 @@
 
 The online learning platform for TIME Inc. It is separate from the public website in the folder above, and it needs its own hosting and database to go live.
 
-- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Step 1 (foundation) is built.**
+- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 (foundation) and 2 (setup, admissions, enrolment) are built.**
 - Stack: Next.js (App Router, TypeScript), Prisma, PostgreSQL (Neon in production), Better Auth.
 
 ## Run it on your computer
@@ -14,7 +14,7 @@ cd platform
 cp .env.example .env          # then set DATABASE_URL and a long random BETTER_AUTH_SECRET
 npm install
 npm run db:deploy             # create the tables
-npm run db:seed               # load TIME's schools, programs and courses
+npm run db:seed               # load TIME's schools, programs, courses and intakes
 ADMIN_NAME="Your Name" ADMIN_EMAIL="you@example.com" ADMIN_PASSWORD="a-long-password" npm run create-admin
 npm run dev                   # http://localhost:3000
 ```
@@ -40,8 +40,10 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/lib/permissions.ts` | Who may do what. Every page and action checks these rules on the server. |
 | `src/lib/audit.ts` | Writes the activity log. Call it for every change that matters. |
 | `src/lib/auth-core.ts`, `auth.ts`, `session.ts` | Sign-in, and finding the signed-in person. |
-| `src/app/actions.ts` | Every change a person can make (sign up, request, approve, change role, suspend). |
-| `src/app/admin/` | Administration: overview, accounts, approvals, activity. |
+| `src/app/actions.ts` | Accounts and approvals: sign up, request, approve or reject, change role, suspend. |
+| `src/app/academic-actions.ts` | Intakes, study centres, classes, class staff, applying, withdrawing, password reset. |
+| `src/app/admin/` | Administration: overview, approvals, classes, intakes and centres, accounts, activity. |
+| `src/app/apply/`, `my-classes/`, `teach/` | What students and lecturers use. |
 
 ## Security notes
 

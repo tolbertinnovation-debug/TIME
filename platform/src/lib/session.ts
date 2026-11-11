@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { can, isRole, type Capability, type Role } from "@/lib/permissions";
+import { can, isRole, seesApprovals, type Capability, type Role } from "@/lib/permissions";
 
 export type CurrentUser = { id: string; name: string; email: string; phone: string | null; role: Role };
 
@@ -25,5 +25,12 @@ export async function requireUser(): Promise<CurrentUser> {
 export async function requireCapability(capability: Capability): Promise<CurrentUser> {
   const user = await requireUser();
   if (!can(user.role, capability)) redirect("/dashboard?notice=not-allowed");
+  return user;
+}
+
+// The approvals inbox is open to anyone who decides at least one kind of request.
+export async function requireApprovalsAccess(): Promise<CurrentUser> {
+  const user = await requireUser();
+  if (!seesApprovals(user.role)) redirect("/dashboard?notice=not-allowed");
   return user;
 }

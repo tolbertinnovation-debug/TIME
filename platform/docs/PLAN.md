@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Step 1 is built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 and 2 are built; the rest follow in order.
 
 ## What the earlier plan was missing
 
@@ -9,7 +9,7 @@ Updated 11 November 2026. This replaces the earlier plan. Step 1 is built; the r
 | **Certificate requests.** A student who has finished asks for their certificate; the platform checks they qualify; staff approve; the certificate is issued. | Step 6 |
 | **One approvals inbox.** Every decision that needs sign-off in one place, with an administrator able to step in on any of them. | Step 1 (built), extended in every step |
 | **A full activity view.** Everything every person does, searchable, for administrators. | Step 1 (built), extended in every step |
-| Academic setup: academic years, intakes, classes (cohorts), study centres, lecturer assignments | Step 2 |
+| Academic setup: intakes, classes (cohorts), study centres, lecturer assignments | Step 2 (built) |
 | Course building tools for lecturers, with review before a course is published | Step 3 |
 | Announcements, class discussions, timetable and calendar | Step 3 |
 | Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 |
@@ -17,7 +17,7 @@ Updated 11 November 2026. This replaces the earlier plan. Step 1 is built; the r
 | Transcripts, results slips and replacement certificates | Step 6 |
 | Notifications by app, email and SMS/WhatsApp | Step 7 |
 | Help desk, course evaluations, sponsor progress reports | Step 7 |
-| Password reset, email verification, sign-in by phone number | Step 2 (reset by an administrator) and Step 8 (self-service) |
+| Password reset, email verification, sign-in by phone number | Step 2 (reset by an administrator, built) and Step 8 (self-service) |
 | Terms and privacy acceptance, data retention, account deletion requests | Step 8 |
 | Backups, monitoring, error alerts, a security review, load testing | Step 8 |
 | Moving the old portal's accounts across | Step 8 |
@@ -51,12 +51,16 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - TIME's 4 schools, 6 programs and 41 courses loaded from the website catalogue.
 - Works on phones; pages need almost no JavaScript.
 
-### Step 2. Academic setup, admissions and enrolment
-- Intakes, classes (course + intake + weekday or Saturday + online or blended), study centres.
-- Assign lecturers and facilitators to classes.
-- Online application; registrar reviews (approval type: application).
-- Enrolment into classes; student records; withdrawal and deferral requests (approval).
-- Administrator can reset a person's password.
+### Step 2. Academic setup, admissions and enrolment — built
+- Intakes (planned, open, closed) and study centres. The March and October 2027 intakes are loaded from the website.
+- Classes: a course in an intake, on weekdays or Saturdays, online or blended, with an optional number of places. A blended class needs a study centre.
+- The registrar assigns lecturers and facilitators to classes. A lecturer can open only the classes they are assigned to.
+- Online application: a student applies to an open class; the registrar approves or rejects it in the approvals inbox.
+- Approval enrols the student and gives them a student number (TIME-year-0001). A full class cannot take another student.
+- Students see their classes and can ask to withdraw or defer; the registrar decides.
+- An administrator can set a new password for a person, which signs them out everywhere.
+- The registrar sees only applications and enrolment requests in the inbox; administrators and leadership see everything.
+- Every one of these actions is in the activity log.
 
 ### Step 3. Teaching and learning
 - Course builder: weeks, lessons (text, audio, small PDFs, short video), each marked online or practical.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { can, canDecide, isRole, REQUESTABLE_ROLES, roleChangeProblem, ROLES, suspendProblem } from "../../src/lib/permissions";
+import { can, canDecide, isRole, REQUESTABLE_ROLES, roleChangeProblem, ROLES, seesApprovals, suspendProblem, visibleApprovalTypes } from "../../src/lib/permissions";
 
 describe("capabilities", () => {
   it("lets only administrators manage accounts", () => {
@@ -13,7 +13,7 @@ describe("capabilities", () => {
   });
   it("lets the registrar see accounts but not approvals or activity", () => {
     expect(can("REGISTRAR", "users.view")).toBe(true);
-    expect(can("REGISTRAR", "approvals.view")).toBe(false);
+    expect(can("REGISTRAR", "approvals.viewAll")).toBe(false);
     expect(can("REGISTRAR", "activity.view")).toBe(false);
   });
 });
@@ -21,6 +21,17 @@ describe("capabilities", () => {
 describe("approvals", () => {
   it("lets an administrator decide every type, and nobody else decide staff access", () => {
     for (const role of ROLES) expect(canDecide(role, "STAFF_ACCESS")).toBe(role === "ADMIN");
+  });
+  it("lets the registrar and administrators decide applications and enrolment changes", () => {
+    for (const type of ["APPLICATION", "ENROLMENT_CHANGE"] as const) {
+      expect(ROLES.filter((r) => canDecide(r, type))).toEqual(["REGISTRAR", "ADMIN"]);
+    }
+  });
+  it("shows each role only the approval types it should see", () => {
+    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE"]);
+    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE"]);
+    expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE"]);
+    for (const role of ["STUDENT", "LECTURER", "FACILITATOR", "FINANCE"] as const) expect(seesApprovals(role)).toBe(false);
   });
   it("never lets someone request administrator access", () => {
     expect((REQUESTABLE_ROLES as readonly string[]).includes("ADMIN")).toBe(false);
@@ -55,5 +66,15 @@ describe("suspending accounts", () => {
     expect(suspendProblem({ ...base, actorRole: "LEADERSHIP" })).toMatch(/not allowed/);
     expect(suspendProblem({ ...base, targetId: "a" })).toMatch(/your own/);
     expect(suspendProblem({ ...base, targetRole: "ADMIN", activeAdminCount: 1 })).toMatch(/only administrator/);
+  });
+});
+
+describe("academic setup and enrolment", () => {
+  it("lets only administrators and the registrar set up intakes and classes", () => {
+    expect(ROLES.filter((r) => can(r, "setup.manage"))).toEqual(["REGISTRAR", "ADMIN"]);
+  });
+  it("lets only students apply, and only administrators reset passwords", () => {
+    expect(ROLES.filter((r) => can(r, "classes.apply"))).toEqual(["STUDENT"]);
+    expect(ROLES.filter((r) => can(r, "users.resetPassword"))).toEqual(["ADMIN"]);
   });
 });

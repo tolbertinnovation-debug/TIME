@@ -8,7 +8,7 @@ import { ROOT, pages } from './layout.mjs';
 import { DATA as PROGRAMS } from './programs.mjs';
 
 const OUT = join(ROOT, 'assets/search-index.json');
-const SKIP = new Set(['404.html', 'offline.html', 'search.html', 'learning.html']);
+const SKIP = new Set(['404.html', 'offline.html', 'search.html']);
 
 const decode = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
   .replace(/&#39;|&rsquo;|&lsquo;/g, '’').replace(/&ldquo;|&rdquo;/g, '"').replace(/&ndash;/g, '–').replace(/&mdash;/g, '—').replace(/&hellip;/g, '…');
@@ -31,10 +31,6 @@ export function buildIndex() {
     if (/<meta name="robots" content="[^"]*noindex/.test(html)) continue;
     entries.push({ type: 'page', ...pageEntry(file, html) });
   }
-  // The study portal renders with JavaScript, so index its title and description only.
-  const learning = readFileSync(join(ROOT, 'learning.html'), 'utf8');
-  entries.push({ type: 'page', url: 'learning.html', title: 'TIME Learning: online courses and study guides',
-    description: decode(learning.match(/<meta name="description" content="([^"]*)"/)[1]), headings: ['Online learning', 'Student sign-in'], text: '' });
   for (const p of PROGRAMS) {
     for (const c of p.courses) {
       entries.push({ type: 'course', url: `${p.file}#courses`, title: c.detail ? `${c.name} (${c.detail})` : c.name,

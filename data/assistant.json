@@ -226,25 +226,19 @@
         "online",
         "distance",
         "remote",
-        "portal",
         "learning portal",
         "e-learning",
         "elearning",
-        "login",
-        "log in",
-        "sign in",
-        "account",
-        "password",
         "zoom"
       ],
       "answer": [
-        "Special Education Support Training (Cohort #1) is delivered 60% online and 40% in person through the TIME Learning portal.",
-        "To get in: create a student account, verify your email address and request enrolment in your course. Once TIME approves it, your materials, assignments and schedule appear in your account."
+        "Special Education Support Training (Cohort #1) is delivered 60% online and 40% in person.",
+        "When your enrolment is confirmed, admissions will tell you how to join the online classes."
       ],
       "links": [
         {
-          "label": "Online Learning",
-          "href": "learning.html"
+          "label": "Special Education",
+          "href": "programs-special-education.html"
         }
       ]
     },
@@ -258,7 +252,7 @@
         "cohort"
       ],
       "answer": [
-        "Special Education Support Training (Cohort #1) is a 10-week program delivered 60% online and 40% in person, through the TIME Learning portal. For its fees, ask admissions."
+        "Special Education Support Training (Cohort #1) is a 10-week program delivered 60% online and 40% in person. For its fees, ask admissions."
       ],
       "links": [
         {

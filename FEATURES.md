@@ -1,5 +1,7 @@
 # TIME Inc. website: production launch checklist
 
+> **Update (11 Nov 2026):** the online learning front end (TIME Learning portal, account and login pages, "How Online Learning Works", the online application form and Certificate Check) has been removed ahead of a new online learning build. Entries below that mention them are historical. The `backend/` code is kept; see `LEARNING_PORTAL.md`.
+
 Purpose: the public website for the Technical Institute for Many Empowerment (TIME) Inc. and Phìtìa Academy, plus the TIME Learning portal.
 
 Users:

@@ -10,7 +10,7 @@ import { ROOT, pages } from './layout.mjs';
 import { DATA as PROGRAMS } from './programs.mjs';
 
 const OUT = join(ROOT, 'data/assistant-knowledge.json');
-const SKIP = new Set(['404.html', 'offline.html', 'search.html', 'account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html']);
+const SKIP = new Set(['404.html', 'offline.html', 'search.html']);
 const MAX = 520; // characters per passage
 
 const decode = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
@@ -75,11 +75,6 @@ export function buildKnowledge() {
   const passages = [];
   for (const file of pages().filter((f) => !SKIP.has(f))) {
     const html = readFileSync(join(ROOT, file), 'utf8');
-    // The study portal renders with JavaScript; describe it from its meta description.
-    if (file === 'learning.html') {
-      passages.push({ u: 'learning.html', p: 'TIME Learning', h: 'Online learning', t: clean(html.match(/<meta name="description" content="([^"]*)"/)[1]) });
-      continue;
-    }
     passages.push(...pagePassages(file, html));
   }
   const courses = PROGRAMS.flatMap((p) => p.courses.map((c) => ({

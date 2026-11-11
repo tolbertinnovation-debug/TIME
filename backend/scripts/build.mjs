@@ -7,4 +7,4 @@ const zodMini={name:'zod-mini',setup(b){b.onResolve({filter:/^zod$/},(args)=>arg
 // The default Better Auth adapter shares a file with the unused Supabase adapter; letting esbuild drop
 // @supabase/auth-js when nothing references it removes about 80 KB.
 const supabaseShakeable={name:'supabase-shakeable',setup(b){b.onResolve({filter:/^@supabase\/auth-js$/},async(args)=>{if(args.pluginData?.skip)return;const r=await b.resolve(args.path,{resolveDir:args.resolveDir,kind:args.kind,pluginData:{skip:true}});return {...r,sideEffects:false};});}};
-await build({entryPoints:['src/account.mjs'],bundle:true,platform:'browser',target:['es2020'],format:'iife',outfile:'../assets/learning/account.bundle.js',minify:true,plugins:[zodMini,supabaseShakeable]});
+await build({entryPoints:['src/account.mjs'],bundle:true,platform:'browser',target:['es2020'],format:'iife',outfile:'build/account.bundle.js',minify:true,plugins:[zodMini,supabaseShakeable]});

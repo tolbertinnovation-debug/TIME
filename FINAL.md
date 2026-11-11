@@ -1,5 +1,7 @@
 # TIME Inc. website: summary
 
+> **Update (11 Nov 2026):** the online learning front end (TIME Learning portal, account and login pages, "How Online Learning Works", the online application form and Certificate Check) has been removed ahead of a new online learning build. Entries below that mention them are historical. The `backend/` code is kept; see `LEARNING_PORTAL.md`.
+
 The TIME Inc. website is a tested, accessible, secure, offline-capable site, live at https://tolbertinnovation-debug.github.io/TIME/. It publishes TIME Inc.'s approved fees and 2027 intake dates. Every item marked critical or high priority in `FEATURES.md` is done. What's left needs information or accounts that only TIME Inc. can provide.
 
 ## Pages

@@ -4,10 +4,9 @@ import { before, after } from 'node:test';
 import { chromium } from 'playwright';
 import { ROOT, startServer } from './serve.mjs';
 
-// Pages of the public website (the learning portal pages are rendered by their own scripts).
-export const PORTAL_PAGES = ['learning.html', 'account.html', 'student-login.html', 'lecturer-login.html', 'admin-login.html'];
+// Pages of the public website.
 export const ALL_PAGES = readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
-export const SITE_PAGES = ALL_PAGES.filter((f) => !PORTAL_PAGES.includes(f));
+export const SITE_PAGES = ALL_PAGES;
 export const PHONE = { width: 390, height: 844 };
 export const DESKTOP = { width: 1366, height: 900 };
 

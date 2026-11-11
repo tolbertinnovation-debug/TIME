@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { ALL_PAGES, PORTAL_PAGES, read } from './helpers.mjs';
+import { ALL_PAGES, read } from './helpers.mjs';
 import { ROOT } from './serve.mjs';
 
 const ids = (html) => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
@@ -19,7 +19,7 @@ test('internal links point to existing pages and anchors', () => {
       const target = path || file;
       if (!existsSync(join(ROOT, target))) { broken.push(`${file} → ${href} (missing file)`); continue; }
       // The portal uses #routes handled by its script, not element ids.
-      if (hash && !PORTAL_PAGES.includes(target) && !ids(read(target)).has(hash)) broken.push(`${file} → ${href} (missing #${hash})`);
+      if (hash && !ids(read(target)).has(hash)) broken.push(`${file} → ${href} (missing #${hash})`);
     }
   }
   assert.deepEqual(broken, []);
@@ -64,7 +64,7 @@ test('every page has a unique id for each id attribute', () => {
 });
 
 test('public pages declare a Content Security Policy that only allows the site itself and FormSubmit', () => {
-  for (const file of ALL_PAGES.filter((f) => !PORTAL_PAGES.includes(f))) {
+  for (const file of ALL_PAGES) {
     const csp = read(file).match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1];
     assert.ok(csp, `${file} has a CSP`);
     assert.match(csp, /script-src 'self';/, `${file} allows no inline or third-party scripts`);

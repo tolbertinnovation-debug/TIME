@@ -1,5 +1,7 @@
 # TIME Learning
 
+> **Status (11 Nov 2026): the TIME Learning front end has been removed from the website** (study portal `learning.html`, the account and login pages, `assets/learning/`, "How Online Learning Works", the online application form and Certificate Check), to make way for a new online learning platform. The `backend/` code below is kept for reference and reuse. Its build now writes the browser bundle to `backend/build/account.bundle.js`. **The deployed Neon Function and database are not affected by this change:** existing accounts and course records are still stored there, and the privacy policy still describes them. Decide whether to migrate, keep or delete that data before the new platform launches.
+
 ## Public study portal
 `learning.html` provides eight courses, 48 draft study guides and practice questions, browser notes/progress, guide downloads, assignment draft preparation, and backup/restore. The teaching materials and proposed ten-week calendar still require lecturer approval.
 

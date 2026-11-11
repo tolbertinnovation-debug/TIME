@@ -35,7 +35,7 @@ function faq(p) {
     ['How much does this program cost?', p.feeAnswer],
     ...(p.online ? [] : [['What else should I know about fees?', 'Tuition covers instruction only unless stated in writing; admissions will tell you before you enroll whether learning materials, exams, certificate processing or internship costs are extra. Eligible PHICA staff, approved groups and early payers may receive a 50% tuition discount, subject to approval. All tuition must be paid before the exit examination, and you should pay only through official TIME Inc. channels and keep your receipts.']]),
     p.online
-      ? ['How does the online part work?', 'You study the online part in TIME Learning: create a student account, verify your email address and request enrolment. Once TIME approves your enrolment, your lessons, quizzes, assignments and class schedule appear in your account. The in-person classes take place with your lecturers.']
+      ? ['How does the online part work?', 'About 60% of the program is studied online and 40% in person with your lecturers. When your enrolment is confirmed, admissions will tell you how to join the online classes.']
       : ['When are classes held?', 'Most programs offer a weekday track (Monday, Wednesday and Friday, 3:00 PM – 6:00 PM) and a Saturday track (8:00 AM – 3:00 PM). Schedules vary by program, so confirm the timetable for your course with admissions.'],
     p.online
       ? ['When does the next cohort start?', 'Contact admissions for the start date of the next Special Education Support Training cohort.']
@@ -46,10 +46,9 @@ function faq(p) {
 
 function steps(p) {
   const s = p.online ? [
-    ['Create your account', 'Open <a href="student-login.html">TIME Learning</a>, register as a student and verify your email address with the code we send you.'],
-    ['Request your courses', 'Choose the courses you want to join. Your request shows as pending until it is reviewed.'],
-    ['Get approved', 'TIME reviews your request and approves your enrolment. Use <em>Check approval</em> in your account to see the decision.'],
-    ['Start learning', 'Open each course to find lessons, quizzes, assignments, class dates and announcements from your lecturers.'],
+    ['Talk to admissions', `Call <a href="tel:+231880902568">+231 880 902 568</a> or <a href="${WA}" target="_blank" rel="noopener">message us on WhatsApp</a> to ask about fees and the next cohort.`],
+    ['Get your enrolment confirmed', 'Admissions reviews your details and confirms your place and your fees.'],
+    ['Join your classes', 'Admissions tells you how to join the online classes and when the in-person sessions take place.'],
   ] : [
     ['Choose your course', `Pick the ${p.credential.toLowerCase()} course that fits your work and goals from the list above.`],
     ['Talk to admissions', `Call <a href="tel:+231880902568">+231 880 902 568</a> or <a href="${WA}" target="_blank" rel="noopener">message us on WhatsApp</a> to confirm your total fees and timetable, and whether you qualify for a discount.`],
@@ -78,7 +77,7 @@ function main(p, schedule) {
   const when = p.online
     ? `        <div class="callout reveal">
           <h3>How the program is delivered</h3>
-          <p>About 60% of the program is studied online in <a href="learning.html">TIME Learning</a>, where your lecturers publish lessons, quizzes, assignments and class dates. The other 40% is taught in person.</p>
+          <p>About 60% of the program is studied online and the other 40% is taught in person. Admissions will tell you how to join the online classes when your enrolment is confirmed.</p>
         </div>`
     : `        <p class="lead reveal">Training schedules vary by program. Confirm the duration and timetable for your course with admissions.</p>\n        ${schedule}`;
   return `

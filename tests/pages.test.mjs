@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DESKTOP, PHONE, PORTAL_PAGES, SITE_PAGES, openPage, settle, useBrowser } from './helpers.mjs';
+import { DESKTOP, PHONE, SITE_PAGES, openPage, settle, useBrowser } from './helpers.mjs';
 
 const ctx = useBrowser();
 
@@ -33,17 +33,6 @@ for (const file of SITE_PAGES) {
       await page.close();
     });
   }
-}
-
-for (const file of PORTAL_PAGES) {
-  test(`${file} loads without script errors`, async () => {
-    const page = await openPage(ctx, file, PHONE);
-    await page.waitForTimeout(300);
-    // Portal pages call the live account service, which tests block; only script errors matter here.
-    assert.deepEqual(page.problems.filter((p) => p.startsWith('script error')), []);
-    assert.ok((await page.title()).includes('TIME'));
-    await page.close();
-  });
 }
 
 test('unknown URLs show the custom 404 page', async () => {

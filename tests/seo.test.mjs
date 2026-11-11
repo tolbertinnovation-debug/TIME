@@ -53,7 +53,7 @@ test('structured data is valid JSON with the expected types', () => {
   assert.ok(types['index.html'].includes('EducationalOrganization+LocalBusiness'));
   assert.ok(types['faq.html'].includes('FAQPage'));
   assert.ok(types['programs.html'].includes('ItemList'));
-  for (const file of indexable.filter((f) => f !== 'index.html' && f !== 'learning.html')) {
+  for (const file of indexable.filter((f) => f !== 'index.html')) {
     assert.ok(types[file]?.includes('BreadcrumbList'), `${file} has breadcrumbs`);
   }
 });

@@ -127,14 +127,15 @@
     lb.innerHTML =
       '<button class="lb-btn lb-close" aria-label="Close">&times;</button>' +
       '<button class="lb-btn lb-prev" aria-label="Previous photo">&#8249;</button>' +
-      '<figure><img alt=""><figcaption></figcaption></figure>' +
+      '<figure><picture><source type="image/webp" sizes="100vw"><img alt=""></picture><figcaption></figcaption></figure>' +
       '<button class="lb-btn lb-next" aria-label="Next photo">&#8250;</button>';
     document.body.appendChild(lb);
-    var img = lb.querySelector("img"), cap = lb.querySelector("figcaption"), idx = 0, lastFocus = null;
+    var img = lb.querySelector("img"), webp = lb.querySelector("source"), cap = lb.querySelector("figcaption"), idx = 0, lastFocus = null;
 
     function show(i) {
       idx = (i + items.length) % items.length;
       var it = items[idx];
+      webp.srcset = it.getAttribute("data-lightbox-webp") || "";
       img.src = it.getAttribute("data-lightbox");
       img.alt = it.getAttribute("data-alt") || "";
       cap.textContent = it.getAttribute("data-caption") || "";
@@ -172,23 +173,268 @@
     });
   }
 
-  // Contact form: compose an email (the site is static, so there is no server to post to)
-  var form = document.getElementById("contact-form");
+  // Contact form: deliver through FormSubmit (the site is static, so there is no server of our own).
+  // If that fails, offer the visitor a prepared email or WhatsApp message instead.
+  var form = document.querySelector("form#contact-form");
   if (form) {
+    var to = form.getAttribute("data-to");
+    var note = form.querySelector(".form-status");
+    var submit = form.querySelector("button[type='submit']");
+    var submitLabel = submit.innerHTML;
+    var fields = Array.prototype.slice.call(form.querySelectorAll("input[required], textarea[required], input[type=email]"));
+    var labels = { "f-name": "your name", "f-email": "your email address", "f-msg": "a message" };
+
+    // Inline validation messages (instead of the browser's pop-ups)
+    function problem(f) {
+      if (f.validity.valueMissing) return "Please enter " + (labels[f.id] || "this field") + ".";
+      if (f.validity.typeMismatch) return "Please enter a valid email address, like name@example.com.";
+      if (f.validity.tooLong) return "Please shorten this to " + f.maxLength + " characters.";
+      return "";
+    }
+    function showProblem(f, msg) {
+      var id = f.id + "-error";
+      var err = document.getElementById(id);
+      var described = (f.getAttribute("aria-describedby") || "").split(" ").filter(function (x) { return x && x !== id; });
+      if (msg) {
+        if (!err) {
+          err = document.createElement("p");
+          err.className = "field-error";
+          err.id = id;
+          f.insertAdjacentElement("afterend", err);
+        }
+        err.textContent = msg;
+        f.setAttribute("aria-invalid", "true");
+        described.unshift(id);
+      } else {
+        if (err) err.remove();
+        f.removeAttribute("aria-invalid");
+      }
+      if (described.length) f.setAttribute("aria-describedby", described.join(" "));
+      else f.removeAttribute("aria-describedby");
+    }
+    function validate() {
+      var first = null;
+      fields.forEach(function (f) {
+        var msg = problem(f);
+        showProblem(f, msg);
+        if (msg && !first) first = f;
+      });
+      if (first) first.focus();
+      return !first;
+    }
+    fields.forEach(function (f) {
+      f.addEventListener("input", function () { if (f.getAttribute("aria-invalid")) showProblem(f, problem(f)); });
+    });
+
+    // Character counter for the message
+    var msgBox = document.getElementById("f-msg");
+    var msgCount = document.getElementById("f-msg-count");
+    if (msgBox && msgCount) {
+      msgBox.addEventListener("input", function () {
+        var n = msgBox.value.length;
+        msgCount.textContent = n ? n.toLocaleString() + " / " + msgBox.maxLength.toLocaleString() + " characters" : "Up to " + msgBox.maxLength.toLocaleString() + " characters";
+      });
+    }
+
+    // Preselect the topic from links such as contact.html?topic=Volunteering
+    var wanted = new URLSearchParams(window.location.search).get("topic");
+    var topicSelect = document.getElementById("f-topic");
+    if (wanted && topicSelect) {
+      Array.prototype.forEach.call(topicSelect.options, function (o) {
+        if (o.text.toLowerCase() === wanted.toLowerCase()) topicSelect.value = o.value;
+      });
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!form.reportValidity()) return;
+      if (!validate()) return;
       var d = new FormData(form);
+      if (d.get("_honey")) return;
       var subject = "[" + d.get("topic") + "] Message from " + d.get("name");
       var body =
         d.get("message") + "\n\n" +
         "— " + d.get("name") + "\n" +
         (d.get("phone") ? "Phone: " + d.get("phone") + "\n" : "") +
         "Email: " + d.get("email");
-      window.location.href = "mailto:" + form.getAttribute("data-to") +
-        "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-      var note = form.querySelector(".form-status");
-      if (note) note.textContent = "Your email app should now open with your message ready to send. If it doesn't, write to us directly at " + form.getAttribute("data-to") + ".";
+
+      function failed() {
+        note.innerHTML = "";
+        note.appendChild(document.createTextNode("We couldn't send your message just now. Please "));
+        var mail = document.createElement("a");
+        mail.href = "mailto:" + to + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        mail.textContent = "send it by email";
+        note.appendChild(mail);
+        note.appendChild(document.createTextNode(" or "));
+        var wa = document.createElement("a");
+        wa.href = "https://wa.me/231888901848?text=" + encodeURIComponent(subject + "\n\n" + body);
+        wa.target = "_blank";
+        wa.rel = "noopener";
+        wa.textContent = "on WhatsApp";
+        note.appendChild(wa);
+        note.appendChild(document.createTextNode("."));
+      }
+
+      submit.disabled = true;
+      submit.textContent = "Sending…";
+      note.textContent = "";
+      fetch("https://formsubmit.co/ajax/" + to, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: d.get("name"),
+          email: d.get("email"),
+          phone: d.get("phone"),
+          topic: d.get("topic"),
+          message: d.get("message"),
+          _subject: subject,
+          _replyto: d.get("email"),
+          _template: "table"
+        })
+      })
+        .then(function (r) { return r.json().then(function (j) { return r.ok && String(j.success) === "true"; }); })
+        .then(function (ok) {
+          if (!ok) return failed();
+          form.reset();
+          if (msgCount) msgCount.textContent = "Up to " + msgBox.maxLength.toLocaleString() + " characters";
+          note.textContent = "Thank you, your message has been sent. We'll reply as soon as we can.";
+        })
+        .catch(failed)
+        .then(function () {
+          submit.disabled = false;
+          submit.innerHTML = submitLabel;
+        });
+    });
+  }
+
+  // Online application (admissions.html#apply-online): same delivery as the contact form
+  var apply = document.querySelector("form#apply-form");
+  if (apply) {
+    var aTo = apply.getAttribute("data-to");
+    var aNote = apply.querySelector(".form-status");
+    var aSubmit = apply.querySelector("button[type='submit']");
+    var aLabel = aSubmit.innerHTML;
+    var aFields = Array.prototype.slice.call(apply.querySelectorAll("input[required], select[required], input[type=email], textarea[maxlength]"));
+    var aNames = { "a-name": "your full name", "a-phone": "a phone or WhatsApp number" };
+    function aProblem(f) {
+      if (f.validity.valueMissing) return f.tagName === "SELECT" ? "Please choose a course." : "Please enter " + (aNames[f.id] || "this field") + ".";
+      if (f.validity.typeMismatch) return "Please enter a valid email address, like name@example.com.";
+      if (f.id === "a-phone" && (f.value.match(/\d/g) || []).length < 7) return "Please enter a full phone number, like 0888 123 456.";
+      if (f.validity.tooLong) return "Please shorten this to " + f.maxLength + " characters.";
+      return "";
+    }
+    function aShow(f, msg) {
+      var id = f.id + "-error", err = document.getElementById(id);
+      if (msg) {
+        if (!err) { err = document.createElement("p"); err.className = "field-error"; err.id = id; f.insertAdjacentElement("afterend", err); }
+        err.textContent = msg;
+        f.setAttribute("aria-invalid", "true");
+        f.setAttribute("aria-describedby", id);
+      } else {
+        if (err) err.remove();
+        f.removeAttribute("aria-invalid");
+        f.removeAttribute("aria-describedby");
+      }
+    }
+    aFields.forEach(function (f) {
+      f.addEventListener(f.tagName === "SELECT" ? "change" : "input", function () { if (f.getAttribute("aria-invalid")) aShow(f, aProblem(f)); });
+    });
+    // Preselect the course from links such as admissions.html?course=QuickBooks#apply-online
+    var wantCourse = new URLSearchParams(window.location.search).get("course");
+    var courseSelect = document.getElementById("a-course");
+    if (wantCourse && courseSelect) {
+      Array.prototype.some.call(courseSelect.options, function (o) {
+        if (o.value && o.text.toLowerCase().indexOf(wantCourse.toLowerCase()) === 0) { courseSelect.value = o.value; return true; }
+      });
+    }
+    apply.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var first = null;
+      aFields.forEach(function (f) { var m = aProblem(f); aShow(f, m); if (m && !first) first = f; });
+      if (first) { first.focus(); return; }
+      var d = new FormData(apply);
+      if (d.get("_honey")) return;
+      var subject = "[Application] " + d.get("course") + " – " + d.get("name");
+      var lines = [
+        "Course: " + d.get("course"), "Intake: " + d.get("intake"), "Schedule: " + d.get("track"),
+        "Name: " + d.get("name"), "Phone: " + d.get("phone"), "Email: " + (d.get("email") || "—"),
+        "County: " + (d.get("county") || "—"), "Current work: " + (d.get("work") || "—")
+      ];
+      if (d.get("notes")) lines.push("", d.get("notes"));
+      var body = lines.join("\n");
+      function failed() {
+        aNote.className = "form-status";
+        aNote.textContent = "We couldn't send your application just now. Please ";
+        var mail = document.createElement("a");
+        mail.href = "mailto:" + aTo + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        mail.textContent = "send it by email";
+        var wa = document.createElement("a");
+        wa.href = "https://wa.me/231888901848?text=" + encodeURIComponent(subject + "\n\n" + body);
+        wa.target = "_blank";
+        wa.rel = "noopener";
+        wa.textContent = "on WhatsApp";
+        aNote.append(mail, " or ", wa, ".");
+      }
+      aSubmit.disabled = true;
+      aSubmit.textContent = "Sending…";
+      aNote.className = "form-status";
+      aNote.textContent = "";
+      fetch("https://formsubmit.co/ajax/" + aTo, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          name: d.get("name"), phone: d.get("phone"), email: d.get("email"), course: d.get("course"),
+          intake: d.get("intake"), schedule: d.get("track"), county: d.get("county"), work: d.get("work"),
+          notes: d.get("notes"), _subject: subject, _replyto: d.get("email") || undefined, _template: "table"
+        })
+      })
+        .then(function (r) { return r.json().then(function (j) { return r.ok && String(j.success) === "true"; }); })
+        .then(function (ok) {
+          if (!ok) return failed();
+          var who = d.get("name").split(" ")[0];
+          apply.reset();
+          aNote.className = "form-status ok";
+          aNote.textContent = "Thank you, " + who + ". Your application for " + d.get("course") + " has been sent. Our admissions office will contact you on " + d.get("phone") + " within a few working days to confirm your place and how to pay.";
+          aNote.setAttribute("tabindex", "-1");
+          aNote.focus();
+        })
+        .catch(failed)
+        .then(function () { aSubmit.disabled = false; aSubmit.innerHTML = aLabel; });
+    });
+  }
+
+  // Certificate check request (verify.html): opens WhatsApp or email with the details filled in
+  var verify = document.querySelector("form#verify-form");
+  if (verify) {
+    verify.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var missing = null;
+      Array.prototype.forEach.call(verify.querySelectorAll("[required]"), function (f) {
+        var id = f.id + "-error", err = document.getElementById(id);
+        if (!f.value.trim()) {
+          if (!err) { err = document.createElement("p"); err.className = "field-error"; err.id = id; f.insertAdjacentElement("afterend", err); }
+          err.textContent = "Please fill in this field.";
+          f.setAttribute("aria-invalid", "true");
+          f.setAttribute("aria-describedby", id);
+          if (!missing) missing = f;
+        } else if (err) { err.remove(); f.removeAttribute("aria-invalid"); f.removeAttribute("aria-describedby"); }
+      });
+      if (missing) { missing.focus(); return; }
+      var d = new FormData(verify);
+      var text = "Certificate check request\n\nName on certificate: " + d.get("name") +
+        "\nCertificate number: " + (d.get("code") || "—") + "\nProgram: " + (d.get("program") || "—") +
+        "\nYear: " + (d.get("year") || "—") + "\n\nRequested by: " + d.get("org");
+      var byEmail = e.submitter && e.submitter.value === "email";
+      var url = byEmail
+        ? "mailto:tinstitute312@gmail.com?subject=" + encodeURIComponent("Certificate check: " + d.get("name")) + "&body=" + encodeURIComponent(text)
+        : "https://wa.me/231888901848?text=" + encodeURIComponent(text);
+      verify.querySelector(".form-status").textContent = "Your " + (byEmail ? "email app" : "WhatsApp") + " should open with the details filled in. Send the message and we will reply with confirmation.";
+      if (byEmail) window.location.href = url; else window.open(url, "_blank", "noopener");
+    });
+  }
+
+  // Offline support: keep visited pages available on slow or patchy connections
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
     });
   }
 
@@ -227,9 +473,277 @@
       var idx = Math.round(row.scrollLeft / w);
       for (var j = 0; j < dots.children.length; j++) dots.children[j].classList.toggle("on", j === idx);
     }
+    // Make the row keyboard-scrollable only while it actually scrolls (phones)
+    function focusable() {
+      if (row.scrollWidth > row.clientWidth + 1) row.setAttribute("tabindex", "0");
+      else row.removeAttribute("tabindex");
+    }
+    row.setAttribute("aria-label", "Swipe for more");
     row.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", focusable);
     update();
+    focusable();
   });
+
+  // FAQ search: filter questions and answers as you type
+  var faqQ = document.getElementById("faq-q");
+  if (faqQ) {
+    var faqItems = Array.prototype.slice.call(document.querySelectorAll(".faq-group details"));
+    var faqCount = document.getElementById("faq-count");
+    var faqEmpty = document.querySelector(".faq-empty");
+    var faqInitial = new URLSearchParams(window.location.search).get("q");
+    faqQ.addEventListener("input", function () {
+      var words = faqQ.value.toLowerCase().split(/\s+/).filter(Boolean);
+      var shown = 0;
+      faqItems.forEach(function (d) {
+        var text = d.textContent.toLowerCase();
+        var match = words.every(function (w) { return text.indexOf(w) !== -1; });
+        d.hidden = !match;
+        if (match) shown++;
+        // Open the answers when the search narrows things down to a few
+        d.open = words.length > 0 && match && shown <= 3 ? true : (words.length ? false : d.open);
+      });
+      document.querySelectorAll(".faq-group").forEach(function (g) {
+        g.hidden = !g.querySelector("details:not([hidden])");
+      });
+      faqEmpty.hidden = !words.length || shown > 0;
+      faqCount.textContent = words.length ? shown + (shown === 1 ? " question matches" : " questions match") : "";
+    });
+    if (faqInitial) { faqQ.value = faqInitial; faqQ.dispatchEvent(new Event("input")); }
+  }
+
+  // News: filter stories by topic
+  var newsFilters = document.querySelectorAll(".news-filter");
+  if (newsFilters.length) {
+    var newsItems = document.querySelectorAll(".news-item");
+    var newsCount = document.querySelector(".news-count");
+    Array.prototype.forEach.call(newsFilters, function (btn) {
+      btn.addEventListener("click", function () {
+        var cat = btn.getAttribute("data-filter");
+        var shown = 0;
+        Array.prototype.forEach.call(newsFilters, function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+        Array.prototype.forEach.call(newsItems, function (item) {
+          var match = cat === "all" || item.getAttribute("data-category") === cat;
+          item.hidden = !match;
+          if (match) shown++;
+        });
+        newsCount.textContent = cat === "all" ? "" : shown + (shown === 1 ? " story" : " stories") + " about " + btn.textContent;
+      });
+    });
+  }
+
+  // Site search (search.html): ranks pages, courses and FAQ answers from a prebuilt index
+  var searchBox = document.getElementById("search-q");
+  var searchList = document.getElementById("search-results");
+  if (searchBox && searchList) {
+    var searchStatus = document.getElementById("search-status");
+    var searchIndex = null;
+    var fold = function (s) { return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); };
+    var LABELS = { page: "Page", course: "Course", faq: "Question", book: "Book" };
+
+    function highlight(el, str, words) {
+      var parts = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).filter(Boolean);
+      if (!parts.length) { el.textContent = str; return; }
+      var re = new RegExp("(" + parts.join("|") + ")", "gi");
+      str.split(re).forEach(function (piece, i) {
+        if (i % 2) { var m = document.createElement("mark"); m.textContent = piece; el.appendChild(m); }
+        else if (piece) el.appendChild(document.createTextNode(piece));
+      });
+    }
+    function snippet(entry, words) {
+      var source = entry.description || "";
+      var body = entry.text || "";
+      var folded = fold(body);
+      for (var i = 0; i < words.length; i++) {
+        if (fold(source).indexOf(words[i]) !== -1) return source;
+        var at = folded.indexOf(words[i]);
+        if (at !== -1) {
+          var start = Math.max(0, at - 70);
+          return (start ? "\u2026" : "") + body.slice(start, start + 200).trim() + "\u2026";
+        }
+      }
+      return source;
+    }
+    function rank(query) {
+      var words = fold(query).split(/[^a-z0-9$]+/).filter(Boolean);
+      if (!words.length) return { words: words, hits: [] };
+      var hits = [];
+      searchIndex.entries.forEach(function (e) {
+        var title = fold(e.title), heads = fold(e.headings.join(" ")), desc = fold(e.description), body = fold(e.text);
+        var score = 0;
+        for (var i = 0; i < words.length; i++) {
+          var w = words[i], s = 0;
+          if (title.indexOf(w) !== -1) s += title.indexOf(w) === 0 ? 15 : 10;
+          if (heads.indexOf(w) !== -1) s += 4;
+          if (desc.indexOf(w) !== -1) s += 3;
+          if (body.indexOf(w) !== -1) s += 1;
+          if (!s) return; // every word must appear somewhere
+          score += s;
+        }
+        hits.push({ e: e, score: score });
+      });
+      hits.sort(function (a, b) { return b.score - a.score; });
+      return { words: words, hits: hits.slice(0, 25) };
+    }
+    function show(query) {
+      searchList.innerHTML = "";
+      var q = query.trim();
+      if (!q) { searchStatus.textContent = "Type a word or two to search the site."; return; }
+      var result = rank(q);
+      if (!result.hits.length) {
+        searchStatus.textContent = "No results for \u201c" + q + "\u201d. Try another word, or browse the popular links below.";
+        return;
+      }
+      searchStatus.textContent = result.hits.length + (result.hits.length === 1 ? " result" : " results") + " for \u201c" + q + "\u201d";
+      result.hits.forEach(function (h) {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.href = h.e.url;
+        highlight(a, h.e.title, result.words);
+        var type = document.createElement("span");
+        type.className = "search-type";
+        type.textContent = LABELS[h.e.type] || "";
+        var p = document.createElement("p");
+        highlight(p, snippet(h.e, result.words), result.words);
+        li.appendChild(a); li.appendChild(type); li.appendChild(p);
+        searchList.appendChild(li);
+      });
+    }
+    var initial = new URLSearchParams(window.location.search).get("q") || "";
+    searchBox.value = initial;
+    searchStatus.textContent = "Loading search\u2026";
+    fetch("assets/search-index.json")
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        searchIndex = data;
+        show(searchBox.value);
+        var timer;
+        searchBox.addEventListener("input", function () {
+          clearTimeout(timer);
+          timer = setTimeout(function () {
+            show(searchBox.value);
+            var url = new URL(window.location.href);
+            if (searchBox.value.trim()) url.searchParams.set("q", searchBox.value.trim()); else url.searchParams.delete("q");
+            history.replaceState(null, "", url);
+          }, 120);
+        });
+      })
+      .catch(function () {
+        searchStatus.textContent = "Search couldn't load. Check your connection, or browse the popular links below.";
+      });
+    searchBox.form.addEventListener("submit", function (e) {
+      if (searchIndex) { e.preventDefault(); show(searchBox.value); }
+    });
+    if (!initial) searchBox.focus();
+  }
+
+  // Print every FAQ answer, then put the page back as it was
+  var printOpened = [];
+  window.addEventListener("beforeprint", function () {
+    printOpened = Array.prototype.filter.call(document.querySelectorAll(".faq details:not([open])"), function (d) { d.open = true; return true; });
+  });
+  window.addEventListener("afterprint", function () {
+    printOpened.forEach(function (d) { d.open = false; });
+    printOpened = [];
+  });
+
+  // TIME Assistant: the chat code and answers download only when a visitor first opens it
+  var chatButton = document.querySelector(".chat-launcher");
+  if (chatButton) {
+    chatButton.addEventListener("click", function () {
+      if (window.TIMEAssistant) { window.TIMEAssistant.open(chatButton); return; }
+      if (chatButton.getAttribute("aria-busy")) return;
+      chatButton.setAttribute("aria-busy", "true");
+      var fail = function () { window.location.href = "contact.html"; };
+      var script = document.createElement("script");
+      script.src = chatButton.getAttribute("data-assistant");
+      script.onload = function () {
+        window.TIMEAssistant.open(chatButton).catch(fail).then(function () { chatButton.removeAttribute("aria-busy"); });
+      };
+      script.onerror = fail;
+      document.body.appendChild(script);
+    });
+  }
+
+  // Countdown to a deadline (Fees & Admissions hero). The date stays visible without JavaScript.
+  document.querySelectorAll("[data-countdown]").forEach(function (box) {
+    var end = Date.parse(box.getAttribute("data-countdown"));
+    if (isNaN(end)) return;
+    var parts = [["days", "day"], ["hours", "hour"], ["minutes", "minute"]].map(function (u) {
+      var cell = document.createElement("span"), num = document.createElement("strong"), label = document.createElement("small");
+      cell.className = "adh-cd-unit";
+      cell.appendChild(num); cell.appendChild(label);
+      return { num: num, label: label, names: u, cell: cell };
+    });
+    function tick() {
+      var left = end - Date.now();
+      if (left <= 0) { box.textContent = "Registration for this intake has closed. Ask admissions about the next intake."; return false; }
+      var values = [Math.floor(left / 864e5), Math.floor(left / 36e5) % 24, Math.floor(left / 6e4) % 60];
+      parts.forEach(function (p, i) { p.num.textContent = values[i]; p.label.textContent = values[i] === 1 ? p.names[1] : p.names[0]; });
+      return true;
+    }
+    box.textContent = "";
+    parts.forEach(function (p) { box.appendChild(p.cell); });
+    if (tick()) var timer = setInterval(function () { if (!tick()) clearInterval(timer); }, 30000);
+  });
+
+  // Reading progress bar and a back-to-top button
+  var progress = document.createElement("div");
+  progress.className = "scroll-progress";
+  progress.setAttribute("aria-hidden", "true");
+  var toTop = document.createElement("button");
+  toTop.type = "button";
+  toTop.className = "to-top";
+  toTop.setAttribute("aria-label", "Back to top");
+  toTop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  document.body.appendChild(progress);
+  document.body.appendChild(toTop);
+  var progressTick = false;
+  function updateProgress() {
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = "scaleX(" + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ")";
+    toTop.classList.toggle("show", window.scrollY > 900);
+    progressTick = false;
+  }
+  window.addEventListener("scroll", function () { if (!progressTick) { progressTick = true; requestAnimationFrame(updateProgress); } }, { passive: true });
+  updateProgress();
+  toTop.addEventListener("click", function () {
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    var skip = document.querySelector(".skip-link");
+    if (skip) skip.focus({ preventScroll: true });
+  });
+
+  // "On this page" links highlight the section in view
+  var pageLinks = document.querySelector(".page-links .wrap");
+  if (pageLinks && "IntersectionObserver" in window) {
+    var spyLinks = Array.prototype.filter.call(pageLinks.querySelectorAll('a[href^="#"]'), function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        spyLinks.forEach(function (a) {
+          var on = a.getAttribute("href") === "#" + entry.target.id;
+          if (on) {
+            a.setAttribute("aria-current", "location");
+            var left = a.offsetLeft - pageLinks.clientWidth / 2 + a.clientWidth / 2;
+            if (pageLinks.scrollWidth > pageLinks.clientWidth) pageLinks.scrollTo({ left: left, behavior: "smooth" });
+          } else a.removeAttribute("aria-current");
+        });
+      });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    spyLinks.forEach(function (a) { spy.observe(document.getElementById(a.getAttribute("href").slice(1))); });
+  }
+
+  // Cards: a soft spotlight follows the pointer (mouse only)
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.addEventListener("pointermove", function (e) {
+      var card = e.target.closest && e.target.closest(".card, .img-card, .step, .way");
+      if (!card) return;
+      var r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+      card.style.setProperty("--my", (e.clientY - r.top) + "px");
+    }, { passive: true });
+  }
 
   // Live search across every course on the Programs page
   var q = document.getElementById("course-q");

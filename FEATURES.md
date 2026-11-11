@@ -1,0 +1,79 @@
+# TIME Inc. website: production launch checklist
+
+Purpose: the public website for the Technical Institute for Many Empowerment (TIME) Inc. and Phìtìa Academy, plus the TIME Learning portal.
+
+Users:
+- **Prospective students** (teachers and professionals, mostly on phones with slow, costly data) who need to find a course and register.
+- **Donors and partners** in Liberia and abroad.
+- **Parents** looking at Phìtìa Academy.
+- **Enrolled students, lecturers and administrators**, who use the learning portal.
+
+Stack: static HTML/CSS/JS on GitHub Pages. The portal runs on Neon Auth and a Neon Function (`backend/`), which has its own tests and docs (`LEARNING_PORTAL.md`).
+
+Status key: ✅ done · 🔨 in progress · ⏳ to do · ⛔ blocked (see the Blocked section)
+
+## Already in place before this pass
+- ✅ Pages: home, about, founder, programs, PHICA, impact, contact, FAQ, donate and 404
+- ✅ Contact form that delivers directly (FormSubmit), with email and WhatsApp fallback and a honeypot
+- ✅ Responsive WebP images with width and height set; self-hosted fonts
+- ✅ Learning portal: accounts, roles, enrolment approval, lessons, assignments, quizzes and tests, attendance, reports, support centre (174 backend tests)
+- ✅ Structured data on home and FAQ; sitemap and robots.txt; portal login pages set to noindex
+
+## P0: required for launch
+| # | Feature | Status |
+|---|---|---|
+| 1 | **Privacy policy page**: what the contact form, WhatsApp links and learning portal collect, where it goes, and how to ask for deletion; linked from every footer, the contact form and the portal | ✅ |
+| 2 | **Automated tests for the public site** (Playwright and `node:test`): every page loads without errors, internal links and anchors resolve, images load, mobile menu, tabs, course search, lightbox, contact form (success, failure, validation), FAQ | ✅ |
+| 3 | **Continuous integration**: a GitHub Actions workflow that runs the site tests and backend tests on every pull request and push to `main` | ✅ |
+| 4 | **Accessibility audit and fixes**: axe-core on every page at phone and desktop sizes; fix contrast, names, landmarks and heading order; keyboard checks | ✅ |
+| 5 | **SEO completeness**: canonical and social tags on `learning.html`, Course and Breadcrumb structured data, sitemap covering every public page, consistent titles | ✅ |
+
+## P1: high value
+| # | Feature | Status |
+|---|---|---|
+| 6 | **Offline and slow-network support**: web app manifest (Add to Home Screen) and a service worker that caches the site shell and pages for offline reading. Never caches portal API or auth traffic. | ✅ |
+| 7 | **Basic security hardening**: Content-Security-Policy and referrer policy on public pages; every `target="_blank"` link has `rel="noopener"`. The portal pages are left as they are, because their live sign-in can't be tested from here. | ✅ |
+| 8 | **Contact form polish**: inline field errors instead of browser pop-ups, a message length limit with counter, and topic preselected from links such as `contact.html?topic=Volunteering` | ✅ |
+| 9 | **FAQ search**: filter questions as you type, with an empty state | ✅ |
+| 10 | **Print styles**: Programs, FAQ and Donate print cleanly without navigation or decorative elements | ✅ |
+
+## P2: nice to have
+| # | Feature | Status |
+|---|---|---|
+| 11 | News and events page: 7 stories drawn from facts already on the site, topic filters, the recurring registration and class schedule, and a WhatsApp sign-up. Exact dates for undated items and upcoming events are still needed from TIME. | ✅ |
+| 12 | Graduate testimonials (needs real quotes and permission) | ⛔ |
+| 13 | Shared header and footer kept in one place (`partials/` + `npm run layout`; tests catch drift). This found and fixed a missing "Online Learning" link on the About page. | ✅ |
+
+## Added after launch
+| # | Feature | Status |
+|---|---|---|
+| 14 | **Program pages**: one per program category plus Special Education Cohort #1. Each has who it's for, an at-a-glance box, courses, schedule or delivery, four enrolment steps, questions, related programs and Course structured data. Generated from `data/programs.json`. | ✅ |
+| 15 | **Site search**: header search button on every page and `search.html`. Ranks pages, courses and FAQ answers from a prebuilt index; ignores accents and case; handles empty and no-result searches; FAQ results open the answer. | ✅ |
+
+| 16 | **Lighter TIME Learning workspace**: account script 717 KB → 214 KB (164 → 61 KB gzipped) by dropping unused auth-library code. Behaviour verified identical against the live sign-in service. | ✅ |
+| 17 | **Offline study guides**: the public study portal is cached for offline study; the account workspace stays network-only. Added to the home-screen app shortcuts. | ✅ |
+
+| 18 | **Approved fees and 2027 intake**: fee table (US$ and LRD at US$1 = LRD 170), other fees, the 50% discount, payment rules and intake dates on the Programs page; tuition and dates on every program page, the FAQ, News & Events and the home banner. Tests keep fees and dates consistent everywhere. | ✅ |
+
+| 19 | **Own pages for crowded topics**: Fees & Admissions (`admissions.html`), Leadership & Faculty (`team.html`, with every Cohort #1 lecturer) and Photo Gallery (`gallery.html`) split out of Programs, About and Our Impact. Programs page went from 14 to 8 phone screens; "Admissions" joins the main menu; all old links redirected. | ✅ |
+
+| 20 | **TIME Assistant chat**: a chat button on every page that answers questions about fees, 2027 dates, applying, programs and individual courses, class times, location, accreditation, PHICA, donating and the learning portal, from approved answers (`data/assistant.json`), and answers anything else from the text of every public page (366 passages, `npm run assistant`), with a link to the section it came from. Questions it can't answer go to WhatsApp with the question filled in. Free to run, no third-party service, works offline, and downloads only when opened (about 9 KB compressed). | ✅ |
+
+| 21 | **Mobile Money payments and donations**: 0888 901 848 (Lonestar Cell MTN, Philip V. Saywrayne) on Donate, Fees & Admissions, every program page's enrolment steps, the FAQ and the chat. A test keeps the number identical everywhere. | ✅ |
+
+| 22 | **Outreach video** on the home page ("Stories from the field") and Our Impact (`#video`), linked from the Photo Gallery: self-hosted MP4 compressed from 5.2 MB to 3 MB, downloads only when play is pressed, with a poster image and a text description of what it shows. | ✅ |
+
+| 23 | **Four areas on the home page**: "Where would you like to go?" buttons for A. TIME Inc. (rolling enrollment, registration in progress), B. Phìtìa Academy, C. Consultation (Education, Agriculture) and D. Book Production, Sales & Publications. Each opens a page with only that area: `time-inc.html`, `phica.html`, `consultation.html`, `books.html`. Footer links and contact-form topics added. | ✅ |
+
+| 24 | **TIME Learning academy rebuilt** (`learning.html`): the site's own header, footer and design; academy home with subjects, popular courses, learning paths, how it works, lecturers and FAQ; course library with search (titles, lecturers, unit names), subject chips, path filter and sorting; course pages with outline and tools; a course player with unit table of contents, progress bar, practice checks with unlimited retries, notes, focus mode, text size and arrow-key navigation; My learning (progress, streak, saved courses, achievements); printable learning records for finished courses and paths. Keeps every earlier feature (learning plan, assignment drafts, downloads, backup/restore, offline use) and reads existing saved progress and backups. | ✅ |
+
+## Blocked: needs information or accounts from TIME Inc.
+| Item | What is needed |
+|---|---|
+| Online donations from abroad | A Givebutter, Donorbox or PayPal giving link. (Mobile Money is done: 0888 901 848, Philip V. Saywrayne.) |
+| Google Maps and review links | The verified Google Business Profile links (see `GOOGLE_BUSINESS_PROFILE.md`) |
+| Custom domain (`time-liberia.com`) | Access to the domain's DNS settings |
+| Visitor analytics | A GoatCounter or Cloudflare Web Analytics account (free) |
+| Facebook and WhatsApp Channel links | The official page and channel URLs |
+| Learning portal backend changes in production | Neon deploy credentials. The backend is deployed through Neon, which this environment can't reach. |
+| Branded email for portal codes | SMTP settings (see `LEARNING_PORTAL.md`) |

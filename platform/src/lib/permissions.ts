@@ -33,6 +33,8 @@ export const CAPABILITIES = {
   "users.resetPassword": ["ADMIN"],
   // Apply to join a class
   "classes.apply": ["STUDENT"],
+  // Read every course's lessons, including drafts, to review them
+  "content.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Capability = keyof typeof CAPABILITIES;
@@ -42,20 +44,36 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   STAFF_ACCESS: "Staff access",
   APPLICATION: "Application",
   ENROLMENT_CHANGE: "Withdrawal or deferral",
+  COURSE_PUBLISH: "Lessons to publish",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   STAFF_ACCESS: ["ADMIN"],
   APPLICATION: ["REGISTRAR"],
   ENROLMENT_CHANGE: ["REGISTRAR"],
+  COURSE_PUBLISH: ["LEADERSHIP"],
 };
+
+// What each kind of class staff may do. An administrator may do all of it, to step in when needed.
+export type ClassAccess = "LECTURER" | "FACILITATOR" | "ADMIN";
+export const CLASS_TASKS = {
+  // Write lessons and send them for review
+  "content.edit": ["LECTURER", "ADMIN"],
+  // Post announcements to the class
+  "announcements.post": ["LECTURER", "ADMIN"],
+  // Schedule sessions, take attendance, sign off practical work
+  "sessions.manage": ["LECTURER", "FACILITATOR", "ADMIN"],
+} as const satisfies Record<string, readonly ClassAccess[]>;
+export type ClassTask = keyof typeof CLASS_TASKS;
+
+export const classCan = (access: ClassAccess, task: ClassTask) => (CLASS_TASKS[task] as readonly ClassAccess[]).includes(access);
 
 export function canDecide(role: Role, type: ApprovalType): boolean {
   return role === "ADMIN" || APPROVERS[type].includes(role);

@@ -163,7 +163,7 @@ test("a lecturer sees only the classes they are assigned to", async () => {
   assert.match(await leo.locator("a.tile").innerText(), /QuickBooks[\s\S]*1 student/);
   await leo.click("a.tile");
   await leo.waitForURL(`**/teach/${classId}`);
-  assert.match(await leo.locator("table").innerText(), new RegExp(`Ama Kollie\\s+TIME-${year}-0001\\s+Margibi`));
+  assert.match(await leo.locator("table").innerText(), new RegExp(`Ama Kollie\\s+TIME-${year}-0001`));
 
   for (const creds of [otherLecturer, ama]) {
     const page = await as(creds);

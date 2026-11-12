@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 and 2 are built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 3 are built; the rest follow in order.
 
 ## What the earlier plan was missing
 
@@ -10,8 +10,8 @@ Updated 11 November 2026. This replaces the earlier plan. Steps 1 and 2 are buil
 | **One approvals inbox.** Every decision that needs sign-off in one place, with an administrator able to step in on any of them. | Step 1 (built), extended in every step |
 | **A full activity view.** Everything every person does, searchable, for administrators. | Step 1 (built), extended in every step |
 | Academic setup: intakes, classes (cohorts), study centres, lecturer assignments | Step 2 (built) |
-| Course building tools for lecturers, with review before a course is published | Step 3 |
-| Announcements, class discussions, timetable and calendar | Step 3 |
+| Course building tools for lecturers, with review before lessons are published | Step 3 (built) |
+| Announcements and class sessions (step 3, built); class discussions (step 7) | Steps 3 and 7 |
 | Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 |
 | Refunds, payment arrangements and finance reports | Step 5 |
 | Transcripts, results slips and replacement certificates | Step 6 |
@@ -62,12 +62,16 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - The registrar sees only applications and enrolment requests in the inbox; administrators and leadership see everything.
 - Every one of these actions is in the activity log.
 
-### Step 3. Teaching and learning
-- Course builder: weeks, lessons (text, audio, small PDFs, short video), each marked online or practical.
-- Course review before publishing (approval).
-- Student course pages, progress split into online and practical, lessons saved for offline study.
-- Live class links, attendance (lecturer and facilitator), practical sign-off.
-- Announcements, class discussion, timetable.
+### Step 3. Teaching and learning — built
+- Lessons: a lecturer writes a course's modules and lessons, each marked online or practical. Every class of the course shares them.
+- Review before publishing: drafts are sent to academic leadership, who read them and approve or reject with a reason. Students see only published lessons. A published lesson is taken back to draft to change it.
+- Students open their class, read lessons and mark online lessons complete. Progress is shown split into online and practical.
+- Practical work is signed off by the lecturer or study centre facilitator, with their name recorded.
+- Sessions: live online classes (with a meeting link) and in-person practicals. Staff take attendance; students see coming sessions and their attendance.
+- Announcements from the lecturer to the class.
+- A facilitator can take attendance and sign off practicals, but cannot write lessons or post announcements.
+- An administrator can open the teaching view of any class to step in.
+- Still to come: uploading files to lessons (needs file storage; a lesson can link to notes or audio for now), class discussion (step 7) and saving lessons for offline study (step 8).
 
 ### Step 4. Assessment
 - Assignments with file upload, quizzes, timed tests with question banks.
@@ -91,7 +95,7 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 
 ### Step 7. Communication and support
 - Notifications in the app, by email and by SMS or WhatsApp.
-- Help desk for students; course evaluations; sponsor progress reports.
+- Class discussions. Help desk for students; course evaluations; sponsor progress reports.
 
 ### Step 8. Launch readiness and pilot
 - Installable app with offline support. Self-service password reset, email verification, sign-in by phone number.
@@ -110,5 +114,6 @@ Android app from the store. Research and thesis management, when TIME runs postg
 3. The old portal's accounts: move, keep or delete.
 4. An email service for password reset and notifications, and an SMS or WhatsApp provider.
 5. Brand: the platform uses the current olive and red. Say if this should change.
-6. The pilot cohort and its start date.
-7. Certificate wording, layout and signatures.
+6. File storage for lesson files and submitted work (Cloudflare R2 is planned).
+7. The pilot cohort and its start date.
+8. Certificate wording, layout and signatures.

@@ -29,6 +29,7 @@ export default async function ClassPage({ params, searchParams }: { params: Prom
         <h1>{cls.course.title}</h1>
         <p className="muted">{cls.intake.name} · {TRACK_LABEL[cls.track]} · {MODE_LABEL[cls.mode]}{cls.studyCentre ? ` · ${cls.studyCentre.name}` : ""} · {active}{cls.capacity ? ` of ${cls.capacity}` : ""} enrolled</p>
         <Notices params={await searchParams} />
+        {me.role === "ADMIN" && <p className="small"><Link href={`/teach/${cls.id}`}>Open the teaching view</Link> (lessons, sessions, attendance)</p>}
         {manage && (
           <form action={setClassStatusAction}>
             <input type="hidden" name="id" value={cls.id} /><input type="hidden" name="status" value={cls.status === "OPEN" ? "CLOSED" : "OPEN"} />

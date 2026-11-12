@@ -40,6 +40,7 @@ export default async function MyClasses({ searchParams }: { searchParams: Promis
               {e.class.studyCentre ? ` · ${e.class.studyCentre.name}` : ""}
             </p>
             <p className="small">Lecturer: {e.class.staff.map((s) => s.user.name).join(", ") || "to be announced"}</p>
+            {(e.status === "ACTIVE" || e.status === "COMPLETED") && <div><Link className="btn" href={`/learn/${e.classId}`}>Open class</Link></div>}
             {request && (
               <div className="row">
                 <span className="notice info">Your request to {(request.payload as { change?: string }).change === "DEFER" ? "defer" : "withdraw"} is waiting for the registrar.</span>

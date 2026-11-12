@@ -148,6 +148,10 @@ export async function decideApprovalAction(form: FormData) {
       });
       if (!updated.count) return false;
       if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload);
+      // Rejected lessons go back to draft so the lecturer can fix them.
+      if (decision === "REJECTED" && type === "COURSE_PUBLISH") {
+        await tx.lesson.updateMany({ where: { status: "IN_REVIEW", module: { courseId: String((request.payload as { courseId?: unknown }).courseId) } }, data: { status: "DRAFT" } });
+      }
       return true;
     });
   } catch (e) {
@@ -163,7 +167,7 @@ export async function decideApprovalAction(form: FormData) {
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
-  if (effect) await audit({ actor: user, action: "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
 }
@@ -205,6 +209,12 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     if (!changed.count) throw new UserProblem("That enrolment is no longer active.");
     const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
     return `${student.name}'s enrolment was ${status === "DEFERRED" ? "deferred" : "withdrawn"}`;
+  }
+  if (type === "COURSE_PUBLISH") {
+    const course = await tx.course.findUnique({ where: { id: String(data.courseId) } });
+    if (!course) throw new UserProblem("That course no longer exists.");
+    const published = await tx.lesson.updateMany({ where: { status: "IN_REVIEW", module: { courseId: course.id } }, data: { status: "PUBLISHED", publishedAt: new Date() } });
+    return `${published.count} ${published.count === 1 ? "lesson was" : "lessons were"} published in ${course.title}`;
   }
   return null;
 }

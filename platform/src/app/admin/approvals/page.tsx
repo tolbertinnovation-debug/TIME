@@ -12,7 +12,7 @@ export const metadata = { title: "Approvals" };
 const STATUS = { PENDING: ["wait", "Waiting"], APPROVED: ["ok", "Approved"], REJECTED: ["bad", "Rejected"], CANCELLED: ["plain", "Cancelled"] } as const;
 
 // What the request asks for, in plain words.
-function describe(type: ApprovalType, payload: unknown, classes: Map<string, string>): string {
+function describe(type: ApprovalType, payload: unknown, classes: Map<string, string>, courses: Map<string, string>): string {
   const data = (payload ?? {}) as Record<string, unknown>;
   if (type === "STAFF_ACCESS") return isRole(data.role) ? `Asks for the ${ROLE_LABEL[data.role]} role` : "Asks for a staff role";
   const cls = classes.get(String(data.classId)) ?? "a class that was removed";
@@ -21,6 +21,7 @@ function describe(type: ApprovalType, payload: unknown, classes: Map<string, str
     return `Applies to ${cls}${extra ? ` (${extra})` : ""}`;
   }
   if (type === "ENROLMENT_CHANGE") return `Asks to ${data.change === "DEFER" ? "defer" : "withdraw from"} ${cls}`;
+  if (type === "COURSE_PUBLISH") return `Asks to publish ${data.lessons} ${data.lessons === 1 ? "lesson" : "lessons"} in ${courses.get(String(data.courseId)) ?? "a course that was removed"}`;
   return APPROVAL_LABEL[type];
 }
 
@@ -36,6 +37,8 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
   });
   const classIds = [...new Set(requests.map((r) => (r.payload as { classId?: unknown } | null)?.classId).filter((v): v is string => typeof v === "string"))];
   const classes = new Map((await prisma.courseClass.findMany({ where: { id: { in: classIds } }, include: { course: true, intake: true } })).map((c) => [c.id, classLabel(c)]));
+  const courseIds = [...new Set(requests.filter((r) => r.type === "COURSE_PUBLISH").map((r) => String((r.payload as { courseId?: unknown }).courseId)))];
+  const courses = new Map((await prisma.course.findMany({ where: { id: { in: courseIds } } })).map((c) => [c.id, c.title]));
   return (
     <div className="stack lg">
       <div className="stack">
@@ -58,8 +61,9 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
               <h2>{r.requestedBy.name} <span className="muted small">· {r.requestedBy.email}</span></h2>
               <span className={`pill ${cls}`}>{label}</span>
             </div>
-            <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload, classes)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>
+            <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload, classes, courses)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>
             {r.note && <p>"{r.note}"</p>}
+            {type === "COURSE_PUBLISH" && <p><Link href={`/admin/content/${String((r.payload as { courseId?: unknown }).courseId)}`}>Read the lessons before deciding</Link></p>}
             {r.status !== "PENDING" && r.status !== "CANCELLED" && (
               <p className="small muted">{label} by {r.decidedBy?.name ?? "a removed account"}{r.decidedAt ? ` on ${formatDateTime(r.decidedAt)}` : ""}{r.decisionNote ? `: "${r.decisionNote}"` : ""}</p>
             )}

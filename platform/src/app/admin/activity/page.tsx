@@ -7,7 +7,11 @@ export const metadata = { title: "Activity" };
 const PAGE = 50;
 
 // Groups of actions, matched on the first part of the action name.
-const GROUPS = { auth: "Sign-ins", account: "New accounts", user: "Account changes", approval: "Approvals" } as const;
+const GROUPS = {
+  auth: "Sign-ins", account: "New accounts", user: "Account changes", approval: "Approvals",
+  setup: "Intakes, centres and classes", class: "Class staff", enrolment: "Enrolments",
+  content: "Lessons", learning: "Learning progress", session: "Sessions", attendance: "Attendance", announcement: "Announcements",
+} as const;
 
 export default async function Activity({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await requireCapability("activity.view");
@@ -28,7 +32,7 @@ export default async function Activity({ searchParams }: { searchParams: Promise
     <div className="stack lg">
       <div className="stack">
         <h1>Activity</h1>
-        <p className="muted">Everything that happens on the platform is recorded here: sign-ins, new accounts, role changes, suspensions and every approval decision. Entries cannot be edited or removed.</p>
+        <p className="muted">Everything that happens on the platform is recorded here: sign-ins, account changes, approvals, enrolments, lessons, learning progress and attendance. Entries cannot be edited or removed.</p>
         <form className="inline-form" method="get" role="search">
           <label className="skip" htmlFor="q">Search by person or words</label>
           <input id="q" name="q" type="search" placeholder="Person or words" defaultValue={q} />

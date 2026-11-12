@@ -8,8 +8,8 @@ describe("capabilities", () => {
   it("shows the activity log to administrators and leadership only", () => {
     expect(ROLES.filter((r) => can(r, "activity.view"))).toEqual(["LEADERSHIP", "ADMIN"]);
   });
-  it("keeps students, lecturers, facilitators and finance out of the administration area", () => {
-    for (const role of ["STUDENT", "LECTURER", "FACILITATOR", "FINANCE"] as const) expect(can(role, "admin.area")).toBe(false);
+  it("keeps students, lecturers and facilitators out of the administration area", () => {
+    for (const role of ["STUDENT", "LECTURER", "FACILITATOR"] as const) expect(can(role, "admin.area")).toBe(false);
   });
   it("lets the registrar see accounts but not approvals or activity", () => {
     expect(can("REGISTRAR", "users.view")).toBe(true);
@@ -28,10 +28,11 @@ describe("approvals", () => {
     }
   });
   it("shows each role only the approval types it should see", () => {
-    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"]);
-    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"]);
+    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"]);
+    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"]);
     expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE"]);
-    for (const role of ["STUDENT", "LECTURER", "FACILITATOR", "FINANCE"] as const) expect(seesApprovals(role)).toBe(false);
+    expect(visibleApprovalTypes("FINANCE")).toEqual(["PAYMENT_ARRANGEMENT"]);
+    for (const role of ["STUDENT", "LECTURER", "FACILITATOR"] as const) expect(seesApprovals(role)).toBe(false);
   });
   it("never lets someone request administrator access", () => {
     expect((REQUESTABLE_ROLES as readonly string[]).includes("ADMIN")).toBe(false);
@@ -97,5 +98,18 @@ describe("teaching", () => {
       expect(classCan("LECTURER", task)).toBe(true);
       expect(classCan("ADMIN", task)).toBe(true);
     }
+  });
+});
+
+describe("finance", () => {
+  it("lets only finance officers and administrators confirm payments", () => {
+    expect(ROLES.filter((r) => can(r, "finance.manage"))).toEqual(["FINANCE", "ADMIN"]);
+    expect(ROLES.filter((r) => can(r, "finance.view"))).toEqual(["FINANCE", "LEADERSHIP", "ADMIN"]);
+  });
+  it("lets finance decide requests for more time to pay, and nothing academic", () => {
+    expect(ROLES.filter((r) => canDecide(r, "PAYMENT_ARRANGEMENT"))).toEqual(["FINANCE", "ADMIN"]);
+    for (const type of ["APPLICATION", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "STAFF_ACCESS"] as const) expect(canDecide("FINANCE", type)).toBe(false);
+    expect(can("FINANCE", "results.review")).toBe(false);
+    expect(can("FINANCE", "content.review")).toBe(false);
   });
 });

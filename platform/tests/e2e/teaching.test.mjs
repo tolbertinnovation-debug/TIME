@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ADMIN, URL_BASE, person, signIn, signUp, submit, useApp } from "./helpers.mjs";
+import { ADMIN, URL_BASE, payFirst, person, signIn, signUp, submit, useApp } from "./helpers.mjs";
 
 const ctx = useApp();
 const DESK = { width: 1280, height: 900 };
@@ -71,6 +71,7 @@ test("a class is set up with a lecturer, a facilitator and two enrolled students
     await reg.waitForFunction((n) => document.querySelectorAll("article").length === n, left);
   }
   await reg.context().close();
+  await payFirst(ctx, [ama.name, ben.name]);
 });
 
 test("the lecturer writes lessons; students cannot see drafts; a facilitator cannot write lessons", async () => {

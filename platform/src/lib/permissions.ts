@@ -16,7 +16,7 @@ export const ROLE_LABEL: Record<Role, string> = {
 
 export const CAPABILITIES = {
   // See the administration area at all
-  "admin.area": ["ADMIN", "LEADERSHIP", "REGISTRAR"],
+  "admin.area": ["ADMIN", "LEADERSHIP", "REGISTRAR", "FINANCE"],
   // Read the full activity log
   "activity.view": ["ADMIN", "LEADERSHIP"],
   // See the list of accounts
@@ -35,6 +35,10 @@ export const CAPABILITIES = {
   "classes.apply": ["STUDENT"],
   // Read every course's lessons, including drafts, to review them
   "content.review": ["LEADERSHIP", "ADMIN"],
+  // See fees, payments and balances
+  "finance.view": ["FINANCE", "ADMIN", "LEADERSHIP"],
+  // Confirm or reject payments, add charges, record payments, change payment details
+  "finance.manage": ["FINANCE", "ADMIN"],
   // Read a class's full gradebook to review results before they are published
   "results.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
@@ -46,7 +50,7 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
@@ -56,6 +60,7 @@ export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   COURSE_PUBLISH: "Lessons to publish",
   GRADES: "Results to publish",
   GRADE_APPEAL: "Result appeal",
+  PAYMENT_ARRANGEMENT: "More time to pay",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
@@ -65,6 +70,7 @@ const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   COURSE_PUBLISH: ["LEADERSHIP"],
   GRADES: ["LEADERSHIP"],
   GRADE_APPEAL: ["LEADERSHIP"],
+  PAYMENT_ARRANGEMENT: ["FINANCE"],
 };
 
 // What each kind of class staff may do. An administrator may do all of it, to step in when needed.

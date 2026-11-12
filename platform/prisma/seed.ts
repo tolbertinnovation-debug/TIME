@@ -44,6 +44,12 @@ async function main() {
     const data = { startDate: new Date(start), registerBy: registerBy ? new Date(registerBy) : null };
     await prisma.intake.upsert({ where: { name }, create: { name, ...data }, update: data });
   }
+  // The Mobile Money details TIME publishes on its website. Finance can change them later; this never overwrites.
+  await prisma.setting.upsert({
+    where: { key: "payment.mobileMoney" },
+    create: { key: "payment.mobileMoney", value: "Send to 0888 901 848 (Lonestar Cell MTN). Account name: Philip V. Saywrayne." },
+    update: {},
+  });
   console.log(`Catalogue loaded: ${cat.schools.length} schools, ${programs.size} programs, ${cat.courses.length} courses, ${intakes.size} intakes.`);
 }
 

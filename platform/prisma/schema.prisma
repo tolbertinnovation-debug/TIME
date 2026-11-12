@@ -3,6 +3,7 @@
 // Step 2: intakes, study centres, classes, class staff and enrolments.
 // Step 3: lessons, progress, class sessions, attendance and announcements.
 // Step 4: assessments, quiz questions, submissions and results.
+// Step 5: charges, payments, receipts, payment arrangements and settings.
 
 generator client {
   provider = "prisma-client"
@@ -54,6 +55,8 @@ model User {
   classStaff        ClassStaff[]
   signOffs          LessonProgress[]
   marked            Submission[]
+  paymentsSent      Payment[]         @relation("paymentSubmitter")
+  paymentsDecided   Payment[]         @relation("paymentDecider")
   sessionsCreated   ClassSession[]
   announcements     Announcement[]
 
@@ -259,6 +262,10 @@ model Enrolment {
   attendance  Attendance[]
   submissions Submission[]
   result      Result?
+  charges     Charge[]
+  payments    Payment[]
+  // Set when Finance approves more time to pay: access continues until this date
+  arrangementUntil DateTime?
 
   @@unique([userId, classId])
   @@index([classId, status])
@@ -473,6 +480,73 @@ model Result {
   @@map("result")
 }
 
+// ---- Fees: what a student owes (charges) and what they have paid (payments). Amounts are US cents. ----
+
+enum ChargeKind {
+  TUITION
+  REGISTRATION
+  EXAM
+  OTHER
+}
+
+model Charge {
+  id          String     @id @default(cuid())
+  enrolmentId String
+  enrolment   Enrolment  @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  kind        ChargeKind
+  description String
+  amountCents Int
+  createdAt   DateTime   @default(now())
+
+  @@index([enrolmentId])
+  @@map("charge")
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  SUBMITTED // the student reported it; Finance has not checked it yet
+  CONFIRMED // Finance found it on the Mobile Money or bank statement
+  REJECTED
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  enrolmentId   String
+  enrolment     Enrolment     @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  amountCents   Int
+  method        PaymentMethod
+  // The Mobile Money transaction ID or the bank's transfer reference
+  reference     String
+  paidOn        DateTime      @db.Date
+  status        PaymentStatus @default(SUBMITTED)
+  submittedById String?
+  submittedBy   User?         @relation("paymentSubmitter", fields: [submittedById], references: [id], onDelete: SetNull)
+  decidedById   String?
+  decidedBy     User?         @relation("paymentDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt     DateTime?
+  rejectReason  String?
+  // Given when the payment is confirmed, e.g. "R-000123"
+  receiptNumber String?       @unique
+  createdAt     DateTime      @default(now())
+
+  @@index([enrolmentId])
+  @@index([status, createdAt])
+  @@index([method, reference])
+  @@map("payment")
+}
+
+// Small pieces of configuration that staff can change, such as the payment details shown to students.
+model Setting {
+  key   String @id
+  value String
+
+  @@map("setting")
+}
+
 // ---- Approvals: one inbox for every decision that needs sign-off ----
 
 enum ApprovalType {
@@ -482,6 +556,7 @@ enum ApprovalType {
   COURSE_PUBLISH // a lecturer asks for new lessons to be published
   GRADES // a lecturer asks for a class's results to be published
   GRADE_APPEAL // a student asks for a published result to be looked at again
+  PAYMENT_ARRANGEMENT // a student asks for more time to pay their balance
 }
 
 enum ApprovalStatus {

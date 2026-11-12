@@ -7,6 +7,7 @@ import { classLabel } from "@/lib/academics";
 import { audit } from "@/lib/audit";
 import { classAccess } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
+import { accessProblem, feeStatusOf } from "@/lib/fees-data";
 import { CATEGORY_LABEL, computeMarks, isLate, missingParts, scoreQuiz } from "@/lib/grading";
 import { classCan } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
@@ -246,6 +247,8 @@ async function requireStudent(classId: string) {
   const user = await requireUser();
   const enrolment = await prisma.enrolment.findUnique({ where: { userId_classId: { userId: user.id, classId } }, include: { class: { include: { course: true, intake: true } }, result: true } });
   if (!enrolment || enrolment.status !== "ACTIVE") back("/my-classes", "error", "You are not enrolled in that class.");
+  const paused = accessProblem(await feeStatusOf(enrolment.id));
+  if (paused) back("/fees", "error", paused);
   return { user, enrolment };
 }
 

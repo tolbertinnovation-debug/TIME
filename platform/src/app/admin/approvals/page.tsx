@@ -4,6 +4,7 @@ import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 import { classLabel } from "@/lib/academics";
+import { formatUsd } from "@/lib/fees";
 import { APPROVAL_LABEL, canDecide, isRole, ROLE_LABEL, visibleApprovalTypes, type ApprovalType } from "@/lib/permissions";
 import { requireApprovalsAccess } from "@/lib/session";
 
@@ -21,6 +22,7 @@ function describe(type: ApprovalType, payload: unknown, classes: Map<string, str
     return `Applies to ${cls}${extra ? ` (${extra})` : ""}`;
   }
   if (type === "ENROLMENT_CHANGE") return `Asks to ${data.change === "DEFER" ? "defer" : "withdraw from"} ${cls}`;
+  if (type === "PAYMENT_ARRANGEMENT") return `Asks for until ${data.until} to pay a balance of ${formatUsd(Number(data.balanceCents) || 0)} for ${cls}`;
   if (type === "GRADES") return `Asks to publish results for ${data.students} ${data.students === 1 ? "student" : "students"} in ${cls}`;
   if (type === "GRADE_APPEAL") return `Appeals their result of ${data.total} of 100 in ${cls}`;
   if (type === "COURSE_PUBLISH") return `Asks to publish ${data.lessons} ${data.lessons === 1 ? "lesson" : "lessons"} in ${courses.get(String(data.courseId)) ?? "a course that was removed"}`;
@@ -65,6 +67,7 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
             </div>
             <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload, classes, courses)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>
             {r.note && <p>"{r.note}"</p>}
+            {type === "PAYMENT_ARRANGEMENT" && <p><Link href={`/finance/students/${String((r.payload as { enrolmentId?: unknown }).enrolmentId)}`}>See the student's statement before deciding</Link></p>}
             {(type === "GRADES" || type === "GRADE_APPEAL") && <p><Link href={`/admin/results/${String((r.payload as { classId?: unknown }).classId)}`}>See the class results before deciding</Link></p>}
             {type === "COURSE_PUBLISH" && <p><Link href={`/admin/content/${String((r.payload as { courseId?: unknown }).courseId)}`}>Read the lessons before deciding</Link></p>}
             {r.status !== "PENDING" && r.status !== "CANCELLED" && (

@@ -35,7 +35,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <nav className="nav" aria-label="Main">
                   <NavLink href="/dashboard">Home</NavLink>
                   {can(user.role, "classes.apply") && <NavLink href="/my-classes">My classes</NavLink>}
+                  {can(user.role, "classes.apply") && <NavLink href="/fees">Fees</NavLink>}
                   {can(user.role, "classes.apply") && <NavLink href="/apply">Apply</NavLink>}
+                  {can(user.role, "finance.view") && <NavLink href="/finance">Finance</NavLink>}
                   {(user.role === "LECTURER" || user.role === "FACILITATOR") && <NavLink href="/teach">My classes</NavLink>}
                   <NavLink href="/catalogue">Programs</NavLink>
                   {can(user.role, "admin.area") && <NavLink href="/admin">Administration</NavLink>}

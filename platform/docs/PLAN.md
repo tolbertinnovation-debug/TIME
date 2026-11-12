@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 4 are built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 5 are built; the rest follow in order.
 
 ## What the earlier plan was missing
 
@@ -13,7 +13,7 @@ Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 4 are built
 | Course building tools for lecturers, with review before lessons are published | Step 3 (built) |
 | Announcements and class sessions (step 3, built); class discussions (step 7) | Steps 3 and 7 |
 | Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 (built) |
-| Refunds, payment arrangements and finance reports | Step 5 |
+| Payment arrangements and finance overview (step 5, built); refunds (later) | Step 5 |
 | Transcripts, results slips and replacement certificates | Step 6 |
 | Notifications by app, email and SMS/WhatsApp | Step 7 |
 | Help desk, course evaluations, sponsor progress reports | Step 7 |
@@ -29,7 +29,7 @@ Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 4 are built
 - **Programs:** TIME's certificates and diplomas, loaded from the website's catalogue.
 - **Learning:** about 60% online and 40% practical, tracked separately in every course.
 - **Grading:** 100 points: continuous assessment 30, assignments and practical activities 20, midterm 20, final 30. Pass mark 70.
-- **Fees:** Mobile Money, confirmed by a finance officer. The balance is due 8 weeks after the first payment; access pauses if it is unpaid and returns on payment or an approved arrangement.
+- **Fees:** Mobile Money or bank transfer, confirmed by a finance officer. A class opens with the first confirmed payment. The balance is due 8 weeks after it; access pauses if it is unpaid and returns on payment or an approved arrangement.
 - **Sponsors:** a termly progress summary, only with the student's consent.
 - **Oversight:** every change is written to the activity log, and every sign-off goes through the approvals inbox.
 
@@ -83,11 +83,17 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - Appeals: a student can appeal a published result. If leadership approves, only that student's result is reopened for re-marking and sent again.
 - Still to come: uploading files with written work (needs file storage; students can paste a link for now), question banks with random selection, and exports of results.
 
-### Step 5. Fees
-- Invoices per student; installments; Mobile Money transaction ID entered by the student.
-- Finance confirmation queue; receipts.
-- The 8-week rule: reminders, automatic pause, restore on payment.
-- Payment arrangements and refunds (approval). Finance reports.
+### Step 5. Fees — built
+- Students pay by **Mobile Money or bank transfer**. The finance office sets the details students see.
+- Enrolment charges the course's tuition automatically. Finance can add other charges (registration, examination, other).
+- A student pays, then enters the amount, the transaction ID or bank reference, and the date. It does not count until a finance officer finds it on the statement and confirms it.
+- Confirming issues a numbered receipt the student can open. One transaction can be used only once.
+- Finance can reject a reported payment with a reason, and can record a payment the student did not report.
+- A class opens when the first payment is confirmed. The balance is due 8 weeks after that payment. If it is unpaid, access pauses automatically and returns the moment the balance is paid.
+- A student can ask for more time; the finance office decides in the approvals inbox.
+- Students are warned on their home page 14 days before the balance is due.
+- Finance sees payments to confirm, balances due soon, paused students and totals. Leadership can look but not change. Finance cannot see marks or lessons.
+- Still to come: reminders by SMS or email (step 7), refunds, and amounts in Liberian dollars.
 
 ### Step 6. Completion and certificates
 - The platform works out when a student has completed a program: every course passed, every required assessment done, fees cleared.

@@ -25,7 +25,9 @@ export default async function AdminOverview() {
     <div className="stack lg">
       <h1>Administration</h1>
       <div className="grid">
-        <Link className="tile" href="/admin/users"><b>{total}</b><span>accounts{suspended ? ` · ${suspended} suspended` : ""}</span></Link>
+        {can(user.role, "users.view")
+          ? <Link className="tile" href="/admin/users"><b>{total}</b><span>accounts{suspended ? ` · ${suspended} suspended` : ""}</span></Link>
+          : <div className="tile"><b>{total}</b><span>accounts</span></div>}
         {seeApprovals && <Link className="tile" href="/admin/approvals"><b>{pending}</b><span>{pending === 1 ? "approval" : "approvals"} waiting</span></Link>}
         {can(user.role, "enrolments.view") && <Link className="tile" href="/admin/classes"><b>{enrolled}</b><span>students enrolled in {classCount} {classCount === 1 ? "class" : "classes"}</span></Link>}
         {seeActivity && <Link className="tile" href="/admin/activity"><b>{activity24h}</b><span>actions recorded in the last 24 hours</span></Link>}

@@ -113,8 +113,24 @@ export async function makeStaff(ctx, creds, role) {
   await admin.context().close();
 }
 
+// An administrator records a confirmed first payment for each named student, which opens their class.
+export async function payFirst(ctx, names, amount = "100") {
+  const admin = await as(ctx, ADMIN, DESK);
+  for (const [i, name] of names.entries()) {
+    await admin.goto(`${URL_BASE}/finance/students?q=${encodeURIComponent(name)}`);
+    await admin.click(`tbody a:has-text("${name}")`);
+    await admin.waitForURL(/\/finance\/students\/.+/);
+    await admin.fill("#p-amount", amount);
+    await admin.fill("#p-ref", `SETUP-${Date.now()}-${i}`);
+    await submit(admin, 'button:has-text("Record payment")');
+    await admin.locator('.notice.ok:has-text("Payment recorded")').waitFor();
+  }
+  await admin.context().close();
+}
+
 // An online QuickBooks class with a lecturer and two enrolled students. Returns the class id.
-export async function setUpClass(ctx) {
+// The students' first payments are recorded so the class is open, unless pay is false.
+export async function setUpClass(ctx, { pay = true } = {}) {
   await makeStaff(ctx, PEOPLE.registrar, "REGISTRAR");
   await makeStaff(ctx, PEOPLE.lecturer, "LECTURER");
   await makeStaff(ctx, PEOPLE.dean, "LEADERSHIP");
@@ -148,6 +164,7 @@ export async function setUpClass(ctx) {
     await reg.waitForFunction((n) => document.querySelectorAll("article").length === n, left);
   }
   await reg.context().close();
+  if (pay) await payFirst(ctx, [PEOPLE.ama.name, PEOPLE.ben.name]);
   return classId;
 }
 

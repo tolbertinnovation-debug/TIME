@@ -1,5 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
+import { feeStatusOf } from "@/lib/fees-data";
 import { classCan, type ClassAccess, type ClassTask } from "@/lib/permissions";
 import { requireUser, type CurrentUser } from "@/lib/session";
 
@@ -30,5 +31,7 @@ export async function requireEnrolment(classId: string) {
     include: { class: { include: { course: true, intake: true, studyCentre: true } } },
   });
   if (!enrolment || (enrolment.status !== "ACTIVE" && enrolment.status !== "COMPLETED")) notFound();
+  // Fees: the class opens with the first confirmed payment and pauses if the balance is overdue.
+  if (!(await feeStatusOf(enrolment.id)).hasAccess) redirect("/fees?notice=paused");
   return { user, enrolment, cls: enrolment.class };
 }

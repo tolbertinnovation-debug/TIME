@@ -10,7 +10,8 @@ const PAGE = 50;
 const GROUPS = {
   auth: "Sign-ins", account: "New accounts", user: "Account changes", approval: "Approvals",
   setup: "Intakes, centres and classes", class: "Class staff", enrolment: "Enrolments",
-  content: "Lessons", learning: "Learning progress", assessment: "Assessments", grade: "Marks", result: "Results", session: "Sessions", attendance: "Attendance", announcement: "Announcements",
+  content: "Lessons", learning: "Learning progress", assessment: "Assessments", grade: "Marks", result: "Results",
+  fee: "Fees and charges", payment: "Payments", setting: "Settings", session: "Sessions", attendance: "Attendance", announcement: "Announcements",
 } as const;
 
 export default async function Activity({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

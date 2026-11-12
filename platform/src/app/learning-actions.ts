@@ -3,6 +3,7 @@
 import { back } from "@/lib/action-helpers";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { accessProblem, feeStatusOf } from "@/lib/fees-data";
 import { requireUser } from "@/lib/session";
 
 // A student marks an online lesson complete. Practical lessons are signed off by staff instead.
@@ -12,6 +13,8 @@ export async function completeLessonAction(form: FormData) {
   const lessonId = String(form.get("lessonId") ?? "");
   const enrolment = await prisma.enrolment.findUnique({ where: { userId_classId: { userId: user.id, classId } }, include: { class: { include: { course: true } } } });
   if (!enrolment || enrolment.status !== "ACTIVE") back("/my-classes", "error", "You are not enrolled in that class.");
+  const paused = accessProblem(await feeStatusOf(enrolment.id));
+  if (paused) back("/fees", "error", paused);
   const lesson = await prisma.lesson.findFirst({ where: { id: lessonId, status: "PUBLISHED", module: { courseId: enrolment.class.courseId } } });
   if (!lesson) back(`/learn/${classId}`, "error", "That lesson is not available.");
   if (lesson.kind !== "ONLINE") back(`/learn/${classId}/${lessonId}`, "error", "Your lecturer or facilitator signs off practical work.");

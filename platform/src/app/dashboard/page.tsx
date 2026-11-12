@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
+import { formatUsd, WARN_DAYS } from "@/lib/fees";
+import { feeStatuses } from "@/lib/fees-data";
 import { can, ROLE_LABEL, visibleApprovalTypes } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 
@@ -18,6 +20,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     can(user.role, "classes.apply") ? prisma.enrolment.count({ where: { userId: user.id, status: "ACTIVE" } }) : Promise.resolve(0),
     teaches ? prisma.classStaff.count({ where: { userId: user.id } }) : Promise.resolve(0),
   ]);
+  // Warn a student whose balance is due soon, or whose access is paused.
+  const mine = can(user.role, "classes.apply") ? await prisma.enrolment.findMany({ where: { userId: user.id, status: "ACTIVE" }, select: { id: true } }) : [];
+  const fees = [...(await feeStatuses(mine.map((e) => e.id))).values()];
+  const paused = fees.filter((f) => !f.hasAccess);
+  const dueSoon = fees.filter((f) => f.state === "OWING" && f.daysLeft !== null && f.daysLeft <= WARN_DAYS);
   return (
     <div className="stack lg">
       <div className="stack">
@@ -25,6 +32,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <p className="muted">You are signed in as <strong>{ROLE_LABEL[user.role]}</strong>.</p>
         {params.notice === "not-allowed" && <p className="notice error" role="alert">Your role does not allow you to open that page.</p>}
         <Notices params={params} />
+        {paused.length > 0 && <p className="notice error" role="alert">You owe {formatUsd(paused.reduce((n, f) => n + f.balanceCents, 0))} and cannot open {paused.length === 1 ? "a class" : "some classes"} yet. <Link href="/fees">See your fees</Link>.</p>}
+        {dueSoon.map((f, i) => <p className="notice info" role="status" key={i}>Your balance of {formatUsd(f.balanceCents)} is due in {f.daysLeft} {f.daysLeft === 1 ? "day" : "days"}. <Link href="/fees">Pay and tell Finance</Link>.</p>)}
         {myRequest && <p className="notice info" role="status">Your staff access request is waiting for an administrator's decision.</p>}
       </div>
       <div className="grid">

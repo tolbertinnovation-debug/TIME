@@ -109,7 +109,7 @@ export async function requestStaffAccessAction(form: FormData) {
 export async function cancelRequestAction(form: FormData) {
   const user = await requireUser();
   const id = String(form.get("id") ?? "");
-  const returnTo = { apply: "/apply", classes: "/my-classes" }[String(form.get("from"))] ?? "/account/staff-access";
+  const returnTo = { apply: "/apply", classes: "/my-classes", fees: "/fees" }[String(form.get("from"))] ?? "/account/staff-access";
   const done = await prisma.approvalRequest.updateMany({ where: { id, requestedById: user.id, status: "PENDING" }, data: { status: "CANCELLED" } });
   if (done.count) await audit({ actor: user, action: "approval.cancelled", summary: `${user.name} cancelled their request`, entityType: "approval", entityId: id });
   back(returnTo, done.count ? "ok" : "error", done.count ? "Your request was cancelled." : "That request can no longer be cancelled.");
@@ -171,7 +171,7 @@ export async function decideApprovalAction(form: FormData) {
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
-  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
 }
@@ -193,11 +193,16 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     });
     if (!cls) throw new UserProblem("That class no longer exists.");
     if (cls.capacity !== null && cls._count.enrolments >= cls.capacity) throw new UserProblem("That class is full. Raise its capacity or reject the application.");
-    await tx.enrolment.upsert({
+    const before = await tx.enrolment.findUnique({ where: { userId_classId: { userId: requesterId, classId: cls.id } } });
+    const enrolment = await tx.enrolment.upsert({
       where: { userId_classId: { userId: requesterId, classId: cls.id } },
       create: { userId: requesterId, classId: cls.id },
       update: { status: "ACTIVE" },
     });
+    // A new enrolment is charged the course's tuition. Re-joining a class is not charged twice.
+    if (!before && cls.course.tuitionUsd) {
+      await tx.charge.create({ data: { enrolmentId: enrolment.id, kind: "TUITION", description: `Tuition: ${cls.course.title}, ${cls.intake.name}`, amountCents: cls.course.tuitionUsd * 100 } });
+    }
     const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
     let number = student.studentNumber;
     if (!number) {
@@ -226,6 +231,14 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     const published = await tx.result.updateMany({ where: { status: "IN_REVIEW", enrolment: { classId: cls.id } }, data: { status: "PUBLISHED", publishedAt: new Date() } });
     if (!published.count) throw new UserProblem("There are no results waiting for this class.");
     return `Results for ${published.count} ${published.count === 1 ? "student" : "students"} were published in ${cls.course.title}, ${cls.intake.name}`;
+  }
+  if (type === "PAYMENT_ARRANGEMENT") {
+    const until = new Date(`${String(data.until)}T23:59:59Z`);
+    if (Number.isNaN(until.getTime())) throw new UserProblem("The request has no valid date.");
+    const changed = await tx.enrolment.updateMany({ where: { id: String(data.enrolmentId), userId: requesterId }, data: { arrangementUntil: until } });
+    if (!changed.count) throw new UserProblem("That enrolment no longer exists.");
+    const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
+    return `${student.name} was given until ${String(data.until)} to pay their balance`;
   }
   if (type === "GRADE_APPEAL") {
     // An approved appeal withdraws the published result so the lecturer can re-mark and send it again.

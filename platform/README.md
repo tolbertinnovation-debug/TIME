@@ -2,7 +2,7 @@
 
 The online learning platform for TIME Inc. It is separate from the public website in the folder above, and it needs its own hosting and database to go live.
 
-- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 to 4 are built:** foundation; setup, admissions and enrolment; teaching and learning; assessment.
+- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 to 5 are built:** foundation; setup, admissions and enrolment; teaching and learning; assessment; fees.
 - Stack: Next.js (App Router, TypeScript), Prisma, PostgreSQL (Neon in production), Better Auth.
 
 ## Run it on your computer
@@ -45,9 +45,12 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/app/admin/` | Administration: overview, approvals, classes, intakes and centres, accounts, activity. |
 | `src/app/teaching-actions.ts`, `learning-actions.ts` | Lessons, review, sessions, attendance, practical sign-off, announcements; completing a lesson. |
 | `src/app/assessment-actions.ts` | Setting assessments, quiz questions, marking, results, handing in work, quizzes, appeals. |
+| `src/app/finance-actions.ts` | Reporting, confirming, rejecting and recording payments; charges; payment details; requests for more time. |
+| `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access) and working out what each student owes. |
 | `src/lib/grading.ts` | The grading rules: 30 / 20 / 20 / 30, pass mark 70, quiz marking and time limits. |
 | `src/lib/class-access.ts` | Who may work with a class: its lecturer, its facilitator, an enrolled student, or an administrator. |
-| `src/app/apply/`, `my-classes/`, `learn/`, `teach/` | What students and lecturers use. |
+| `src/app/apply/`, `my-classes/`, `learn/`, `fees/`, `teach/` | What students and lecturers use. |
+| `src/app/finance/` | The finance office: payments, student balances, payment details. |
 
 ## Security notes
 

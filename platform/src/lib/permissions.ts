@@ -35,6 +35,8 @@ export const CAPABILITIES = {
   "classes.apply": ["STUDENT"],
   // Read every course's lessons, including drafts, to review them
   "content.review": ["LEADERSHIP", "ADMIN"],
+  // Read a class's full gradebook to review results before they are published
+  "results.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
 
 export type Capability = keyof typeof CAPABILITIES;
@@ -44,7 +46,7 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
@@ -52,6 +54,8 @@ export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   APPLICATION: "Application",
   ENROLMENT_CHANGE: "Withdrawal or deferral",
   COURSE_PUBLISH: "Lessons to publish",
+  GRADES: "Results to publish",
+  GRADE_APPEAL: "Result appeal",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
@@ -59,6 +63,8 @@ const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   APPLICATION: ["REGISTRAR"],
   ENROLMENT_CHANGE: ["REGISTRAR"],
   COURSE_PUBLISH: ["LEADERSHIP"],
+  GRADES: ["LEADERSHIP"],
+  GRADE_APPEAL: ["LEADERSHIP"],
 };
 
 // What each kind of class staff may do. An administrator may do all of it, to step in when needed.
@@ -68,6 +74,8 @@ export const CLASS_TASKS = {
   "content.edit": ["LECTURER", "ADMIN"],
   // Post announcements to the class
   "announcements.post": ["LECTURER", "ADMIN"],
+  // Set assessments, mark work and send results for approval
+  "assessments.manage": ["LECTURER", "ADMIN"],
   // Schedule sessions, take attendance, sign off practical work
   "sessions.manage": ["LECTURER", "FACILITATOR", "ADMIN"],
 } as const satisfies Record<string, readonly ClassAccess[]>;

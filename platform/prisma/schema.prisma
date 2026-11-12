@@ -2,6 +2,7 @@
 // Step 1: accounts, roles, the catalogue, approvals and the activity log.
 // Step 2: intakes, study centres, classes, class staff and enrolments.
 // Step 3: lessons, progress, class sessions, attendance and announcements.
+// Step 4: assessments, quiz questions, submissions and results.
 
 generator client {
   provider = "prisma-client"
@@ -52,6 +53,7 @@ model User {
   enrolments        Enrolment[]
   classStaff        ClassStaff[]
   signOffs          LessonProgress[]
+  marked            Submission[]
   sessionsCreated   ClassSession[]
   announcements     Announcement[]
 
@@ -213,6 +215,7 @@ model CourseClass {
   enrolments    Enrolment[]
   sessions      ClassSession[]
   announcements Announcement[]
+  assessments   Assessment[]
 
   @@unique([courseId, intakeId, track])
   @@index([intakeId])
@@ -252,8 +255,10 @@ model Enrolment {
   status     EnrolmentStatus @default(ACTIVE)
   enrolledAt DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
-  progress   LessonProgress[]
-  attendance Attendance[]
+  progress    LessonProgress[]
+  attendance  Attendance[]
+  submissions Submission[]
+  result      Result?
 
   @@unique([userId, classId])
   @@index([classId, status])
@@ -367,6 +372,107 @@ model Announcement {
   @@map("announcement")
 }
 
+// ---- Assessment: every class is graded out of 100 points in four parts ----
+
+enum AssessmentCategory {
+  CONTINUOUS // 30 points
+  ASSIGNMENT // assignments and practical activities, 20 points
+  MIDTERM // 20 points
+  FINAL // final examination or course project, 30 points
+}
+
+enum AssessmentKind {
+  WRITTEN // the student writes an answer online; the lecturer marks it
+  QUIZ // multiple choice, marked automatically, optionally timed
+  OFFLINE // sat on paper or done in person; the lecturer enters the marks
+}
+
+enum AssessmentStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+model Assessment {
+  id               String             @id @default(cuid())
+  classId          String
+  class            CourseClass        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title            String
+  category         AssessmentCategory
+  kind             AssessmentKind
+  instructions     String
+  maxScore         Int
+  dueAt            DateTime?
+  timeLimitMinutes Int?
+  status           AssessmentStatus   @default(DRAFT)
+  createdAt        DateTime           @default(now())
+  questions        Question[]
+  submissions      Submission[]
+
+  @@index([classId])
+  @@map("assessment")
+}
+
+model Question {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  text         String
+  options      String[]
+  // Never sent to students
+  correctIndex Int
+  points       Int
+  sort         Int        @default(0)
+
+  @@index([assessmentId, sort])
+  @@map("question")
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  enrolmentId  String
+  enrolment    Enrolment  @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  text         String?
+  link         String?
+  // Quiz answers: question id -> chosen option number
+  answers      Json?
+  startedAt    DateTime   @default(now())
+  submittedAt  DateTime?
+  score        Float?
+  feedback     String?
+  gradedById   String?
+  gradedBy     User?      @relation(fields: [gradedById], references: [id], onDelete: SetNull)
+  gradedAt     DateTime?
+
+  @@unique([assessmentId, enrolmentId])
+  @@index([enrolmentId])
+  @@map("submission")
+}
+
+enum ResultStatus {
+  IN_REVIEW // sent for approval; marks are locked
+  PUBLISHED // the student can see it
+}
+
+// A student's result for a class, fixed at the moment it was sent for approval.
+model Result {
+  enrolmentId String       @id
+  enrolment   Enrolment    @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  continuous  Float
+  assignments Float
+  midterm     Float
+  final       Float
+  total       Float
+  passed      Boolean
+  status      ResultStatus @default(IN_REVIEW)
+  computedAt  DateTime     @default(now())
+  publishedAt DateTime?
+
+  @@map("result")
+}
+
 // ---- Approvals: one inbox for every decision that needs sign-off ----
 
 enum ApprovalType {
@@ -374,6 +480,8 @@ enum ApprovalType {
   APPLICATION // a student applies to join a class
   ENROLMENT_CHANGE // an enrolled student asks to withdraw or defer
   COURSE_PUBLISH // a lecturer asks for new lessons to be published
+  GRADES // a lecturer asks for a class's results to be published
+  GRADE_APPEAL // a student asks for a published result to be looked at again
 }
 
 enum ApprovalStatus {

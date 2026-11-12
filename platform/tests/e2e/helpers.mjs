@@ -83,3 +83,77 @@ export async function signIn(page, { email, password }) {
   await page.fill("#password", password);
   await submit(page, "form.form button[type=submit]");
 }
+
+// ---- Shared set-up for tests that need a running class ----
+
+export const DESK = { width: 1280, height: 900 };
+export const PEOPLE = {
+  registrar: { name: "Rita Registrar", email: "rita@example.test", password: "registrar-password-1" },
+  lecturer: { name: "Leo Lecturer", email: "leo@example.test", password: "lecturer-password-1" },
+  dean: { name: "Dora Dean", email: "dora@example.test", password: "leadership-password-1" },
+  ama: { name: "Ama Kollie", email: "ama@example.test", password: "student-password-1" },
+  ben: { name: "Ben Dolo", email: "ben@example.test", password: "student-password-2" },
+};
+
+export async function as(ctx, creds, viewport) {
+  const page = await person(ctx, viewport);
+  await signIn(page, creds);
+  return page;
+}
+
+// Create an account, then have the administrator give it a role.
+export async function makeStaff(ctx, creds, role) {
+  const page = await person(ctx);
+  await signUp(page, creds);
+  await page.context().close();
+  const admin = await as(ctx, ADMIN, DESK);
+  await admin.goto(`${URL_BASE}/admin/users?q=${encodeURIComponent(creds.email)}`);
+  await admin.selectOption("tbody select[name=role]", role);
+  await submit(admin, 'tbody button:has-text("Save")');
+  await admin.context().close();
+}
+
+// An online QuickBooks class with a lecturer and two enrolled students. Returns the class id.
+export async function setUpClass(ctx) {
+  await makeStaff(ctx, PEOPLE.registrar, "REGISTRAR");
+  await makeStaff(ctx, PEOPLE.lecturer, "LECTURER");
+  await makeStaff(ctx, PEOPLE.dean, "LEADERSHIP");
+  for (const s of [PEOPLE.ama, PEOPLE.ben]) { const p = await person(ctx); await signUp(p, s); await p.context().close(); }
+
+  const reg = await as(ctx, PEOPLE.registrar, DESK);
+  await reg.goto(`${URL_BASE}/admin/classes`);
+  await reg.selectOption("#courseId", { label: "QuickBooks" });
+  await reg.selectOption("#intakeId", { label: "March 2027" });
+  await reg.selectOption("#mode", "ONLINE");
+  await submit(reg, 'button:has-text("Add class")');
+  await reg.waitForURL(/\/admin\/classes\/.+/);
+  const classId = reg.url().split("?")[0].split("/").pop();
+  await reg.selectOption("#staff-user", { label: "Leo Lecturer · Lecturer" });
+  await submit(reg, 'button:has-text("Assign")');
+  await reg.locator('.notice.ok:has-text("was assigned")').waitFor();
+  await reg.goto(`${URL_BASE}/admin/setup`);
+  await submit(reg, 'tr:has-text("March 2027") button:has-text("Open for applications")');
+
+  for (const s of [PEOPLE.ama, PEOPLE.ben]) {
+    const page = await as(ctx, s);
+    await page.goto(`${URL_BASE}/apply`);
+    await page.selectOption("#classId", { index: 1 });
+    await page.fill("#county", "Margibi");
+    await submit(page, 'button:has-text("Send application")');
+    await page.context().close();
+  }
+  await reg.goto(`${URL_BASE}/admin/approvals`);
+  for (const left of [1, 0]) {
+    await submit(reg, 'article >> nth=0 >> button[value="APPROVED"]');
+    await reg.waitForFunction((n) => document.querySelectorAll("article").length === n, left);
+  }
+  await reg.context().close();
+  return classId;
+}
+
+// Run one statement against the test database (used to move a clock back in a test).
+export async function testDb(sql, params = []) {
+  const client = new pg.Client({ connectionString: env.DATABASE_URL });
+  await client.connect();
+  try { return (await client.query(sql, params)).rows; } finally { await client.end(); }
+}

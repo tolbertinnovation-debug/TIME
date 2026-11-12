@@ -35,6 +35,8 @@ export function TeachNav({ classId, access }: { classId: string; access: ClassAc
       <NavLink href={`/teach/${classId}`} exact>Students</NavLink>
       {classCan(access, "content.edit") && <NavLink href={`/teach/${classId}/content`}>Lessons</NavLink>}
       <NavLink href={`/teach/${classId}/sessions`}>Sessions and attendance</NavLink>
+      {classCan(access, "assessments.manage") && <NavLink href={`/teach/${classId}/assessments`}>Assessments</NavLink>}
+      {classCan(access, "assessments.manage") && <NavLink href={`/teach/${classId}/gradebook`}>Gradebook</NavLink>}
     </nav>
   );
 }

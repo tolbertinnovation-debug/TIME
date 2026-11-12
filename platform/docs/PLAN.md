@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 3 are built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 4 are built; the rest follow in order.
 
 ## What the earlier plan was missing
 
@@ -12,7 +12,7 @@ Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 3 are built
 | Academic setup: intakes, classes (cohorts), study centres, lecturer assignments | Step 2 (built) |
 | Course building tools for lecturers, with review before lessons are published | Step 3 (built) |
 | Announcements and class sessions (step 3, built); class discussions (step 7) | Steps 3 and 7 |
-| Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 |
+| Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 (built) |
 | Refunds, payment arrangements and finance reports | Step 5 |
 | Transcripts, results slips and replacement certificates | Step 6 |
 | Notifications by app, email and SMS/WhatsApp | Step 7 |
@@ -73,11 +73,15 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - An administrator can open the teaching view of any class to step in.
 - Still to come: uploading files to lessons (needs file storage; a lesson can link to notes or audio for now), class discussion (step 7) and saving lessons for offline study (step 8).
 
-### Step 4. Assessment
-- Assignments with file upload, quizzes, timed tests with question banks.
-- Gradebook with the 30 / 20 / 20 / 30 split and the pass mark of 70.
-- Grade approval: lecturer → coordinator → Dean (approval), then published to students.
-- Grade appeals and resits (approval). Results slips. Exports for leadership.
+### Step 4. Assessment — built
+- Three kinds of assessment: written work handed in online, multiple-choice quizzes marked automatically, and exams or practicals taken on paper or in person where the lecturer enters the marks.
+- Each assessment counts toward one of the four parts of the grade. The gradebook applies the 30 / 20 / 20 / 30 split and the pass mark of 70.
+- Quizzes: one attempt, an optional time limit that starts on the server, and two minutes' allowance for a slow connection. A late hand-in gets no marks. Students never receive the correct answers.
+- The lecturer can let a student take an assessment again, with a reason that is recorded.
+- Marking: marks cannot exceed the maximum, and changing a mark that was already given needs a reason. Every mark and change is in the activity log.
+- Results: the lecturer sends a class's results to academic leadership. Marks are locked while they wait. Rejected results come back with a reason. Students see a result only after it is approved.
+- Appeals: a student can appeal a published result. If leadership approves, only that student's result is reopened for re-marking and sent again.
+- Still to come: uploading files with written work (needs file storage; students can paste a link for now), question banks with random selection, and exports of results.
 
 ### Step 5. Fees
 - Invoices per student; installments; Mobile Money transaction ID entered by the student.

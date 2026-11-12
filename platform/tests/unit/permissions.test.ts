@@ -28,8 +28,8 @@ describe("approvals", () => {
     }
   });
   it("shows each role only the approval types it should see", () => {
-    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH"]);
-    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH"]);
+    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"]);
+    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL"]);
     expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE"]);
     for (const role of ["STUDENT", "LECTURER", "FACILITATOR", "FINANCE"] as const) expect(seesApprovals(role)).toBe(false);
   });
@@ -84,11 +84,16 @@ describe("teaching", () => {
     expect(ROLES.filter((r) => canDecide(r, "COURSE_PUBLISH"))).toEqual(["LEADERSHIP", "ADMIN"]);
     expect(ROLES.filter((r) => can(r, "content.review"))).toEqual(["LEADERSHIP", "ADMIN"]);
   });
-  it("lets a facilitator take attendance but not write lessons or post announcements", () => {
+  it("lets only academic leadership and administrators publish results and decide appeals", () => {
+    for (const type of ["GRADES", "GRADE_APPEAL"] as const) expect(ROLES.filter((r) => canDecide(r, type))).toEqual(["LEADERSHIP", "ADMIN"]);
+    expect(ROLES.filter((r) => can(r, "results.review"))).toEqual(["LEADERSHIP", "ADMIN"]);
+  });
+  it("lets a facilitator take attendance but not write lessons, post announcements or mark work", () => {
     expect(classCan("FACILITATOR", "sessions.manage")).toBe(true);
     expect(classCan("FACILITATOR", "content.edit")).toBe(false);
     expect(classCan("FACILITATOR", "announcements.post")).toBe(false);
-    for (const task of ["content.edit", "announcements.post", "sessions.manage"] as const) {
+    expect(classCan("FACILITATOR", "assessments.manage")).toBe(false);
+    for (const task of ["content.edit", "announcements.post", "sessions.manage", "assessments.manage"] as const) {
       expect(classCan("LECTURER", task)).toBe(true);
       expect(classCan("ADMIN", task)).toBe(true);
     }

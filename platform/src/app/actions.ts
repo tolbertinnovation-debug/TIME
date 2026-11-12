@@ -149,6 +149,10 @@ export async function decideApprovalAction(form: FormData) {
       if (!updated.count) return false;
       if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload);
       // Rejected lessons go back to draft so the lecturer can fix them.
+      // Rejected results are discarded so the lecturer can correct the marks and send them again.
+      if (decision === "REJECTED" && type === "GRADES") {
+        await tx.result.deleteMany({ where: { status: "IN_REVIEW", enrolment: { classId: String((request.payload as { classId?: unknown }).classId) } } });
+      }
       if (decision === "REJECTED" && type === "COURSE_PUBLISH") {
         await tx.lesson.updateMany({ where: { status: "IN_REVIEW", module: { courseId: String((request.payload as { courseId?: unknown }).courseId) } }, data: { status: "DRAFT" } });
       }
@@ -167,7 +171,7 @@ export async function decideApprovalAction(form: FormData) {
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
-  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
 }
@@ -215,6 +219,20 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     if (!course) throw new UserProblem("That course no longer exists.");
     const published = await tx.lesson.updateMany({ where: { status: "IN_REVIEW", module: { courseId: course.id } }, data: { status: "PUBLISHED", publishedAt: new Date() } });
     return `${published.count} ${published.count === 1 ? "lesson was" : "lessons were"} published in ${course.title}`;
+  }
+  if (type === "GRADES") {
+    const cls = await tx.courseClass.findUnique({ where: { id: String(data.classId) }, include: { course: true, intake: true } });
+    if (!cls) throw new UserProblem("That class no longer exists.");
+    const published = await tx.result.updateMany({ where: { status: "IN_REVIEW", enrolment: { classId: cls.id } }, data: { status: "PUBLISHED", publishedAt: new Date() } });
+    if (!published.count) throw new UserProblem("There are no results waiting for this class.");
+    return `Results for ${published.count} ${published.count === 1 ? "student" : "students"} were published in ${cls.course.title}, ${cls.intake.name}`;
+  }
+  if (type === "GRADE_APPEAL") {
+    // An approved appeal withdraws the published result so the lecturer can re-mark and send it again.
+    const removed = await tx.result.deleteMany({ where: { enrolmentId: String(data.enrolmentId), status: "PUBLISHED", enrolment: { userId: requesterId } } });
+    if (!removed.count) throw new UserProblem("That result is no longer published.");
+    const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
+    return `${student.name}'s result was reopened for re-marking after an appeal`;
   }
   return null;
 }

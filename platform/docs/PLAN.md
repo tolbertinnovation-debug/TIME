@@ -1,12 +1,12 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 5 are built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 6 are built; the rest follow in order.
 
 ## What the earlier plan was missing
 
 | Missing | Now in |
 |---|---|
-| **Certificate requests.** A student who has finished asks for their certificate; the platform checks they qualify; staff approve; the certificate is issued. | Step 6 |
+| **Certificate requests.** A student who has finished asks for their certificate; the platform checks they qualify; staff approve; the certificate is issued. | Step 6 (built) |
 | **One approvals inbox.** Every decision that needs sign-off in one place, with an administrator able to step in on any of them. | Step 1 (built), extended in every step |
 | **A full activity view.** Everything every person does, searchable, for administrators. | Step 1 (built), extended in every step |
 | Academic setup: intakes, classes (cohorts), study centres, lecturer assignments | Step 2 (built) |
@@ -95,13 +95,18 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - Finance sees payments to confirm, balances due soon, paused students and totals. Leadership can look but not change. Finance cannot see marks or lessons.
 - Still to come: reminders by SMS or email (step 7), refunds, and amounts in Liberian dollars.
 
-### Step 6. Completion and certificates
-- The platform works out when a student has completed a program: every course passed, every required assessment done, fees cleared.
-- **Certificate request:** the student presses "Request my certificate". The request shows what has been checked.
-- Registrar verifies → Dean approves → Executive Director signs (approval, three steps; an administrator can see every step and step in if necessary).
-- The certificate is issued with a code, as a PDF the student can download.
-- A public page lets an employer check the code.
-- Transcripts, and requests for a replacement certificate (approval).
+### Step 6. Completion and certificates — built
+- **The administration decides when a class has ended.** The registrar or an administrator ends it (and can reopen it).
+- A student can then **request their certificate** if three things are true: the class has ended, their published result is a pass, and their fees are cleared. The page shows each of the three with a tick or a cross.
+- **Two checks before it is issued:** the registrar checks the record, then academic leadership approves and issues. Either can reject with a reason, and the student can ask again. An administrator can do either step.
+- If the student stops qualifying while the request is waiting (for example a new charge), it cannot be approved until that is put right.
+- **The certificate follows TIME's paper certificate:** the heading and address, the award title, the holder's name in blackletter, TIME's wording, the award date and place, and "ID NO". It prints on one landscape page.
+- The "C" Certificate programs award a **Teaching Certificate in Elementary Education** with the Bureau of Teacher Education wording and three signature lines (Executive Director, Assistant Minister, County Education Office). Other programs award a Diploma, Professional Certificate or Certificate, with TIME's wording only and the Executive Director's line.
+- **Signature lines are blank, to be signed by hand.** The platform does not print the Ministry's seal or any signature.
+- **Numbering continues from paper:** the registrar enters the last number already issued on paper for each kind (TC, DP, PC, CT), and the platform uses the next one.
+- **Anyone can check a certificate** on a public page with its ID number and the code printed on it. An ID alone reveals nothing.
+- Leadership or an administrator can **revoke** a certificate with a reason; it then shows as revoked to everyone.
+- Still to come: transcripts, and requests for a replacement certificate.
 
 ### Step 7. Communication and support
 - Notifications in the app, by email and by SMS or WhatsApp.

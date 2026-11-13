@@ -11,6 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {seesApprovals(user.role) && <NavLink href="/admin/approvals">Approvals</NavLink>}
         {can(user.role, "enrolments.view") && <NavLink href="/admin/classes">Classes</NavLink>}
         {can(user.role, "setup.manage") && <NavLink href="/admin/setup">Intakes and centres</NavLink>}
+        {can(user.role, "certificates.view") && <NavLink href="/admin/certificates">Certificates</NavLink>}
         {can(user.role, "users.view") && <NavLink href="/admin/users">Accounts</NavLink>}
         {can(user.role, "activity.view") && <NavLink href="/admin/activity">Activity</NavLink>}
       </nav>

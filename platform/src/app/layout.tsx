@@ -10,6 +10,8 @@ import { getCurrentUser } from "@/lib/session";
 
 const body = localFont({ src: "../fonts/dm-sans-latin.woff2", weight: "400 700", variable: "--font-body", display: "swap" });
 const display = localFont({ src: "../fonts/manrope-latin.woff2", weight: "500 800", variable: "--font-display", display: "swap" });
+// Used only for the holder's name on certificates, so it is not preloaded on every page.
+const blackletter = localFont({ src: "../fonts/unifrakturcook-latin-700.woff2", weight: "700", variable: "--font-blackletter", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: { default: "TIME Learning", template: "%s | TIME Learning" },
@@ -21,7 +23,7 @@ export const viewport: Viewport = { themeColor: "#435e25" };
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   return (
-    <html lang="en" className={`${body.variable} ${display.variable}`}>
+    <html lang="en" className={`${body.variable} ${display.variable} ${blackletter.variable}`}>
       <body>
         <a className="skip" href="#main">Skip to content</a>
         <header className="site-header">
@@ -36,6 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <NavLink href="/dashboard">Home</NavLink>
                   {can(user.role, "classes.apply") && <NavLink href="/my-classes">My classes</NavLink>}
                   {can(user.role, "classes.apply") && <NavLink href="/fees">Fees</NavLink>}
+                  {can(user.role, "classes.apply") && <NavLink href="/certificates">Certificates</NavLink>}
                   {can(user.role, "classes.apply") && <NavLink href="/apply">Apply</NavLink>}
                   {can(user.role, "finance.view") && <NavLink href="/finance">Finance</NavLink>}
                   {(user.role === "LECTURER" || user.role === "FACILITATOR") && <NavLink href="/teach">My classes</NavLink>}
@@ -47,6 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </>
             ) : (
               <nav className="nav" aria-label="Main">
+                <NavLink href="/verify">Check a certificate</NavLink>
                 <NavLink href="/sign-in">Sign in</NavLink>
                 <NavLink href="/sign-up">Create account</NavLink>
               </nav>

@@ -39,6 +39,12 @@ export const CAPABILITIES = {
   "finance.view": ["FINANCE", "ADMIN", "LEADERSHIP"],
   // Confirm or reject payments, add charges, record payments, change payment details
   "finance.manage": ["FINANCE", "ADMIN"],
+  // See every certificate that has been issued
+  "certificates.view": ["ADMIN", "REGISTRAR", "LEADERSHIP"],
+  // Withdraw a certificate that should not stand
+  "certificates.revoke": ["ADMIN", "LEADERSHIP"],
+  // Set the last paper certificate number, so platform numbers continue from it
+  "certificates.numbering": ["ADMIN", "REGISTRAR"],
   // Read a class's full gradebook to review results before they are published
   "results.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
@@ -50,7 +56,7 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
@@ -61,6 +67,8 @@ export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   GRADES: "Results to publish",
   GRADE_APPEAL: "Result appeal",
   PAYMENT_ARRANGEMENT: "More time to pay",
+  CERTIFICATE_VERIFY: "Certificate: check the record",
+  CERTIFICATE_ISSUE: "Certificate: approve and issue",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
@@ -71,6 +79,8 @@ const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   GRADES: ["LEADERSHIP"],
   GRADE_APPEAL: ["LEADERSHIP"],
   PAYMENT_ARRANGEMENT: ["FINANCE"],
+  CERTIFICATE_VERIFY: ["REGISTRAR"],
+  CERTIFICATE_ISSUE: ["LEADERSHIP"],
 };
 
 // What each kind of class staff may do. An administrator may do all of it, to step in when needed.

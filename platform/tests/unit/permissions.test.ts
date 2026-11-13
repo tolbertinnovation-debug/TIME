@@ -28,9 +28,9 @@ describe("approvals", () => {
     }
   });
   it("shows each role only the approval types it should see", () => {
-    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"]);
-    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT"]);
-    expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE"]);
+    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"]);
+    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"]);
+    expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE", "CERTIFICATE_VERIFY"]);
     expect(visibleApprovalTypes("FINANCE")).toEqual(["PAYMENT_ARRANGEMENT"]);
     for (const role of ["STUDENT", "LECTURER", "FACILITATOR"] as const) expect(seesApprovals(role)).toBe(false);
   });
@@ -111,5 +111,16 @@ describe("finance", () => {
     for (const type of ["APPLICATION", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "STAFF_ACCESS"] as const) expect(canDecide("FINANCE", type)).toBe(false);
     expect(can("FINANCE", "results.review")).toBe(false);
     expect(can("FINANCE", "content.review")).toBe(false);
+  });
+});
+
+describe("certificates", () => {
+  it("has the registrar check the record and academic leadership issue; an administrator can do either", () => {
+    expect(ROLES.filter((r) => canDecide(r, "CERTIFICATE_VERIFY"))).toEqual(["REGISTRAR", "ADMIN"]);
+    expect(ROLES.filter((r) => canDecide(r, "CERTIFICATE_ISSUE"))).toEqual(["LEADERSHIP", "ADMIN"]);
+  });
+  it("lets only leadership and administrators revoke a certificate", () => {
+    expect(ROLES.filter((r) => can(r, "certificates.revoke"))).toEqual(["LEADERSHIP", "ADMIN"]);
+    expect(ROLES.filter((r) => can(r, "certificates.view"))).toEqual(["REGISTRAR", "LEADERSHIP", "ADMIN"]);
   });
 });

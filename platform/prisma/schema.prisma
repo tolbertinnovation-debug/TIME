@@ -4,6 +4,7 @@
 // Step 3: lessons, progress, class sessions, attendance and announcements.
 // Step 4: assessments, quiz questions, submissions and results.
 // Step 5: charges, payments, receipts, payment arrangements and settings.
+// Step 6: ending a class, certificate requests and certificates.
 
 generator client {
   provider = "prisma-client"
@@ -57,6 +58,7 @@ model User {
   marked            Submission[]
   paymentsSent      Payment[]         @relation("paymentSubmitter")
   paymentsDecided   Payment[]         @relation("paymentDecider")
+  certificates      Certificate[]
   sessionsCreated   ClassSession[]
   announcements     Announcement[]
 
@@ -196,8 +198,9 @@ enum Track {
 }
 
 enum ClassStatus {
-  OPEN
-  CLOSED
+  OPEN // taking applications
+  CLOSED // running, no new applications
+  ENDED // the administration has declared the class finished; certificates can be requested
 }
 
 // A class is one running of a course: an intake, a schedule and a way of studying.
@@ -213,6 +216,7 @@ model CourseClass {
   studyCentre   StudyCentre? @relation(fields: [studyCentreId], references: [id])
   capacity      Int?
   status        ClassStatus  @default(OPEN)
+  endedAt       DateTime?
   createdAt     DateTime     @default(now())
   staff         ClassStaff[]
   enrolments    Enrolment[]
@@ -264,6 +268,7 @@ model Enrolment {
   result      Result?
   charges     Charge[]
   payments    Payment[]
+  certificate Certificate?
   // Set when Finance approves more time to pay: access continues until this date
   arrangementUntil DateTime?
 
@@ -547,6 +552,35 @@ model Setting {
   @@map("setting")
 }
 
+// ---- Certificates. The details are copied onto the certificate when it is issued, so it never changes afterwards. ----
+
+model Certificate {
+  id           String    @id @default(cuid())
+  // Printed on the certificate as "ID NO", e.g. "TC-002"
+  number       String    @unique
+  // A short code printed on the certificate, needed with the ID to check it online
+  code         String
+  enrolmentId  String    @unique
+  enrolment    Enrolment @relation(fields: [enrolmentId], references: [id])
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  holderName   String
+  // e.g. "Teaching Certificate" and "Elementary Education"
+  title        String
+  field        String
+  courseTitle  String
+  // Which wording the certificate carries: TEACHING names the Bureau of Teacher Education
+  wording      String
+  awardedOn    DateTime  @db.Date
+  issuedByName String
+  revokedAt    DateTime?
+  revokeReason String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@map("certificate")
+}
+
 // ---- Approvals: one inbox for every decision that needs sign-off ----
 
 enum ApprovalType {
@@ -557,6 +591,8 @@ enum ApprovalType {
   GRADES // a lecturer asks for a class's results to be published
   GRADE_APPEAL // a student asks for a published result to be looked at again
   PAYMENT_ARRANGEMENT // a student asks for more time to pay their balance
+  CERTIFICATE_VERIFY // a student requests their certificate; the registrar checks the record
+  CERTIFICATE_ISSUE // the verified request goes to academic leadership, who issue the certificate
 }
 
 enum ApprovalStatus {

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assignStaffAction, removeStaffAction, setClassStatusAction } from "@/app/academic-actions";
+import { endClassAction } from "@/app/certificate-actions";
+import { formatDate } from "@/lib/format";
 import { Notices } from "@/components/notice";
 import { Roster } from "@/components/roster";
 import { MODE_LABEL, TRACK_LABEL } from "@/lib/academics";
@@ -30,11 +32,18 @@ export default async function ClassPage({ params, searchParams }: { params: Prom
         <p className="muted">{cls.intake.name} · {TRACK_LABEL[cls.track]} · {MODE_LABEL[cls.mode]}{cls.studyCentre ? ` · ${cls.studyCentre.name}` : ""} · {active}{cls.capacity ? ` of ${cls.capacity}` : ""} enrolled</p>
         <Notices params={await searchParams} />
         {me.role === "ADMIN" && <p className="small"><Link href={`/teach/${cls.id}`}>Open the teaching view</Link> (lessons, sessions, attendance)</p>}
-        {manage && (
-          <form action={setClassStatusAction}>
-            <input type="hidden" name="id" value={cls.id} /><input type="hidden" name="status" value={cls.status === "OPEN" ? "CLOSED" : "OPEN"} />
-            <button className="btn ghost sm" type="submit">{cls.status === "OPEN" ? "Stop taking applications" : "Take applications again"}</button>
-          </form>
+        {cls.status === "ENDED" && <p className="notice ok">This class ended on {cls.endedAt ? formatDate(cls.endedAt) : "an earlier date"}. Students who passed and have cleared their fees can request their certificate.</p>}
+        {manage && cls.status !== "ENDED" && (
+          <div className="row">
+            <form action={setClassStatusAction}>
+              <input type="hidden" name="id" value={cls.id} /><input type="hidden" name="status" value={cls.status === "OPEN" ? "CLOSED" : "OPEN"} />
+              <button className="btn ghost sm" type="submit">{cls.status === "OPEN" ? "Stop taking applications" : "Take applications again"}</button>
+            </form>
+            <form action={endClassAction}><input type="hidden" name="id" value={cls.id} /><button className="btn sm" type="submit">End this class</button></form>
+          </div>
+        )}
+        {manage && cls.status === "ENDED" && (
+          <form action={endClassAction}><input type="hidden" name="id" value={cls.id} /><input type="hidden" name="reopen" value="yes" /><button className="btn ghost sm" type="submit">Reopen this class</button></form>
         )}
       </div>
 

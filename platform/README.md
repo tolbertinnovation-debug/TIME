@@ -2,7 +2,7 @@
 
 The online learning platform for TIME Inc. It is separate from the public website in the folder above, and it needs its own hosting and database to go live.
 
-- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 to 5 are built:** foundation; setup, admissions and enrolment; teaching and learning; assessment; fees.
+- Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 to 6 are built:** foundation; setup, admissions and enrolment; teaching and learning; assessment; fees; certificates.
 - Stack: Next.js (App Router, TypeScript), Prisma, PostgreSQL (Neon in production), Better Auth.
 
 ## Run it on your computer
@@ -47,10 +47,13 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/app/assessment-actions.ts` | Setting assessments, quiz questions, marking, results, handing in work, quizzes, appeals. |
 | `src/app/finance-actions.ts` | Reporting, confirming, rejecting and recording payments; charges; payment details; requests for more time. |
 | `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access) and working out what each student owes. |
+| `src/app/certificate-actions.ts` | Ending a class, requesting a certificate, revoking, paper numbering, the public check. |
+| `src/lib/certificate.ts`, `certificate-data.ts` | The certificate's wording and numbering, who qualifies, and issuing. To change the wording or address, edit `certificate.ts`. |
 | `src/lib/grading.ts` | The grading rules: 30 / 20 / 20 / 30, pass mark 70, quiz marking and time limits. |
 | `src/lib/class-access.ts` | Who may work with a class: its lecturer, its facilitator, an enrolled student, or an administrator. |
 | `src/app/apply/`, `my-classes/`, `learn/`, `fees/`, `teach/` | What students and lecturers use. |
 | `src/app/finance/` | The finance office: payments, student balances, payment details. |
+| `src/app/certificates/`, `verify/` | A student's certificates and the printable certificate; the public page for checking one. |
 
 ## Security notes
 

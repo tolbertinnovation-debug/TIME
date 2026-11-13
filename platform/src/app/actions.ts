@@ -8,6 +8,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { back, firstProblem, UserProblem } from "@/lib/action-helpers";
 import { studentNumber } from "@/lib/academics";
+import { assertStillEligible, issueCertificate } from "@/lib/certificate-data";
 import { auth } from "@/lib/auth";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
@@ -109,7 +110,7 @@ export async function requestStaffAccessAction(form: FormData) {
 export async function cancelRequestAction(form: FormData) {
   const user = await requireUser();
   const id = String(form.get("id") ?? "");
-  const returnTo = { apply: "/apply", classes: "/my-classes", fees: "/fees" }[String(form.get("from"))] ?? "/account/staff-access";
+  const returnTo = { apply: "/apply", classes: "/my-classes", fees: "/fees", certificates: "/certificates" }[String(form.get("from"))] ?? "/account/staff-access";
   const done = await prisma.approvalRequest.updateMany({ where: { id, requestedById: user.id, status: "PENDING" }, data: { status: "CANCELLED" } });
   if (done.count) await audit({ actor: user, action: "approval.cancelled", summary: `${user.name} cancelled their request`, entityType: "approval", entityId: id });
   back(returnTo, done.count ? "ok" : "error", done.count ? "Your request was cancelled." : "That request can no longer be cancelled.");
@@ -147,7 +148,7 @@ export async function decideApprovalAction(form: FormData) {
         data: { status: decision, decidedById: user.id, decidedAt: new Date(), decisionNote: note },
       });
       if (!updated.count) return false;
-      if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload);
+      if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload, user.name);
       // Rejected lessons go back to draft so the lecturer can fix them.
       // Rejected results are discarded so the lecturer can correct the marks and send them again.
       if (decision === "REJECTED" && type === "GRADES") {
@@ -171,14 +172,14 @@ export async function decideApprovalAction(form: FormData) {
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
-  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : type === "CERTIFICATE_VERIFY" ? "certificate.verified" : type === "CERTIFICATE_ISSUE" ? "certificate.issued" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
 }
 
 // What an approval does once it is granted. Runs inside the same transaction as the decision,
 // so a request is never marked approved without its effect.
-async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, requesterId: string, payload: Prisma.JsonValue): Promise<string | null> {
+async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, requesterId: string, payload: Prisma.JsonValue, deciderName: string): Promise<string | null> {
   const data = (payload ?? {}) as Record<string, unknown>;
   if (type === "STAFF_ACCESS") {
     const role = data.role;
@@ -231,6 +232,17 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     const published = await tx.result.updateMany({ where: { status: "IN_REVIEW", enrolment: { classId: cls.id } }, data: { status: "PUBLISHED", publishedAt: new Date() } });
     if (!published.count) throw new UserProblem("There are no results waiting for this class.");
     return `Results for ${published.count} ${published.count === 1 ? "student" : "students"} were published in ${cls.course.title}, ${cls.intake.name}`;
+  }
+  if (type === "CERTIFICATE_VERIFY") {
+    // The registrar has checked the record. The request now goes to academic leadership.
+    const standing = await assertStillEligible(String(data.enrolmentId), requesterId);
+    await tx.approvalRequest.create({ data: { type: "CERTIFICATE_ISSUE", requestedById: requesterId, payload: { ...data, verifiedBy: deciderName } } });
+    return `${standing.enrolment.user.name}'s record was checked for a certificate and sent to academic leadership`;
+  }
+  if (type === "CERTIFICATE_ISSUE") {
+    const standing = await assertStillEligible(String(data.enrolmentId), requesterId);
+    const cert = await issueCertificate(tx, standing, deciderName);
+    return `Certificate ${cert.number} (${cert.title}, ${cert.field}) was issued to ${cert.holderName}`;
   }
   if (type === "PAYMENT_ARRANGEMENT") {
     const until = new Date(`${String(data.until)}T23:59:59Z`);

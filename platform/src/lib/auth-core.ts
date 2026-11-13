@@ -3,12 +3,14 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { prisma } from "@/lib/db";
 import { audit } from "@/lib/audit";
+import { publicUrl } from "@/lib/deploy-check";
 
 export const MIN_PASSWORD = 10;
 
 // Shared sign-in setup. The web app adds cookie handling; command-line scripts use it as is.
 export function createAuth(plugins: BetterAuthPlugin[] = []) {
   return betterAuth({
+    baseURL: publicUrl(process.env),
     database: prismaAdapter(prisma, { provider: "postgresql" }),
     emailAndPassword: { enabled: true, minPasswordLength: MIN_PASSWORD, maxPasswordLength: 128 },
     user: {

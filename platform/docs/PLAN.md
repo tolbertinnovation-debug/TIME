@@ -121,6 +121,8 @@ Built:
 - **Offline lessons.** Every lesson a student opens is kept on their phone, and **Save lessons for offline** on the class page keeps the whole class. With no connection, saved lessons open as usual and other pages explain that a connection is needed. With a connection the server is always asked first, so permission and fee checks still apply. Assessments, fees, certificates and staff pages are never kept. Saved lessons are removed when the student signs out.
 - **Guides** for students, lecturers and facilitators, the registrar, Finance, academic leadership and administrators, in [`guides/`](guides/README.md).
 - **Going-live checklist** in [GOING-LIVE.md](GOING-LIVE.md), and a health check address (`/api/health`) for monitoring.
+- **One-step deployment.** On the live host the build checks its settings, creates the tables, loads the catalogue and creates the first administrator. Steps for Neon and Vercel are in [DEPLOY.md](DEPLOY.md).
+- **Draft terms of use and privacy notice** in [`legal/`](legal/README.md), waiting for TIME's review. Acceptance at sign-up is added once they are approved.
 
 Still to come (each waits on a decision or account from TIME):
 - Self-service password reset, email verification, sign-in by phone number.

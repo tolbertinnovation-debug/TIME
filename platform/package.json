@@ -2,10 +2,12 @@
   "name": "time-learning-platform",
   "private": true,
   "type": "module",
+  "engines": { "node": ">=22" },
   "description": "TIME Learning: the online learning platform for TIME Inc. (Next.js, Prisma, Better Auth, PostgreSQL).",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "vercel-build": "tsx scripts/deploy.ts",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",

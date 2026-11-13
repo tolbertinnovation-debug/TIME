@@ -10,6 +10,7 @@ import { back, firstProblem, UserProblem } from "@/lib/action-helpers";
 import { studentNumber } from "@/lib/academics";
 import { assertStillEligible, issueCertificate } from "@/lib/certificate-data";
 import { auth } from "@/lib/auth";
+import { classStudentIds, notify } from "@/lib/notify";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
@@ -173,9 +174,26 @@ export async function decideApprovalAction(form: FormData) {
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
   if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : type === "CERTIFICATE_VERIFY" ? "certificate.verified" : type === "CERTIFICATE_ISSUE" ? "certificate.issued" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  // Tell the person who asked what was decided.
+  await notify(request.requestedById, {
+    title: `${APPROVAL_LABEL[type]}: ${verb}`,
+    body: decision === "REJECTED" ? `Reason: ${note}` : (effect ?? `Your request was approved by ${user.name}.`),
+    href: REQUEST_PAGE[type],
+  });
+  // Published results are news for every student in the class.
+  if (decision === "APPROVED" && type === "GRADES") {
+    const classId = String((request.payload as { classId?: unknown }).classId);
+    await notify(await classStudentIds(classId), { title: "Your result has been published", body: "Open your class to see your marks for each part of the grade.", href: `/learn/${classId}` });
+  }
   revalidatePath("/admin");
   back("/admin/approvals", "ok", `Request ${verb}.`);
 }
+
+// Where a person goes to see the outcome of each kind of request.
+const REQUEST_PAGE: Record<ApprovalType, string> = {
+  STAFF_ACCESS: "/account/staff-access", APPLICATION: "/apply", ENROLMENT_CHANGE: "/my-classes", COURSE_PUBLISH: "/teach", GRADES: "/teach",
+  GRADE_APPEAL: "/my-classes", PAYMENT_ARRANGEMENT: "/fees", CERTIFICATE_VERIFY: "/certificates", CERTIFICATE_ISSUE: "/certificates",
+};
 
 // What an approval does once it is granted. Runs inside the same transaction as the decision,
 // so a request is never marked approved without its effect.

@@ -45,6 +45,8 @@ export const CAPABILITIES = {
   "certificates.revoke": ["ADMIN", "LEADERSHIP"],
   // Set the last paper certificate number, so platform numbers continue from it
   "certificates.numbering": ["ADMIN", "REGISTRAR"],
+  // Add sponsors, link them to students and produce progress summaries
+  "sponsors.manage": ["ADMIN", "REGISTRAR"],
   // Read a class's full gradebook to review results before they are published
   "results.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;
@@ -92,6 +94,8 @@ export const CLASS_TASKS = {
   "announcements.post": ["LECTURER", "ADMIN"],
   // Set assessments, mark work and send results for approval
   "assessments.manage": ["LECTURER", "ADMIN"],
+  // Remove a post from the class discussion
+  "discussion.moderate": ["LECTURER", "ADMIN"],
   // Schedule sessions, take attendance, sign off practical work
   "sessions.manage": ["LECTURER", "FACILITATOR", "ADMIN"],
 } as const satisfies Record<string, readonly ClassAccess[]>;
@@ -147,4 +151,18 @@ export function suspendProblem(input: {
   if (input.actorId === input.targetId) return "You cannot suspend your own account.";
   if (input.targetRole === "ADMIN" && input.activeAdminCount <= 1) return "This is the only administrator and cannot be suspended.";
   return null;
+}
+
+// Help desk: who answers which kind of request. Fee questions go to finance; the rest to the registrar.
+export const SUPPORT_CATEGORIES = ["ACCOUNT", "COURSE", "FEES", "TECHNICAL", "OTHER"] as const;
+export type SupportCategory = (typeof SUPPORT_CATEGORIES)[number];
+export const SUPPORT_LABEL: Record<SupportCategory, string> = {
+  ACCOUNT: "My account or sign-in", COURSE: "My class or lessons", FEES: "Fees and payments", TECHNICAL: "Something is not working", OTHER: "Something else",
+};
+
+export function supportCategoriesFor(role: Role): SupportCategory[] {
+  if (role === "ADMIN") return [...SUPPORT_CATEGORIES];
+  if (role === "REGISTRAR") return SUPPORT_CATEGORIES.filter((c) => c !== "FEES");
+  if (role === "FINANCE") return ["FEES"];
+  return [];
 }

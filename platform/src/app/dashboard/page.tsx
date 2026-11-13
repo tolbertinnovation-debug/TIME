@@ -13,12 +13,13 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const params = await searchParams;
   const types = visibleApprovalTypes(user.role);
   const teaches = user.role === "LECTURER" || user.role === "FACILITATOR";
-  const [myRequest, pendingCount, courseCount, myEnrolments, myTeaching] = await Promise.all([
+  const [myRequest, pendingCount, courseCount, myEnrolments, myTeaching, unread] = await Promise.all([
     prisma.approvalRequest.findFirst({ where: { requestedById: user.id, status: "PENDING", type: "STAFF_ACCESS" } }),
     types.length ? prisma.approvalRequest.count({ where: { status: "PENDING", type: { in: types } } }) : Promise.resolve(0),
     prisma.course.count({ where: { active: true } }),
     can(user.role, "classes.apply") ? prisma.enrolment.count({ where: { userId: user.id, status: "ACTIVE" } }) : Promise.resolve(0),
     teaches ? prisma.classStaff.count({ where: { userId: user.id } }) : Promise.resolve(0),
+    prisma.notification.count({ where: { userId: user.id, readAt: null } }),
   ]);
   // Warn a student whose balance is due soon, or whose access is paused.
   const mine = can(user.role, "classes.apply") ? await prisma.enrolment.findMany({ where: { userId: user.id, status: "ACTIVE" }, select: { id: true } }) : [];
@@ -34,6 +35,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         <Notices params={params} />
         {paused.length > 0 && <p className="notice error" role="alert">You owe {formatUsd(paused.reduce((n, f) => n + f.balanceCents, 0))} and cannot open {paused.length === 1 ? "a class" : "some classes"} yet. <Link href="/fees">See your fees</Link>.</p>}
         {dueSoon.map((f, i) => <p className="notice info" role="status" key={i}>Your balance of {formatUsd(f.balanceCents)} is due in {f.daysLeft} {f.daysLeft === 1 ? "day" : "days"}. <Link href="/fees">Pay and tell Finance</Link>.</p>)}
+        {unread > 0 && <p className="notice info" role="status">You have {unread} unread {unread === 1 ? "notification" : "notifications"}. <Link href="/notifications">Read {unread === 1 ? "it" : "them"}</Link>.</p>}
         {myRequest && <p className="notice info" role="status">Your staff access request is waiting for an administrator's decision.</p>}
       </div>
       <div className="grid">

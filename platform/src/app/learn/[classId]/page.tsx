@@ -44,7 +44,10 @@ export default async function LearnClass({ params, searchParams }: { params: Pro
         <div className="row between"><h2 id="progress-h">Your progress</h2><strong>{summary.percent}%</strong></div>
         <ProgressBar progress={summary} />
         <p className="small muted">Attendance: {att === null ? "not recorded yet" : `${att}% of sessions`}</p>
-        {next && <div><Link className="btn" href={`/learn/${classId}/${next.id}`}>Continue: {next.title}</Link></div>}
+        <div className="row">
+          {next && <Link className="btn" href={`/learn/${classId}/${next.id}`}>Continue: {next.title}</Link>}
+          <Link className="btn ghost" href={`/discussion/${classId}`}>Class discussion</Link>
+        </div>
       </section>
 
       {result && (

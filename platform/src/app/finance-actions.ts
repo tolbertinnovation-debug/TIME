@@ -8,6 +8,7 @@ import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { CHARGE_LABEL, formatUsd, METHOD_LABEL, normaliseReference, parseAmount, receiptNumber } from "@/lib/fees";
 import { feeStatusOf, SETTING } from "@/lib/fees-data";
+import { notify } from "@/lib/notify";
 import { can } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 import type { Prisma } from "@/generated/prisma/client";
@@ -121,6 +122,7 @@ export async function confirmPaymentAction(form: FormData) {
   });
   if (!receipt) back("/finance/payments", "error", "Someone has already dealt with that payment.");
   await audit({ actor: user, action: "payment.confirmed", summary: `${user.name} confirmed ${payment.enrolment.user.name}'s ${METHOD_LABEL[payment.method]} payment of ${formatUsd(payment.amountCents)} (${payment.reference}). Receipt ${receipt}`, entityType: "payment", entityId: id });
+  await notify(payment.enrolment.userId, { title: `Payment confirmed: ${formatUsd(payment.amountCents)}`, body: `Your ${METHOD_LABEL[payment.method]} payment (${payment.reference}) was confirmed. Receipt ${receipt}.`, href: "/fees" });
   back("/finance/payments", "ok", `Confirmed. Receipt ${receipt} was issued to ${payment.enrolment.user.name}.`);
 }
 
@@ -134,6 +136,7 @@ export async function rejectPaymentAction(form: FormData) {
   const done = await prisma.payment.updateMany({ where: { id, status: "SUBMITTED" }, data: { status: "REJECTED", decidedById: user.id, decidedAt: new Date(), rejectReason: reason.data } });
   if (!done.count) back("/finance/payments", "error", "Someone has already dealt with that payment.");
   await audit({ actor: user, action: "payment.rejected", summary: `${user.name} rejected ${payment.enrolment.user.name}'s reported payment of ${formatUsd(payment.amountCents)} (${payment.reference}). Reason: ${reason.data}`, entityType: "payment", entityId: id });
+  await notify(payment.enrolment.userId, { title: `Payment not confirmed: ${formatUsd(payment.amountCents)}`, body: `Your reported payment (${payment.reference}) was rejected. Reason: ${reason.data}`, href: "/fees" });
   back("/finance/payments", "ok", "Payment rejected. The student can see the reason.");
 }
 
@@ -162,6 +165,7 @@ export async function recordPaymentAction(form: FormData) {
   }
   if (problem) back(returnTo, "error", problem);
   await audit({ actor: user, action: "payment.recorded", summary: `${user.name} recorded ${enrolment.user.name}'s ${METHOD_LABEL[d.method]} payment of ${formatUsd(d.amountCents)} (${d.reference}). Receipt ${receipt}`, entityType: "enrolment", entityId: enrolmentId });
+  await notify(enrolment.userId, { title: `Payment recorded: ${formatUsd(d.amountCents)}`, body: `The finance office recorded your ${METHOD_LABEL[d.method]} payment (${d.reference}). Receipt ${receipt}.`, href: "/fees" });
   back(returnTo, "ok", `Payment recorded. Receipt ${receipt} was issued.`);
 }
 

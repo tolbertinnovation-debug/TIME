@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 6 are built; the rest follow in order.
+Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 7 are built, except sending email and SMS. Step 8 follows.
 
 ## What the earlier plan was missing
 
@@ -15,8 +15,8 @@ Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 6 are built
 | Grade appeals, resits, withdrawals and deferrals | Steps 4 and 2 (built) |
 | Payment arrangements and finance overview (step 5, built); refunds (later) | Step 5 |
 | Transcripts, results slips and replacement certificates | Step 6 |
-| Notifications by app, email and SMS/WhatsApp | Step 7 |
-| Help desk, course evaluations, sponsor progress reports | Step 7 |
+| Notifications in the app (step 7, built); by email and SMS/WhatsApp (needs providers) | Step 7 |
+| Help desk and sponsor progress reports (step 7, built); course evaluations (later) | Step 7 |
 | Password reset, email verification, sign-in by phone number | Step 2 (reset by an administrator, built) and Step 8 (self-service) |
 | Terms and privacy acceptance, data retention, account deletion requests | Step 8 |
 | Backups, monitoring, error alerts, a security review, load testing | Step 8 |
@@ -108,9 +108,12 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - Leadership or an administrator can **revoke** a certificate with a reason; it then shows as revoked to everyone.
 - Still to come: transcripts, and requests for a replacement certificate.
 
-### Step 7. Communication and support
-- Notifications in the app, by email and by SMS or WhatsApp.
-- Class discussions. Help desk for students; course evaluations; sponsor progress reports.
+### Step 7. Communication and support — built, except email and SMS
+- **Notifications inside the platform.** People are told when a request of theirs is approved or rejected, a payment is confirmed or rejected, results are published, an announcement or a new assessment is posted, and when someone replies to them. The header shows how many are unread.
+- **Class discussion.** Students and staff of a class ask and answer questions. Only the class can read it. The lecturer can remove a post; the text is kept in the activity log.
+- **Help desk.** Anyone can ask the TIME office for help. Fee questions go to the finance office; everything else goes to the registrar. Only the person who asked and the staff who handle that kind of request can read it.
+- **Sponsors.** The registrar records sponsors and the students they sponsor. A progress report can include a student only after that student agrees, on the platform or by a signed form the registrar records. The student can withdraw at any time. The report is a summary only: enrolment, attendance, work handed in, overall result, standing and completion. It never includes individual work, feedback, messages or fees. Each report produced is logged.
+- **Still to come: email and SMS or WhatsApp.** Every notification goes through one function (`src/lib/notify.ts`), so sending by email and SMS is added there once TIME has chosen providers. Fee reminders 14 and 3 days before the due date will be sent the same way; today the student sees them on their home page. Course evaluations are also still to come.
 
 ### Step 8. Launch readiness and pilot
 - Installable app with offline support. Self-service password reset, email verification, sign-in by phone number.

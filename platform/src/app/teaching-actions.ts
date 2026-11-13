@@ -7,6 +7,7 @@ import { classLabel } from "@/lib/academics";
 import { audit } from "@/lib/audit";
 import { classAccess } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
+import { classStudentIds, notify } from "@/lib/notify";
 import { classCan, type ClassTask } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 
@@ -217,5 +218,6 @@ export async function postAnnouncementAction(form: FormData) {
   if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
   const a = await prisma.announcement.create({ data: { classId, authorId: user.id, ...parsed.data } });
   await audit({ actor: user, action: "announcement.posted", summary: `${user.name} posted "${a.title}" to ${classLabel(cls)}`, entityType: "announcement", entityId: a.id });
+  await notify(await classStudentIds(classId), { title: `${cls.course.title}: ${a.title}`, body: a.body, href: `/learn/${classId}` });
   back(returnTo, "ok", "Announcement posted.");
 }

@@ -6,6 +6,7 @@ import "./globals.css";
 import { signOutAction } from "@/app/actions";
 import { NavLink } from "@/components/nav-link";
 import { can, ROLE_LABEL } from "@/lib/permissions";
+import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 
 const body = localFont({ src: "../fonts/dm-sans-latin.woff2", weight: "400 700", variable: "--font-body", display: "swap" });
@@ -22,6 +23,7 @@ export const viewport: Viewport = { themeColor: "#435e25" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
+  const unread = user ? await prisma.notification.count({ where: { userId: user.id, readAt: null } }) : 0;
   return (
     <html lang="en" className={`${body.variable} ${display.variable} ${blackletter.variable}`}>
       <body>
@@ -44,6 +46,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   {(user.role === "LECTURER" || user.role === "FACILITATOR") && <NavLink href="/teach">My classes</NavLink>}
                   <NavLink href="/catalogue">Programs</NavLink>
                   {can(user.role, "admin.area") && <NavLink href="/admin">Administration</NavLink>}
+                  <NavLink href="/help">Help</NavLink>
+                  <NavLink href="/notifications">Notifications{unread > 0 ? <span className="pill bad" style={{ marginLeft: 6 }}>{unread}<span className="skip"> unread</span></span> : null}</NavLink>
                 </nav>
                 <span className="who">{user.name} · {ROLE_LABEL[user.role]}</span>
                 <form action={signOutAction}><button className="btn ghost sm" type="submit">Sign out</button></form>

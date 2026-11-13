@@ -5,6 +5,7 @@
 // Step 4: assessments, quiz questions, submissions and results.
 // Step 5: charges, payments, receipts, payment arrangements and settings.
 // Step 6: ending a class, certificate requests and certificates.
+// Step 7: notifications, class discussions, the help desk and sponsors.
 
 generator client {
   provider = "prisma-client"
@@ -59,6 +60,10 @@ model User {
   paymentsSent      Payment[]         @relation("paymentSubmitter")
   paymentsDecided   Payment[]         @relation("paymentDecider")
   certificates      Certificate[]
+  notifications     Notification[]
+  posts             Post[]            @relation("postAuthor")
+  tickets           SupportTicket[]
+  supportMessages   SupportMessage[]
   sessionsCreated   ClassSession[]
   announcements     Announcement[]
 
@@ -223,6 +228,7 @@ model CourseClass {
   sessions      ClassSession[]
   announcements Announcement[]
   assessments   Assessment[]
+  posts         Post[]
 
   @@unique([courseId, intakeId, track])
   @@index([intakeId])
@@ -269,6 +275,7 @@ model Enrolment {
   charges     Charge[]
   payments    Payment[]
   certificate Certificate?
+  sponsorship Sponsorship?
   // Set when Finance approves more time to pay: access continues until this date
   arrangementUntil DateTime?
 
@@ -579,6 +586,120 @@ model Certificate {
 
   @@index([userId])
   @@map("certificate")
+}
+
+// ---- Notifications shown inside the platform. Email and SMS can be added to the same place later. ----
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  // Where the person goes when they open it, e.g. "/fees"
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notification")
+}
+
+// ---- Class discussion: questions and replies inside one class ----
+
+model Post {
+  id        String      @id @default(cuid())
+  classId   String
+  class     CourseClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?       @relation("postAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  // A reply points at the question it answers. Replies are one level deep.
+  parentId  String?
+  parent    Post?       @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Post[]      @relation("replies")
+  body      String
+  // Set when a lecturer removes a post. The text is kept for the record but no longer shown.
+  hiddenAt  DateTime?
+  createdAt DateTime    @default(now())
+
+  @@index([classId, createdAt])
+  @@index([parentId])
+  @@map("post")
+}
+
+// ---- Help desk ----
+
+enum SupportCategory {
+  ACCOUNT
+  COURSE
+  FEES
+  TECHNICAL
+  OTHER
+}
+
+enum SupportStatus {
+  OPEN // waiting for TIME staff
+  ANSWERED // staff replied; waiting for the person
+  CLOSED
+}
+
+model SupportTicket {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  category  SupportCategory
+  status    SupportStatus    @default(OPEN)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  messages  SupportMessage[]
+
+  @@index([status, updatedAt])
+  @@index([userId])
+  @@map("support_ticket")
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("support_message")
+}
+
+// ---- Sponsors. A sponsor never signs in; with the student's consent they get a progress summary. ----
+
+model Sponsor {
+  id           String        @id @default(cuid())
+  name         String
+  contact      String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  sponsorships Sponsorship[]
+
+  @@map("sponsor")
+}
+
+model Sponsorship {
+  id          String    @id @default(cuid())
+  sponsorId   String
+  sponsor     Sponsor   @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  enrolmentId String    @unique
+  enrolment   Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  // When the student agreed to share a progress summary. Empty means no report may be sent.
+  consentAt   DateTime?
+  // "student" when given on the platform, or the staff member who recorded a signed paper form
+  consentBy   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([sponsorId])
+  @@map("sponsorship")
 }
 
 // ---- Approvals: one inbox for every decision that needs sign-off ----

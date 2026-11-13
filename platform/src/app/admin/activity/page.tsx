@@ -11,7 +11,7 @@ const GROUPS = {
   auth: "Sign-ins", account: "New accounts", user: "Account changes", approval: "Approvals",
   setup: "Intakes, centres and classes", class: "Class staff", enrolment: "Enrolments",
   content: "Lessons", learning: "Learning progress", assessment: "Assessments", grade: "Marks", result: "Results",
-  fee: "Fees and charges", payment: "Payments", certificate: "Certificates", setting: "Settings", session: "Sessions", attendance: "Attendance", announcement: "Announcements",
+  fee: "Fees and charges", payment: "Payments", certificate: "Certificates", discussion: "Class discussions", support: "Help desk", sponsor: "Sponsors", setting: "Settings", session: "Sessions", attendance: "Attendance", announcement: "Announcements",
 } as const;
 
 export default async function Activity({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {

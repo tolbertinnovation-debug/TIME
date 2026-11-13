@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requestEnrolmentChangeAction } from "@/app/academic-actions";
+import { setConsentAction } from "@/app/community-actions";
 import { cancelRequestAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { ENROLMENT_LABEL, MODE_LABEL, TRACK_LABEL } from "@/lib/academics";
@@ -16,7 +17,7 @@ export default async function MyClasses({ searchParams }: { searchParams: Promis
   const [enrolments, pending, me] = await Promise.all([
     prisma.enrolment.findMany({
       where: { userId: user.id }, orderBy: { enrolledAt: "desc" },
-      include: { class: { include: { course: true, intake: true, studyCentre: true, staff: { where: { role: "LECTURER" }, include: { user: true } } } } },
+      include: { sponsorship: { include: { sponsor: true } }, class: { include: { course: true, intake: true, studyCentre: true, staff: { where: { role: "LECTURER" }, include: { user: true } } } } },
     }),
     prisma.approvalRequest.findMany({ where: { requestedById: user.id, type: "ENROLMENT_CHANGE", status: "PENDING" } }),
     prisma.user.findUnique({ where: { id: user.id }, select: { studentNumber: true } }),
@@ -41,6 +42,22 @@ export default async function MyClasses({ searchParams }: { searchParams: Promis
             </p>
             <p className="small">Lecturer: {e.class.staff.map((s) => s.user.name).join(", ") || "to be announced"}</p>
             {(e.status === "ACTIVE" || e.status === "COMPLETED") && <div><Link className="btn" href={`/learn/${e.classId}`}>Open class</Link></div>}
+            {e.sponsorship && (
+              <div className="card stack" style={{ background: "var(--olive-soft)" }}>
+                <h3>Your sponsor: {e.sponsorship.sponsor.name}</h3>
+                {e.sponsorship.consentAt ? (
+                  <>
+                    <p className="small">You agreed on {formatDate(e.sponsorship.consentAt)} that TIME may send your sponsor a summary of your progress: enrolment, attendance, work handed in, overall result, standing and completion. Your individual work, feedback, messages and fees are never shared.</p>
+                    <form action={setConsentAction}><input type="hidden" name="sponsorshipId" value={e.sponsorship.id} /><input type="hidden" name="give" value="no" /><button className="btn ghost sm" type="submit">Withdraw my consent</button></form>
+                  </>
+                ) : (
+                  <>
+                    <p className="small">Do you agree that TIME may send your sponsor a summary of your progress each term? It covers enrolment, attendance, work handed in, overall result, standing and completion. Your individual work, feedback, messages and fees are never shared. You can withdraw at any time, and saying no does not affect your studies.</p>
+                    <form action={setConsentAction}><input type="hidden" name="sponsorshipId" value={e.sponsorship.id} /><input type="hidden" name="give" value="yes" /><button className="btn sm" type="submit">I agree to share my progress</button></form>
+                  </>
+                )}
+              </div>
+            )}
             {request && (
               <div className="row">
                 <span className="notice info">Your request to {(request.payload as { change?: string }).change === "DEFER" ? "defer" : "withdraw"} is waiting for the registrar.</span>

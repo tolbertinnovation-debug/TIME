@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { can, canDecide, classCan, isRole, REQUESTABLE_ROLES, roleChangeProblem, ROLES, seesApprovals, suspendProblem, visibleApprovalTypes } from "../../src/lib/permissions";
+import { can, canDecide, classCan, supportCategoriesFor, isRole, REQUESTABLE_ROLES, roleChangeProblem, ROLES, seesApprovals, suspendProblem, visibleApprovalTypes } from "../../src/lib/permissions";
 
 describe("capabilities", () => {
   it("lets only administrators manage accounts", () => {
@@ -122,5 +122,22 @@ describe("certificates", () => {
   it("lets only leadership and administrators revoke a certificate", () => {
     expect(ROLES.filter((r) => can(r, "certificates.revoke"))).toEqual(["LEADERSHIP", "ADMIN"]);
     expect(ROLES.filter((r) => can(r, "certificates.view"))).toEqual(["REGISTRAR", "LEADERSHIP", "ADMIN"]);
+  });
+});
+
+describe("help desk, discussions and sponsors", () => {
+  it("sends fee questions to finance and everything else to the registrar; an administrator sees all", () => {
+    expect(supportCategoriesFor("FINANCE")).toEqual(["FEES"]);
+    expect(supportCategoriesFor("REGISTRAR")).toEqual(["ACCOUNT", "COURSE", "TECHNICAL", "OTHER"]);
+    expect(supportCategoriesFor("ADMIN")).toHaveLength(5);
+    for (const role of ["STUDENT", "LECTURER", "FACILITATOR", "LEADERSHIP"] as const) expect(supportCategoriesFor(role)).toEqual([]);
+  });
+  it("lets lecturers, not facilitators, remove posts from a class discussion", () => {
+    expect(classCan("LECTURER", "discussion.moderate")).toBe(true);
+    expect(classCan("ADMIN", "discussion.moderate")).toBe(true);
+    expect(classCan("FACILITATOR", "discussion.moderate")).toBe(false);
+  });
+  it("lets only the registrar and administrators manage sponsors", () => {
+    expect(ROLES.filter((r) => can(r, "sponsors.manage"))).toEqual(["REGISTRAR", "ADMIN"]);
   });
 });

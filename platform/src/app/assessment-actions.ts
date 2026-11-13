@@ -9,6 +9,7 @@ import { classAccess } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { accessProblem, feeStatusOf } from "@/lib/fees-data";
 import { CATEGORY_LABEL, computeMarks, isLate, missingParts, scoreQuiz } from "@/lib/grading";
+import { classStudentIds, notify } from "@/lib/notify";
 import { classCan } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 
@@ -78,6 +79,7 @@ export async function setAssessmentStatusAction(form: FormData) {
   if (status.data === "OPEN" && a.kind === "QUIZ" && a._count.questions === 0) back(returnTo, "error", "Add at least one question before opening the quiz.");
   await prisma.assessment.update({ where: { id }, data: { status: status.data } });
   await audit({ actor: user, action: "assessment.status", summary: `${user.name} ${status.data === "OPEN" ? "opened" : "closed"} "${a.title}" for ${classLabel(cls)}`, entityType: "assessment", entityId: id });
+  if (status.data === "OPEN") await notify(await classStudentIds(classId), { title: `New assessment: ${a.title}`, body: `${cls.course.title}. ${a.dueAt ? "Check the due date and " : ""}open it from your class page.`, href: `/learn/${classId}/assess/${id}` });
   back(returnTo, "ok", status.data === "OPEN" ? "Students can now see and take this assessment." : "This assessment is closed to new work.");
 }
 

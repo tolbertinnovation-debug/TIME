@@ -66,6 +66,7 @@ a.tile:hover { border-color: var(--olive-deep); }
 .tile b { display: block; font: 800 1.7rem/1.1 var(--font-display), sans-serif; font-variant-numeric: tabular-nums; }
 .tile span { color: var(--muted); font-size: .92rem; }
 .notice { padding: 12px 14px; border-radius: 10px; font-weight: 600; }
+.offline-bar { margin: 0 0 16px; padding: 10px 14px; border-radius: 10px; background: var(--amber-soft); color: var(--amber); font-weight: 600; }
 .notice.error { background: var(--red-soft); color: var(--red-deep); }
 .notice.ok { background: var(--ok-soft); color: var(--ok); }
 .notice.info { background: var(--amber-soft); color: var(--amber); }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { KindPill, ProgressBar } from "@/components/learning";
 import { requestAppealAction } from "@/app/assessment-actions";
 import { Notices } from "@/components/notice";
+import { SaveForOffline } from "@/components/offline";
 import { MODE_LABEL, TRACK_LABEL } from "@/lib/academics";
 import { requireEnrolment } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
@@ -48,6 +49,7 @@ export default async function LearnClass({ params, searchParams }: { params: Pro
           {next && <Link className="btn" href={`/learn/${classId}/${next.id}`}>Continue: {next.title}</Link>}
           <Link className="btn ghost" href={`/discussion/${classId}`}>Class discussion</Link>
         </div>
+        <SaveForOffline lessons={lessons.length} paths={["/my-classes", `/learn/${classId}`, ...lessons.map((l) => `/learn/${classId}/${l.id}`)]} />
       </section>
 
       {result && (

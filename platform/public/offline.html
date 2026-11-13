@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>No connection | TIME Learning</title>
+<style>
+  body { margin: 0; background: #f8f8f3; color: #17251d; font: 400 1rem/1.6 system-ui, sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 48px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #435e25; margin-bottom: 28px; }
+  h1 { font-size: 1.6rem; line-height: 1.2; margin: 0 0 12px; }
+  p { margin: 0 0 14px; }
+  .card { background: #fff; border: 1px solid #dce3d9; border-radius: 14px; padding: 20px; }
+  .btn { display: inline-block; background: #435e25; color: #fff; text-decoration: none; font-weight: 700; padding: 11px 18px; border-radius: 10px; border: 0; font-size: 1rem; cursor: pointer; margin: 4px 8px 4px 0; }
+  .btn.ghost { background: #fff; color: #435e25; border: 1px solid #435e25; }
+  :focus-visible { outline: 3px solid #435e25; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><img src="/logo.png" alt="" width="36" height="36"> TIME Learning</div>
+  <div class="card">
+    <h1>You have no connection</h1>
+    <p>This page needs the internet, and it has not been saved on this phone.</p>
+    <p>Lessons you have opened before, or saved with <strong>Save lessons for offline</strong>, can still be read. Handing in work, quizzes, fees and messages need a connection.</p>
+    <p>
+      <a class="btn" href="/my-classes">Open my saved classes</a>
+      <button class="btn ghost" type="button" onclick="location.reload()">Try again</button>
+    </p>
+  </div>
+</main>
+</body>
+</html>

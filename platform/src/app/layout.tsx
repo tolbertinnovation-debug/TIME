@@ -5,6 +5,7 @@ import Link from "next/link";
 import "./globals.css";
 import { signOutAction } from "@/app/actions";
 import { NavLink } from "@/components/nav-link";
+import { OfflineSupport } from "@/components/offline";
 import { can, ROLE_LABEL } from "@/lib/permissions";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
@@ -61,7 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             )}
           </div>
         </header>
-        <main id="main"><div className="wrap">{children}</div></main>
+        <main id="main"><div className="wrap"><OfflineSupport signedIn={Boolean(user)} />{children}</div></main>
       </body>
     </html>
   );

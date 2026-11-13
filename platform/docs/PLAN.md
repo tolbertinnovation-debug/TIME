@@ -1,6 +1,6 @@
 # TIME Learning: complete plan
 
-Updated 11 November 2026. This replaces the earlier plan. Steps 1 to 7 are built, except sending email and SMS. Step 8 follows.
+Updated 13 November 2026. This replaces the earlier plan. Steps 1 to 7 are built, except sending email and SMS. Of step 8, the installable app, offline lessons and the guides are built; the rest waits on accounts and decisions from TIME, listed in [GOING-LIVE.md](GOING-LIVE.md).
 
 ## What the earlier plan was missing
 
@@ -115,12 +115,19 @@ The rules are in `src/lib/permissions.ts` and are checked on the server for ever
 - **Sponsors.** The registrar records sponsors and the students they sponsor. A progress report can include a student only after that student agrees, on the platform or by a signed form the registrar records. The student can withdraw at any time. The report is a summary only: enrolment, attendance, work handed in, overall result, standing and completion. It never includes individual work, feedback, messages or fees. Each report produced is logged.
 - **Still to come: email and SMS or WhatsApp.** Every notification goes through one function (`src/lib/notify.ts`), so sending by email and SMS is added there once TIME has chosen providers. Fee reminders 14 and 3 days before the due date will be sent the same way; today the student sees them on their home page. Course evaluations are also still to come.
 
-### Step 8. Launch readiness and pilot
-- Installable app with offline support. Self-service password reset, email verification, sign-in by phone number.
+### Step 8. Launch readiness and pilot — partly built
+Built:
+- **Installable app.** The platform can be added to a phone's home screen and opens like an app.
+- **Offline lessons.** Every lesson a student opens is kept on their phone, and **Save lessons for offline** on the class page keeps the whole class. With no connection, saved lessons open as usual and other pages explain that a connection is needed. With a connection the server is always asked first, so permission and fee checks still apply. Assessments, fees, certificates and staff pages are never kept. Saved lessons are removed when the student signs out.
+- **Guides** for students, lecturers and facilitators, the registrar, Finance, academic leadership and administrators, in [`guides/`](guides/README.md).
+- **Going-live checklist** in [GOING-LIVE.md](GOING-LIVE.md), and a health check address (`/api/health`) for monitoring.
+
+Still to come (each waits on a decision or account from TIME):
+- Self-service password reset, email verification, sign-in by phone number.
 - Terms and privacy acceptance; data retention; account deletion requests.
 - Backups tested by restoring; monitoring and alerts; security review; load test.
 - Old portal accounts moved across (if TIME decides to keep them).
-- Staff training and user guides. Pilot with one cohort of about 50 students.
+- Staff training. Pilot with one cohort of about 50 students.
 
 ### Later
 Android app from the store. Research and thesis management, when TIME runs postgraduate programs.

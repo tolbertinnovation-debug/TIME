@@ -50,7 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <NavLink href="/help">Help</NavLink>
                   <NavLink href="/notifications">Notifications{unread > 0 ? <span className="pill bad" style={{ marginLeft: 6 }}>{unread}<span className="skip"> unread</span></span> : null}</NavLink>
                 </nav>
-                <span className="who">{user.name} · {ROLE_LABEL[user.role]}</span>
+                <Link className="who" href="/account/settings" title="Your account">{user.name} · {ROLE_LABEL[user.role]}</Link>
                 <form action={signOutAction}><button className="btn ghost sm" type="submit">Sign out</button></form>
               </>
             ) : (

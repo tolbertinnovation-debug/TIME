@@ -6,7 +6,8 @@ You can see everything and step in anywhere. Use that power sparingly: each offi
 
 - **Accounts:** search by name or email. Change a person's role with **Save**. New accounts are always students; staff ask for their role with **Ask for staff access**, and their request arrives in **Approvals**.
 - **Suspend** an account to stop a person signing in. Restore it the same way.
-- **New password:** sets a password for someone who has forgotten theirs and signs them out everywhere. Give it to them in person or by phone, never in a group chat.
+- **New password:** sets a password for someone who has forgotten theirs and signs them out everywhere. Give it to them in person or by phone, never in a group chat, and ask them to change it under **Your account** once they have signed in.
+- To change **your own** password, choose your name at the top of the page.
 - The platform always keeps at least one administrator. Keep **two** administrator accounts, held by two different people.
 
 ## Oversight

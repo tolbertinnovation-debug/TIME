@@ -50,6 +50,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
       <section className="card stack" aria-labelledby="account-h">
         <h2 id="account-h">Your account</h2>
         <p>{user.name}<br /><span className="muted">{user.email}{user.phone ? ` · ${user.phone}` : ""}</span></p>
+        <p className="small"><Link href="/account/settings">Change your password or phone number</Link></p>
         {user.role === "STUDENT" && <p className="small">Do you teach or work at TIME? <Link href="/account/staff-access">Ask for staff access</Link>.</p>}
       </section>
     </div>

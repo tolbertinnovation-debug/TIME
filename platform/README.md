@@ -51,6 +51,7 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/app/certificate-actions.ts` | Ending a class, requesting a certificate, revoking, paper numbering, the public check. |
 | `src/lib/certificate.ts`, `certificate-data.ts` | The certificate's wording and numbering, who qualifies, and issuing. To change the wording or address, edit `certificate.ts`. |
 | `src/app/community-actions.ts` | Class discussions, the help desk, sponsors and consent, marking notifications read. |
+| `src/app/account-actions.ts`, `src/app/account/settings/` | A person's own account: change password, phone number. |
 | `src/components/transcript.tsx`, `src/app/transcript/` | A student's transcript of published results. |
 | `src/lib/evaluation.ts`, `src/components/evaluation.tsx`, `src/app/evaluate/` | Anonymous course evaluations and their summary. |
 | `src/lib/reports.ts`, `src/app/api/reports/`, `src/app/admin/reports/` | Enrolment, results and payments reports, downloaded as CSV. |

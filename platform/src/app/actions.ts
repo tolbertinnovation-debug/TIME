@@ -17,10 +17,10 @@ import { prisma } from "@/lib/db";
 import { creditToClear, formatUsd, refundableCents } from "@/lib/fees";
 import { refundFigures, refundLockKey } from "@/lib/fees-data";
 import {
-  APPROVAL_LABEL, REQUESTABLE_ROLES, ROLE_LABEL, ROLES, canDecide, isRole, roleChangeProblem, suspendProblem,
+  APPROVAL_LABEL, BULK_APPROVAL_LIMIT, BULK_APPROVAL_TYPES, REQUESTABLE_ROLES, ROLE_LABEL, ROLES, canDecide, isRole, roleChangeProblem, suspendProblem,
   type ApprovalType, type Role,
 } from "@/lib/permissions";
-import { requireUser } from "@/lib/session";
+import { requireUser, type CurrentUser } from "@/lib/session";
 
 // ---- Accounts ----
 
@@ -127,23 +127,21 @@ const decisionSchema = z.object({
   note: z.string().trim().max(500, "Keep the note under 500 characters.").optional(),
 });
 
-export async function decideApprovalAction(form: FormData) {
-  const user = await requireUser();
-  const parsed = decisionSchema.safeParse({ id: form.get("id"), decision: form.get("decision"), note: form.get("note") || undefined });
-  if (!parsed.success) back("/admin/approvals", "error", firstProblem(parsed.error));
-  const { id, decision, note } = parsed.data;
+type Decided = { ok: true; verb: "approved" | "rejected" } | { ok: false; problem: string };
 
+// Decides one request: every check, the effect, the activity log and the notifications.
+// Used for a single decision and, for applications, for approving several at once.
+async function decideOne(user: CurrentUser, id: string, decision: "APPROVED" | "REJECTED", note: string | undefined): Promise<Decided> {
   const request = await prisma.approvalRequest.findUnique({ where: { id }, include: { requestedBy: true } });
-  if (!request) back("/admin/approvals", "error", "That request no longer exists.");
+  if (!request) return { ok: false, problem: "That request no longer exists." };
   const type = request.type as ApprovalType;
-  if (!canDecide(user.role, type)) back("/admin/approvals", "error", "You are not allowed to decide this request.");
-  if (request.requestedById === user.id) back("/admin/approvals", "error", "You cannot decide your own request.");
-  if (decision === "REJECTED" && !note) back("/admin/approvals", "error", "Give a short reason when you reject a request.");
+  if (!canDecide(user.role, type)) return { ok: false, problem: "You are not allowed to decide this request." };
+  if (request.requestedById === user.id) return { ok: false, problem: "You cannot decide your own request." };
+  if (decision === "REJECTED" && !note) return { ok: false, problem: "Give a short reason when you reject a request." };
 
   // The status check inside the update means two people can never decide the same request.
   let applied = false;
   let effect: string | null = null;
-  let problem: string | null = null;
   try {
     applied = await prisma.$transaction(async (tx) => {
       const updated = await tx.approvalRequest.updateMany({
@@ -164,10 +162,9 @@ export async function decideApprovalAction(form: FormData) {
     });
   } catch (e) {
     if (!(e instanceof UserProblem)) throw e;
-    problem = e.message;
+    return { ok: false, problem: e.message };
   }
-  if (problem) back("/admin/approvals", "error", problem);
-  if (!applied) back("/admin/approvals", "error", "Someone has already decided that request.");
+  if (!applied) return { ok: false, problem: "Someone has already decided that request." };
 
   const verb = decision === "APPROVED" ? "approved" : "rejected";
   await audit({
@@ -187,8 +184,42 @@ export async function decideApprovalAction(form: FormData) {
     const classId = String((request.payload as { classId?: unknown }).classId);
     await notify(await classStudentIds(classId), { title: "Your result has been published", body: "Open your class to see your marks for each part of the grade.", href: `/learn/${classId}` });
   }
+  return { ok: true, verb };
+}
+
+export async function decideApprovalAction(form: FormData) {
+  const user = await requireUser();
+  const parsed = decisionSchema.safeParse({ id: form.get("id"), decision: form.get("decision"), note: form.get("note") || undefined });
+  if (!parsed.success) back("/admin/approvals", "error", firstProblem(parsed.error));
+  const result = await decideOne(user, parsed.data.id, parsed.data.decision, parsed.data.note);
+  if (!result.ok) back("/admin/approvals", "error", result.problem);
   revalidatePath("/admin");
-  back("/admin/approvals", "ok", `Request ${verb}.`);
+  back("/admin/approvals", "ok", `Request ${result.verb}.`);
+}
+
+// Approves several requests at once (applications only; see BULK_APPROVAL_TYPES). Each is still
+// decided on its own, with every check, so one that cannot be approved (for example, its class is
+// full) is reported and the others go ahead.
+export async function approveSelectedAction(form: FormData) {
+  const user = await requireUser();
+  const ids = [...new Set((form.get("mode") === "all" ? form.getAll("allIds") : form.getAll("ids")).map(String).filter(Boolean))];
+  if (!ids.length) back("/admin/approvals", "error", "Tick the applications to approve first.");
+  if (ids.length > BULK_APPROVAL_LIMIT) back("/admin/approvals", "error", `Approve at most ${BULK_APPROVAL_LIMIT} at a time.`);
+  const requests = await prisma.approvalRequest.findMany({ where: { id: { in: ids } }, select: { id: true, type: true } });
+  if (requests.some((r) => !(BULK_APPROVAL_TYPES as readonly string[]).includes(r.type))) back("/admin/approvals", "error", "Only applications can be approved together. Decide other requests one at a time.");
+
+  let approved = 0;
+  const problems: string[] = [];
+  for (const id of ids) {
+    const result = await decideOne(user, id, "APPROVED", undefined);
+    if (result.ok) approved += 1;
+    else problems.push(result.problem);
+  }
+  revalidatePath("/admin");
+  const done = `${approved} ${approved === 1 ? "application was" : "applications were"} approved.`;
+  if (!problems.length) back("/admin/approvals", "ok", done);
+  const reasons = [...new Set(problems)].join(" ");
+  back("/admin/approvals", approved ? "ok" : "error", `${done} ${problems.length} could not be: ${reasons}`);
 }
 
 // Where a person goes to see the outcome of each kind of request.

@@ -12,6 +12,7 @@ You work from **Administration** in the menu.
 ## Applications and enrolment
 
 - **Approvals** lists every application waiting for you. **Approve** enrols the student and gives them a student number. **Reject** needs a short reason, which the student sees.
+- **Many applications at once:** tick the applications you have checked and choose **Approve ticked applications**, or **Approve all** to approve every one shown. Each is still checked on its own: if a class fills up, the rest are not approved and you are told which. Reject an application on its own, with a reason.
 - A full class cannot take another student.
 - Requests to withdraw or defer arrive in the same inbox.
 - A newly enrolled student's class opens when Finance confirms their first payment. That part belongs to Finance.

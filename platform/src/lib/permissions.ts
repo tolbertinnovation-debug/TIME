@@ -119,6 +119,11 @@ export function visibleApprovalTypes(role: Role): ApprovalType[] {
   return APPROVAL_TYPES.filter((t) => APPROVERS[t].includes(role));
 }
 
+// Applications are the only requests that may be approved several at a time: during an intake the
+// Registrar may face dozens. Results, money and certificates are always decided one by one.
+export const BULK_APPROVAL_TYPES = ["APPLICATION"] as const satisfies readonly ApprovalType[];
+export const BULK_APPROVAL_LIMIT = 100;
+
 export const seesApprovals = (role: Role) => visibleApprovalTypes(role).length > 0;
 
 // Roles a person may ask for. Administrator access is only ever given directly by another administrator.

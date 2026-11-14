@@ -30,6 +30,21 @@ You work from **Finance** in the menu. Approvals and the help desk are under **A
 
 A student who needs more time sends a request, which arrives in **Approvals**. If you approve it, access continues until the date agreed. If that date passes unpaid, the class is paused.
 
+## Refunds and cancelled balances
+
+Money only leaves TIME with two people's agreement: you ask, academic leadership approves.
+
+1. Open the student under **Student balances**. At the bottom, under **Refunds**, enter the amount to refund and the reason. Tick **Also cancel the ... still to pay** if the student has withdrawn and should not owe the rest. You can cancel the balance without a refund by leaving the amount empty.
+2. You cannot refund more than the student has paid and not had back, and only one request per student can wait at a time.
+3. Academic leadership approves or rejects it in **Approvals**. You are notified either way. A cancelled balance takes effect at once.
+4. An approved refund appears under **Finance**, **Refunds**, **Approved, to send**. Send the money by Mobile Money or bank transfer, then enter the transaction reference and choose **Record as sent**. The student is notified, and only then does the refund come off what they have paid.
+
+The **Refunds** report lists every approved refund, who approved and who sent it.
+
+## Reports
+
+Under **Administration**, **Reports**, download the **Payments** report: every confirmed payment with its receipt number, date, student, amount, method and reference, for one intake or all of them. Use it to reconcile against the Mobile Money and bank statements.
+
 ## Help desk
 
 Requests about fees and payments come to you under **Administration**, **Help desk**.

@@ -47,10 +47,15 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/app/teaching-actions.ts`, `learning-actions.ts` | Lessons, review, sessions, attendance, practical sign-off, announcements; completing a lesson. |
 | `src/app/assessment-actions.ts` | Setting assessments, quiz questions, marking, results, handing in work, quizzes, appeals. |
 | `src/app/finance-actions.ts` | Reporting, confirming, rejecting and recording payments; charges; payment details; requests for more time. |
-| `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access) and working out what each student owes. |
+| `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access, refund limits) and working out what each student owes. |
+| `src/app/finance/refunds/` | Approved refunds to send, and those sent. Requests start on the student's statement. |
 | `src/app/certificate-actions.ts` | Ending a class, requesting a certificate, revoking, paper numbering, the public check. |
 | `src/lib/certificate.ts`, `certificate-data.ts` | The certificate's wording and numbering, who qualifies, and issuing. To change the wording or address, edit `certificate.ts`. |
 | `src/app/community-actions.ts` | Class discussions, the help desk, sponsors and consent, marking notifications read. |
+| `src/app/account-actions.ts`, `src/app/account/settings/` | A person's own account: change password, phone number. |
+| `src/components/transcript.tsx`, `src/app/transcript/` | A student's transcript of published results. |
+| `src/lib/evaluation.ts`, `src/components/evaluation.tsx`, `src/app/evaluate/` | Anonymous course evaluations and their summary. |
+| `src/lib/reports.ts`, `src/app/api/reports/`, `src/app/admin/reports/` | Enrolment, results and payments reports, downloaded as CSV. |
 | `src/lib/notify.ts` | The one place that tells people something happened. Email and SMS will be added here. |
 | `src/lib/grading.ts` | The grading rules: 30 / 20 / 20 / 30, pass mark 70, quiz marking and time limits. |
 | `src/lib/class-access.ts` | Who may work with a class: its lecturer, its facilitator, an enrolled student, or an administrator. |

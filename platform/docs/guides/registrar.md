@@ -27,6 +27,11 @@ When teaching has finished and results are published, open the class and choose 
 3. **Certificates** lists every certificate issued, with search.
 4. **Last number issued on paper:** before the first certificate is issued here, enter the last number TIME issued on paper for each kind (for example TC-001), so that numbering carries on without a gap or a repeat.
 
+## Transcripts and reports
+
+- **Transcripts:** under **Accounts**, find the student and choose **Transcript**. Print it, then sign and stamp it to make it official. It shows published results only. Each time you open one, it is recorded in the activity log.
+- **Reports:** download the **Enrolment** report or the **Results** report for one intake or all of them. The files open in Excel and can be sent to the Ministry of Education. They hold personal information: share them only with those who need them.
+
 ## Help desk and sponsors
 
 - **Help desk** shows students' requests about accounts, classes and technical problems. Reply there; the student is notified.

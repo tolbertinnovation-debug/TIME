@@ -16,7 +16,9 @@ Before the platform opens to students, follow the [going-live checklist](../GOIN
 ## The same for everyone
 
 - **Sign in** with your email and password. After 5 wrong passwords, sign-in locks for 10 minutes.
-- **Forgot your password?** Ask an administrator (or use **Help**). They set a new one and you are signed out everywhere else.
+- **Your account:** choose your name at the top of any page to change your password or phone number. Changing your password signs you out on every other phone or computer.
+- **Forgot your password?** Ask an administrator (or use **Help**). They set a new one; sign in with it, then change it under **Your account** to one only you know.
+- **Your name** is printed on certificates, so only the Registrar can correct it. Ask through **Help**.
 - **Notifications** in the menu shows what needs your attention. A red number means unread.
 - **Help** in the menu sends a request to the right office and keeps the replies in one place.
 - **On a phone**, open the platform in Chrome, open the browser menu and choose **Add to Home screen** (on iPhone: Share, then **Add to Home Screen**). It then opens like an app.

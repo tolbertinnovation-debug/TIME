@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { addChargeAction, recordPaymentAction } from "@/app/finance-actions";
+import { addChargeAction, recordPaymentAction, requestRefundAction } from "@/app/finance-actions";
 import { FeePill, feeSentence, PAYMENT_STATE } from "@/components/fees";
 import { Notices } from "@/components/notice";
 import { classLabel } from "@/lib/academics";
 import { prisma } from "@/lib/db";
-import { CHARGE_LABEL, formatUsd, METHOD_LABEL } from "@/lib/fees";
-import { feeStatusOf } from "@/lib/fees-data";
+import { CHARGE_LABEL, formatUsd, MANUAL_CHARGE_KINDS, METHOD_LABEL, refundableCents } from "@/lib/fees";
+import { feeStatusOf, refundFigures } from "@/lib/fees-data";
 import { formatDate } from "@/lib/format";
 import { can } from "@/lib/permissions";
 import { requireCapability } from "@/lib/session";
@@ -18,10 +18,11 @@ export default async function Statement({ params, searchParams }: { params: Prom
   const { enrolmentId } = await params;
   const e = await prisma.enrolment.findUnique({
     where: { id: enrolmentId },
-    include: { user: true, class: { include: { course: true, intake: true } }, charges: { orderBy: { createdAt: "asc" } }, payments: { orderBy: { createdAt: "desc" } } },
+    include: { user: true, class: { include: { course: true, intake: true } }, charges: { orderBy: { createdAt: "asc" } }, payments: { orderBy: { createdAt: "desc" } }, refunds: { orderBy: { createdAt: "desc" } } },
   });
   if (!e) notFound();
-  const status = await feeStatusOf(e.id);
+  const [status, figures] = await Promise.all([feeStatusOf(e.id), refundFigures(prisma, e.id)]);
+  const refundable = refundableCents(figures);
   const manage = can(me.role, "finance.manage");
   const today = new Date().toISOString().slice(0, 10);
   return (
@@ -35,7 +36,7 @@ export default async function Statement({ params, searchParams }: { params: Prom
       </div>
       <div className="grid">
         <div className="tile"><b>{formatUsd(status.chargedCents)}</b><span>charged</span></div>
-        <div className="tile"><b>{formatUsd(status.paidCents)}</b><span>paid and confirmed</span></div>
+        <div className="tile"><b>{formatUsd(status.paidCents)}</b><span>paid and confirmed{figures.refundedCents > 0 ? ", less refunds" : ""}</span></div>
         <div className="tile"><b>{formatUsd(status.balanceCents)}</b><span>balance</span></div>
       </div>
 
@@ -53,7 +54,7 @@ export default async function Statement({ params, searchParams }: { params: Prom
             <h3>Add a charge</h3>
             <input type="hidden" name="enrolmentId" value={e.id} />
             <div className="grid">
-              <div className="field"><label htmlFor="c-kind">Kind</label><select id="c-kind" name="kind" required>{Object.entries(CHARGE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
+              <div className="field"><label htmlFor="c-kind">Kind</label><select id="c-kind" name="kind" required>{MANUAL_CHARGE_KINDS.map((k) => <option key={k} value={k}>{CHARGE_LABEL[k]}</option>)}</select></div>
               <div className="field"><label htmlFor="c-desc">Description</label><input id="c-desc" name="description" type="text" required maxLength={140} /></div>
               <div className="field"><label htmlFor="c-amount">Amount in US dollars</label><input id="c-amount" name="amount" type="text" inputMode="decimal" required maxLength={12} /></div>
             </div>
@@ -89,6 +90,39 @@ export default async function Statement({ params, searchParams }: { params: Prom
               <div className="field"><label htmlFor="p-date">Date paid</label><input id="p-date" name="paidOn" type="date" required max={today} defaultValue={today} /></div>
             </div>
             <div><button className="btn" type="submit">Record payment</button></div>
+          </form>
+        )}
+      </section>
+
+      <section className="stack" aria-labelledby="refunds-h">
+        <h2 id="refunds-h">Refunds</h2>
+        {figures.pendingRequests > 0 && <p className="notice info" role="status">A refund request is waiting for approval by academic leadership.</p>}
+        {e.refunds.length > 0 ? (
+          <div className="table-wrap"><table>
+            <thead><tr><th>Approved</th><th>Amount</th><th>Reason</th><th>Status</th><th>Sent</th></tr></thead>
+            <tbody>
+              {e.refunds.map((r) => (
+                <tr key={r.id}>
+                  <td className="nowrap">{formatDate(r.createdAt)}<br /><span className="small muted">by {r.approvedByName}</span></td>
+                  <td className="nowrap">{formatUsd(r.amountCents)}</td><td>{r.reason}</td>
+                  <td><span className={`pill ${r.status === "PAID" ? "ok" : "wait"}`}>{r.status === "PAID" ? "Sent" : "To send"}</span></td>
+                  <td>{r.status === "PAID" && r.method ? `${METHOD_LABEL[r.method]}, ${r.reference}, ${r.paidOn ? formatDate(r.paidOn) : ""}` : <Link href="/finance/refunds">Record it</Link>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table></div>
+        ) : !figures.pendingRequests && <p className="muted">No refunds.</p>}
+        {manage && figures.pendingRequests === 0 && (refundable > 0 || status.balanceCents > 0) && (
+          <form className="card form" action={requestRefundAction}>
+            <h3>Ask for a refund or to cancel the balance</h3>
+            <p className="muted small">Academic leadership approves it first. Nothing changes until then. At most {formatUsd(refundable)} can be refunded: what this student has paid and has not had back.</p>
+            <input type="hidden" name="enrolmentId" value={e.id} />
+            <div className="field"><label htmlFor="r-amount">Amount to refund, in US dollars</label><input id="r-amount" name="amount" type="text" inputMode="decimal" maxLength={12} placeholder="0" /><p className="small muted">Leave empty to cancel the balance without a refund.</p></div>
+            {status.balanceCents > 0 && (
+              <label className="row" style={{ gap: 8 }}><input type="checkbox" name="cancelBalance" value="yes" style={{ width: "auto", minHeight: 0 }} /> Also cancel the {formatUsd(status.balanceCents)} still to pay (for example, the student has withdrawn)</label>
+            )}
+            <div className="field"><label htmlFor="r-reason">Reason</label><textarea id="r-reason" name="reason" required minLength={10} maxLength={500} /></div>
+            <div><button className="btn ghost" type="submit">Send for approval</button></div>
           </form>
         )}
       </section>

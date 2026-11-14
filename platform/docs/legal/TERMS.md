@@ -53,7 +53,7 @@ Work you hand in remains yours. You allow TIME to store it, mark it, and keep it
 - A payment counts only when TIME's Finance Office has confirmed it. You then receive a numbered receipt.
 - Your class opens when your first payment is confirmed. The balance is due 8 weeks after that payment.
 - If the balance is unpaid after 8 weeks, your access to the class is paused. It returns when the balance is paid, or when the Finance Office approves a payment arrangement you have requested.
-- Refunds: [TIME's refund policy].
+- Refunds: [TIME's refund policy]. An approved refund is sent by Mobile Money or bank transfer, and you are told on the platform when it has been sent.
 
 ## 7. Certificates
 

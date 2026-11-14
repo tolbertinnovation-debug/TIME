@@ -240,3 +240,145 @@ test("every step toward the certificate is in the activity log", async () => {
   assert.deepEqual(admin.problems, []);
   await admin.context().close();
 });
+
+test("a student opens their transcript; staff who keep records can open it; other students cannot", async () => {
+  const student = await as(ctx, ama, DESK);
+  await student.goto(`${URL_BASE}/certificates`);
+  await student.click('a:has-text("My transcript")');
+  await student.waitForURL("**/transcript");
+  const text = await student.locator(".transcript").innerText();
+  assert.match(text, /Academic transcript[\s\S]*Ama Kollie[\s\S]*TIME-\d{4}-\d{4}/);
+  assert.match(text, /QuickBooks[\s\S]*March 2027[\s\S]*27\s+18\s+18\s+27\s+90\s+Pass/);
+  assert.match(text, /Courses passed: 1 of 1/);
+  assert.ok(!text.includes("DP-005"), "a revoked certificate is not listed");
+  const [{ id: amaId }] = await testDb('SELECT id FROM "user" WHERE email = $1', [ama.email]);
+  await student.context().close();
+
+  const other = await as(ctx, ben, DESK);
+  await other.goto(`${URL_BASE}/transcript`);
+  assert.match(await other.locator(".transcript").innerText(), /Ben Dolo[\s\S]*40\s+Not passed[\s\S]*Courses passed: 0 of 1/);
+  await other.goto(`${URL_BASE}/transcript/${amaId}`);
+  assert.equal(path(other), "/dashboard", "a student cannot open another student's transcript");
+  await other.context().close();
+
+  const reg = await as(ctx, registrar, DESK);
+  await reg.goto(`${URL_BASE}/admin/users?q=${encodeURIComponent(ama.email)}`);
+  await reg.click('tbody a:has-text("Transcript")');
+  await reg.waitForURL(`**/transcript/${amaId}`);
+  assert.match(await reg.locator(".transcript").innerText(), /Ama Kollie[\s\S]*90\s+Pass/);
+  assert.equal((await reg.goto(`${URL_BASE}/transcript/not-a-student`)).status(), 404);
+  await reg.context().close();
+});
+
+test("reports download as spreadsheets for the roles allowed, and each download is logged", async () => {
+  const rows = (csv) => csv.replace(/^﻿/, "").trimEnd().split("\r\n");
+  const reg = await as(ctx, registrar, DESK);
+  await reg.goto(`${URL_BASE}/admin/reports`);
+  assert.deepEqual(await reg.locator("section h2").allInnerTexts(), ["Enrolment", "Results"], "the registrar has no payments report");
+
+  const [download] = await Promise.all([reg.waitForEvent("download"), reg.click('button:has-text("Download results report")')]);
+  assert.match(download.suggestedFilename(), /^time-results-all-intakes-\d{4}-\d{2}-\d{2}\.csv$/);
+
+  const results = rows(await (await reg.request.get(`${URL_BASE}/api/reports/results`)).text());
+  assert.match(results[0], /^Student number,Name,Course,Program,Intake,/);
+  assert.equal(results.length, 3, "a header and two published results");
+  assert.match(results.find((r) => r.includes("Ama Kollie")), /^TIME-\d{4}-\d{4},Ama Kollie,QuickBooks,.*,March 2027,27,18,18,27,90,Yes,\d{4}-\d{2}-\d{2},$/);
+  assert.match(results.find((r) => r.includes("Ben Dolo")), /,40,No,/);
+
+  const enrolment = rows(await (await reg.request.get(`${URL_BASE}/api/reports/enrolment`)).text());
+  assert.equal(enrolment.length, 3);
+  assert.match(enrolment[1], /,Margibi,QuickBooks,.*,March 2027,Weekday afternoons,Online,,Enrolled,\d{4}-\d{2}-\d{2}$/);
+  // Choosing another intake leaves only the header.
+  const [{ id: october }] = await testDb("SELECT id FROM intake WHERE name = 'October 2027'");
+  assert.equal(rows(await (await reg.request.get(`${URL_BASE}/api/reports/enrolment?intake=${october}`)).text()).length, 1);
+  assert.equal((await reg.request.get(`${URL_BASE}/api/reports/enrolment?intake=nope`)).status(), 404);
+  assert.equal((await reg.request.get(`${URL_BASE}/api/reports/payments`)).status(), 404, "the registrar cannot download payments");
+  await reg.context().close();
+
+  const student = await as(ctx, ama, DESK);
+  for (const kind of ["enrolment", "results", "payments"]) assert.equal((await student.request.get(`${URL_BASE}/api/reports/${kind}`)).status(), 404);
+  await student.goto(`${URL_BASE}/admin/reports`);
+  assert.equal(path(student), "/dashboard");
+  await student.context().close();
+  const visitor = await person(ctx);
+  assert.equal((await visitor.request.get(`${URL_BASE}/api/reports/results`)).status(), 404, "nobody gets a report without signing in");
+  await visitor.context().close();
+
+  const admin = await as(ctx, ADMIN, DESK);
+  const payments = rows(await (await admin.request.get(`${URL_BASE}/api/reports/payments`)).text());
+  assert.match(payments[0], /^Receipt number,Paid on,Student number,Name,Course,Intake,Amount \(USD\),Method,Reference,/);
+  assert.ok(payments.length > 2, "confirmed payments are listed");
+  assert.ok(payments.slice(1).every((r) => /^R-\d+,\d{4}-\d{2}-\d{2},TIME-/.test(r)), "every row has a receipt number");
+  await admin.goto(`${URL_BASE}/admin/activity`);
+  const log = await admin.locator("table").innerText();
+  for (const expected of [
+    "Rita Registrar downloaded the results report (all intakes, 2 rows)",
+    "Rita Registrar downloaded the enrolment report (October 2027, 0 rows)",
+    "Test Admin downloaded the payments report (all intakes,",
+    "Rita Registrar opened the transcript of Ama Kollie",
+  ]) assert.ok(log.includes(expected), expected);
+  await admin.context().close();
+});
+
+test("students evaluate the course anonymously; staff see a summary only once three have answered", async () => {
+  const fill = async (page, score, wentWell, improve) => {
+    await page.goto(`${URL_BASE}/learn/${classId}`);
+    await page.click('a:has-text("Evaluate this course")');
+    await page.waitForURL(`**/evaluate/${classId}`);
+    for (const q of ["teaching", "materials", "support", "overall"]) await page.check(`input[name="${q}"][value="${score}"]`);
+    await page.fill("#wentWell", wentWell);
+    await page.fill("#improve", improve);
+    await submit(page, 'button:has-text("Hand in evaluation")');
+    await page.locator('.notice.ok:has-text("stored without your name")').waitFor();
+  };
+  const student = await as(ctx, ama);
+  await fill(student, 5, "The worked examples from a real shop.", "More practice quizzes.");
+  assert.equal(await student.locator("form.form").count(), 0, "an evaluation is handed in once");
+  await student.goto(`${URL_BASE}/learn/${classId}`);
+  assert.equal(await student.locator('a:has-text("Evaluate this course")').count(), 0);
+  await student.context().close();
+
+  const leo = await as(ctx, lecturer, DESK);
+  await leo.goto(`${URL_BASE}/teach/${classId}/evaluations`);
+  let text = await leo.locator("main").innerText();
+  assert.match(text, /1 of 2 students have answered\. To keep answers anonymous, results appear once at least 3 students have answered/);
+  assert.ok(!text.includes("worked examples"), "comments are hidden until enough students answer");
+
+  const other = await as(ctx, ben);
+  await fill(other, 3, "", "Audio versions of the lessons.");
+  await other.context().close();
+  // A third answer, as if from another student, brings the class to the number needed.
+  await testDb(`INSERT INTO course_evaluation (id, "classId", teaching, materials, support, overall, "wentWell") VALUES ('ev-third', $1, 4, 4, 2, 4, 'Clear notes.')`, [classId]);
+
+  await leo.reload();
+  text = await leo.locator("main").innerText();
+  assert.match(text, /3 of \d students answered/);
+  assert.match(text, /The teaching\s+4\.0\s+1\s+1\s+1\s+0\s+0/);
+  assert.match(text, /Support from TIME\s+3\.3/);
+  assert.match(text, /What went well[\s\S]*Clear notes\.[\s\S]*The worked examples from a real shop\.[\s\S]*What should be improved[\s\S]*Audio versions of the lessons\.[\s\S]*More practice quizzes\./);
+  assert.ok(!/Ama Kollie|Ben Dolo/.test(text), "no student is named");
+  await leo.context().close();
+
+  const dora = await as(ctx, dean, DESK);
+  await dora.goto(`${URL_BASE}/admin/evaluations`);
+  assert.match(await dora.locator("tbody tr").first().innerText(), /QuickBooks[\s\S]*Leo Lecturer\s+3 of 2\s+4\.0/);
+  await dora.click("tbody a");
+  await dora.waitForURL(`**/admin/evaluations/${classId}`);
+  assert.match(await dora.locator("main").innerText(), /The course overall\s+4\.0/);
+  await dora.context().close();
+
+  const reg = await as(ctx, registrar, DESK);
+  await reg.goto(`${URL_BASE}/admin/evaluations`);
+  assert.equal(path(reg), "/dashboard", "the registrar does not see evaluations");
+  await reg.context().close();
+
+  // Nothing stored with an evaluation says who wrote it.
+  const columns = (await testDb("SELECT column_name FROM information_schema.columns WHERE table_name = 'course_evaluation'")).map((r) => r.column_name).sort();
+  assert.deepEqual(columns, ["classId", "id", "improve", "materials", "overall", "support", "teaching", "wentWell"]);
+  const admin = await as(ctx, ADMIN, DESK);
+  await admin.goto(`${URL_BASE}/admin/activity?q=evaluated`);
+  const log = await admin.locator("table").innerText();
+  assert.ok(log.includes("A student evaluated QuickBooks · March 2027 · Weekday afternoons"));
+  assert.ok(!/(Ama Kollie|Ben Dolo) evaluated/.test(log));
+  await admin.context().close();
+});

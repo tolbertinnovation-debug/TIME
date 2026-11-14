@@ -28,11 +28,14 @@ describe("approvals", () => {
     }
   });
   it("shows each role only the approval types it should see", () => {
-    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"]);
-    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"]);
+    expect(visibleApprovalTypes("ADMIN")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE", "REFUND"]);
+    expect(visibleApprovalTypes("LEADERSHIP")).toEqual(["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE", "REFUND"]);
     expect(visibleApprovalTypes("REGISTRAR")).toEqual(["APPLICATION", "ENROLMENT_CHANGE", "CERTIFICATE_VERIFY"]);
     expect(visibleApprovalTypes("FINANCE")).toEqual(["PAYMENT_ARRANGEMENT"]);
     for (const role of ["STUDENT", "LECTURER", "FACILITATOR"] as const) expect(seesApprovals(role)).toBe(false);
+  });
+  it("lets only academic leadership and administrators approve refunds, never Finance who ask for them", () => {
+    expect(ROLES.filter((r) => canDecide(r, "REFUND"))).toEqual(["LEADERSHIP", "ADMIN"]);
   });
   it("never lets someone request administrator access", () => {
     expect((REQUESTABLE_ROLES as readonly string[]).includes("ADMIN")).toBe(false);

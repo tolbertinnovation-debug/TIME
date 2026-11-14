@@ -227,12 +227,12 @@ export async function resetPasswordAction(form: FormData) {
   if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
   const target = await prisma.user.findUnique({ where: { id: userId } });
   if (!target) back("/admin/users", "error", "That account no longer exists.");
-  if (target.id === user.id) back("/admin/users", "error", "Ask another administrator to reset your own password.");
+  if (target.id === user.id) back("/admin/users", "error", "Change your own password under Your account.");
 
   const ctx = await auth.$context;
   await ctx.internalAdapter.updatePassword(userId, await ctx.password.hash(parsed.data.password));
   // Sign the person out everywhere so only the new password works.
   await prisma.session.deleteMany({ where: { userId } });
   await audit({ actor: user, action: "user.password_reset", summary: `${user.name} set a new password for ${target.name}`, entityType: "user", entityId: userId });
-  back("/admin/users", "ok", `${target.name} has a new password. Give it to them in person or by phone, and ask them to keep it private.`);
+  back("/admin/users", "ok", `${target.name} has a new password. Give it to them in person or by phone, and ask them to change it under Your account after signing in.`);
 }

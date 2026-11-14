@@ -7,6 +7,7 @@ import { MODE_LABEL, TRACK_LABEL } from "@/lib/academics";
 import { requireEnrolment } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
+import { canEvaluate } from "@/lib/evaluation";
 import { CATEGORY_LABEL, PASS_MARK, WEIGHTS } from "@/lib/grading";
 import { attendancePercent, summarise } from "@/lib/progress";
 
@@ -51,6 +52,14 @@ export default async function LearnClass({ params, searchParams }: { params: Pro
         </div>
         <SaveForOffline lessons={lessons.length} paths={["/my-classes", `/learn/${classId}`, ...lessons.map((l) => `/learn/${classId}/${l.id}`)]} />
       </section>
+
+      {canEvaluate(cls.status, Boolean(result)) && !enrolment.evaluatedAt && (
+        <section className="card stack" aria-labelledby="eval-h" style={{ background: "var(--olive-soft)" }}>
+          <h2 id="eval-h">Tell TIME how this course went</h2>
+          <p>Your answers are anonymous and take about two minutes.</p>
+          <div><Link className="btn" href={`/evaluate/${classId}`}>Evaluate this course</Link></div>
+        </section>
+      )}
 
       {result && (
         <section className="card stack" aria-labelledby="result-h">

@@ -37,6 +37,7 @@ export function TeachNav({ classId, access }: { classId: string; access: ClassAc
       <NavLink href={`/teach/${classId}/sessions`}>Sessions and attendance</NavLink>
       {classCan(access, "assessments.manage") && <NavLink href={`/teach/${classId}/assessments`}>Assessments</NavLink>}
       {classCan(access, "assessments.manage") && <NavLink href={`/teach/${classId}/gradebook`}>Gradebook</NavLink>}
+      {classCan(access, "assessments.manage") && <NavLink href={`/teach/${classId}/evaluations`}>Evaluations</NavLink>}
       <NavLink href={`/discussion/${classId}`}>Discussion</NavLink>
     </nav>
   );

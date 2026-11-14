@@ -319,3 +319,66 @@ test("reports download as spreadsheets for the roles allowed, and each download 
   ]) assert.ok(log.includes(expected), expected);
   await admin.context().close();
 });
+
+test("students evaluate the course anonymously; staff see a summary only once three have answered", async () => {
+  const fill = async (page, score, wentWell, improve) => {
+    await page.goto(`${URL_BASE}/learn/${classId}`);
+    await page.click('a:has-text("Evaluate this course")');
+    await page.waitForURL(`**/evaluate/${classId}`);
+    for (const q of ["teaching", "materials", "support", "overall"]) await page.check(`input[name="${q}"][value="${score}"]`);
+    await page.fill("#wentWell", wentWell);
+    await page.fill("#improve", improve);
+    await submit(page, 'button:has-text("Hand in evaluation")');
+    await page.locator('.notice.ok:has-text("stored without your name")').waitFor();
+  };
+  const student = await as(ctx, ama);
+  await fill(student, 5, "The worked examples from a real shop.", "More practice quizzes.");
+  assert.equal(await student.locator("form.form").count(), 0, "an evaluation is handed in once");
+  await student.goto(`${URL_BASE}/learn/${classId}`);
+  assert.equal(await student.locator('a:has-text("Evaluate this course")').count(), 0);
+  await student.context().close();
+
+  const leo = await as(ctx, lecturer, DESK);
+  await leo.goto(`${URL_BASE}/teach/${classId}/evaluations`);
+  let text = await leo.locator("main").innerText();
+  assert.match(text, /1 of 2 students have answered\. To keep answers anonymous, results appear once at least 3 students have answered/);
+  assert.ok(!text.includes("worked examples"), "comments are hidden until enough students answer");
+
+  const other = await as(ctx, ben);
+  await fill(other, 3, "", "Audio versions of the lessons.");
+  await other.context().close();
+  // A third answer, as if from another student, brings the class to the number needed.
+  await testDb(`INSERT INTO course_evaluation (id, "classId", teaching, materials, support, overall, "wentWell") VALUES ('ev-third', $1, 4, 4, 2, 4, 'Clear notes.')`, [classId]);
+
+  await leo.reload();
+  text = await leo.locator("main").innerText();
+  assert.match(text, /3 of 2 students answered|3 of \d students answered/);
+  assert.match(text, /The teaching\s+4\.0\s+1\s+1\s+1\s+0\s+0/);
+  assert.match(text, /Support from TIME\s+3\.3/);
+  assert.match(text, /What went well[\s\S]*Clear notes\.[\s\S]*The worked examples from a real shop\.[\s\S]*What should be improved[\s\S]*Audio versions of the lessons\.[\s\S]*More practice quizzes\./);
+  assert.ok(!/Ama Kollie|Ben Dolo/.test(text), "no student is named");
+  await leo.context().close();
+
+  const dora = await as(ctx, dean, DESK);
+  await dora.goto(`${URL_BASE}/admin/evaluations`);
+  assert.match(await dora.locator("tbody tr").first().innerText(), /QuickBooks[\s\S]*Leo Lecturer\s+3 of 2\s+4\.0/);
+  await dora.click("tbody a");
+  await dora.waitForURL(`**/admin/evaluations/${classId}`);
+  assert.match(await dora.locator("main").innerText(), /The course overall\s+4\.0/);
+  await dora.context().close();
+
+  const reg = await as(ctx, registrar, DESK);
+  await reg.goto(`${URL_BASE}/admin/evaluations`);
+  assert.equal(path(reg), "/dashboard", "the registrar does not see evaluations");
+  await reg.context().close();
+
+  // Nothing stored with an evaluation says who wrote it.
+  const columns = (await testDb("SELECT column_name FROM information_schema.columns WHERE table_name = 'course_evaluation'")).map((r) => r.column_name).sort();
+  assert.deepEqual(columns, ["classId", "id", "improve", "materials", "overall", "support", "teaching", "wentWell"]);
+  const admin = await as(ctx, ADMIN, DESK);
+  await admin.goto(`${URL_BASE}/admin/activity?q=evaluated`);
+  const log = await admin.locator("table").innerText();
+  assert.ok(log.includes("A student evaluated QuickBooks · March 2027 · Weekday afternoons"));
+  assert.ok(!/(Ama Kollie|Ben Dolo) evaluated/.test(log));
+  await admin.context().close();
+});

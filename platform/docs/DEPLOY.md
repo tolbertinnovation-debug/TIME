@@ -1,5 +1,7 @@
 # Putting TIME Learning online (Neon and Vercel)
 
+**Simplest route:** create the project in Vercel (step 2, without the database variables), then in the project open **Storage**, choose **Create Database**, pick **Neon**, and connect it to the project with the default settings. Vercel creates the database and adds `DATABASE_URL` and `DATABASE_URL_UNPOOLED` for you, so step 1 and those two rows in step 2 can be skipped. The platform uses `DATABASE_URL_UNPOOLED` for table changes.
+
 Follow these steps once. After that, every change merged into `main` goes live by itself.
 
 **Never put a password, key or connection string in an email, a chat or this repository.** They go only into Vercel's settings.

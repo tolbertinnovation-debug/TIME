@@ -56,3 +56,7 @@ See [`GOOGLE_BUSINESS_PROFILE.md`](GOOGLE_BUSINESS_PROFILE.md) for the details t
 - **News:** to add a story to `news.html`, copy one `<article class="img-card news-item">` block to the top of the list and change its text, link, photo, date (`<time datetime="2026-11">November 2026</time>`) and `data-category` (`programs`, `graduation`, `outreach` or `phica`). Add confirmed intake or graduation dates to the *Events & schedule* list.
 - **Contact details** also appear in the body of `contact.html`, `programs.html`, `faq.html`, `donate.html` and `offline.html`.
 - **Contact form:** messages are delivered to `tinstitute312@gmail.com` through [FormSubmit](https://formsubmit.co), a free service that needs no account. The **first** message sent after publishing triggers an "Activate Form" email to that inbox; click the link once and every message after that arrives directly. Until then, and whenever sending fails, visitors are offered a prepared email or WhatsApp message instead. To change the receiving address, edit `data-to` on the form in `contact.html`.
+
+## Learning platform
+
+The new online learning platform is being built in [`platform/`](platform/README.md). It is a separate app with its own database and hosting; it is not part of the GitHub Pages site. The plan and progress are in [`platform/docs/PLAN.md`](platform/docs/PLAN.md).

@@ -1,0 +1,765 @@
+// TIME Learning database.
+// Step 1: accounts, roles, the catalogue, approvals and the activity log.
+// Step 2: intakes, study centres, classes, class staff and enrolments.
+// Step 3: lessons, progress, class sessions, attendance and announcements.
+// Step 4: assessments, quiz questions, submissions and results.
+// Step 5: charges, payments, receipts, payment arrangements and settings.
+// Step 6: ending a class, certificate requests and certificates.
+// Step 7: notifications, class discussions, the help desk and sponsors.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  LECTURER
+  FACILITATOR // study centre facilitator
+  REGISTRAR
+  FINANCE
+  LEADERSHIP // Dean, Executive Director
+  ADMIN // system administrator
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+// ---- Accounts (the first four models follow Better Auth's schema) ----
+
+model User {
+  id            String     @id
+  name          String
+  email         String     @unique
+  emailVerified Boolean    @default(false)
+  image         String?
+  phone         String?
+  role          Role       @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  // Given once, when the person is first enrolled, e.g. "TIME-2027-0001"
+  studentNumber String?    @unique
+  county        String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  sessions          Session[]
+  accounts          Account[]
+  activity          AuditLog[]
+  approvalsMade     ApprovalRequest[] @relation("requester")
+  approvalsDecided  ApprovalRequest[] @relation("decider")
+  enrolments        Enrolment[]
+  classStaff        ClassStaff[]
+  signOffs          LessonProgress[]
+  marked            Submission[]
+  paymentsSent      Payment[]         @relation("paymentSubmitter")
+  paymentsDecided   Payment[]         @relation("paymentDecider")
+  certificates      Certificate[]
+  notifications     Notification[]
+  posts             Post[]            @relation("postAuthor")
+  tickets           SupportTicket[]
+  supportMessages   SupportMessage[]
+  sessionsCreated   ClassSession[]
+  announcements     Announcement[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---- Catalogue: School -> Program -> Course (imported from the website's data/catalogue.json) ----
+
+model School {
+  id      String   @id // slug, e.g. "teacher-education"
+  title   String
+  short   String
+  blurb   String
+  sort    Int      @default(0)
+  courses Course[]
+
+  @@map("school")
+}
+
+model Program {
+  id      String   @id // slug, e.g. "c-certificate"
+  title   String
+  sort    Int      @default(0)
+  courses Course[]
+
+  @@map("program")
+}
+
+enum DeliveryMode {
+  ONLINE
+  BLENDED
+  ON_CAMPUS
+}
+
+model Course {
+  id                String       @id // slug
+  title             String
+  schoolId          String
+  school            School       @relation(fields: [schoolId], references: [id])
+  programId         String
+  program           Program      @relation(fields: [programId], references: [id])
+  duration          String?
+  tuitionUsd        Int?
+  installments      Int          @default(1)
+  deliveryMode      DeliveryMode
+  deliveryConfirmed Boolean      @default(false)
+  active            Boolean      @default(true)
+  sort              Int          @default(0)
+  classes           CourseClass[]
+  modules           Module[]
+
+  @@index([schoolId])
+  @@index([programId])
+  @@map("course")
+}
+
+// ---- Academic setup: intakes, study centres and classes ----
+
+enum IntakeStatus {
+  PLANNED // visible to staff only
+  OPEN // students can apply
+  CLOSED // applications have ended
+}
+
+model Intake {
+  id         String        @id @default(cuid())
+  name       String        @unique // e.g. "March 2027"
+  startDate  DateTime      @db.Date
+  registerBy DateTime?     @db.Date
+  status     IntakeStatus  @default(PLANNED)
+  classes    CourseClass[]
+
+  @@map("intake")
+}
+
+model StudyCentre {
+  id      String        @id @default(cuid())
+  name    String        @unique
+  county  String
+  address String?
+  active  Boolean       @default(true)
+  classes CourseClass[]
+
+  @@map("study_centre")
+}
+
+enum Track {
+  WEEKDAY
+  SATURDAY
+}
+
+enum ClassStatus {
+  OPEN // taking applications
+  CLOSED // running, no new applications
+  ENDED // the administration has declared the class finished; certificates can be requested
+}
+
+// A class is one running of a course: an intake, a schedule and a way of studying.
+model CourseClass {
+  id            String       @id @default(cuid())
+  courseId      String
+  course        Course       @relation(fields: [courseId], references: [id])
+  intakeId      String
+  intake        Intake       @relation(fields: [intakeId], references: [id])
+  track         Track
+  mode          DeliveryMode
+  studyCentreId String?
+  studyCentre   StudyCentre? @relation(fields: [studyCentreId], references: [id])
+  capacity      Int?
+  status        ClassStatus  @default(OPEN)
+  endedAt       DateTime?
+  createdAt     DateTime     @default(now())
+  staff         ClassStaff[]
+  enrolments    Enrolment[]
+  sessions      ClassSession[]
+  announcements Announcement[]
+  assessments   Assessment[]
+  posts         Post[]
+
+  @@unique([courseId, intakeId, track])
+  @@index([intakeId])
+  @@map("course_class")
+}
+
+enum ClassStaffRole {
+  LECTURER
+  FACILITATOR
+}
+
+model ClassStaff {
+  classId String
+  class   CourseClass    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role    ClassStaffRole
+
+  @@id([classId, userId])
+  @@index([userId])
+  @@map("class_staff")
+}
+
+enum EnrolmentStatus {
+  ACTIVE
+  WITHDRAWN
+  DEFERRED
+  COMPLETED
+}
+
+model Enrolment {
+  id         String          @id @default(cuid())
+  userId     String
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId    String
+  class      CourseClass     @relation(fields: [classId], references: [id])
+  status     EnrolmentStatus @default(ACTIVE)
+  enrolledAt DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  progress    LessonProgress[]
+  attendance  Attendance[]
+  submissions Submission[]
+  result      Result?
+  charges     Charge[]
+  payments    Payment[]
+  certificate Certificate?
+  sponsorship Sponsorship?
+  // Set when Finance approves more time to pay: access continues until this date
+  arrangementUntil DateTime?
+
+  @@unique([userId, classId])
+  @@index([classId, status])
+  @@map("enrolment")
+}
+
+// ---- Course content: a course has modules, a module has lessons. Every class of the course shares them. ----
+
+model Module {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title    String
+  sort     Int      @default(0)
+  lessons  Lesson[]
+
+  @@index([courseId, sort])
+  @@map("module")
+}
+
+enum LessonKind {
+  ONLINE // the student studies it and marks it complete
+  PRACTICAL // a lecturer or facilitator signs it off
+}
+
+enum LessonStatus {
+  DRAFT // being written; students cannot see it
+  IN_REVIEW // sent for approval; locked
+  PUBLISHED // students can see it
+}
+
+model Lesson {
+  id          String           @id @default(cuid())
+  moduleId    String
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  kind        LessonKind
+  body        String
+  minutes     Int?
+  resourceUrl String?
+  status      LessonStatus     @default(DRAFT)
+  sort        Int              @default(0)
+  publishedAt DateTime?
+  updatedAt   DateTime         @updatedAt
+  progress    LessonProgress[]
+
+  @@index([moduleId, sort])
+  @@map("lesson")
+}
+
+model LessonProgress {
+  enrolmentId   String
+  enrolment     Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  lessonId      String
+  lesson        Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt   DateTime  @default(now())
+  // Set for practical lessons: the lecturer or facilitator who signed it off
+  signedOffById String?
+  signedOffBy   User?     @relation(fields: [signedOffById], references: [id], onDelete: SetNull)
+
+  @@id([enrolmentId, lessonId])
+  @@map("lesson_progress")
+}
+
+// ---- Class sessions (live online classes and in-person practicals) and attendance ----
+
+model ClassSession {
+  id          String       @id @default(cuid())
+  classId     String
+  class       CourseClass  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  kind        LessonKind
+  startsAt    DateTime
+  meetingUrl  String?
+  createdById String?
+  createdBy   User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  attendance  Attendance[]
+
+  @@index([classId, startsAt])
+  @@map("class_session")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
+
+model Attendance {
+  sessionId   String
+  session     ClassSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  enrolmentId String
+  enrolment   Enrolment        @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  status      AttendanceStatus
+
+  @@id([sessionId, enrolmentId])
+  @@map("attendance")
+}
+
+model Announcement {
+  id        String      @id @default(cuid())
+  classId   String
+  class     CourseClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?       @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  title     String
+  body      String
+  createdAt DateTime    @default(now())
+
+  @@index([classId, createdAt])
+  @@map("announcement")
+}
+
+// ---- Assessment: every class is graded out of 100 points in four parts ----
+
+enum AssessmentCategory {
+  CONTINUOUS // 30 points
+  ASSIGNMENT // assignments and practical activities, 20 points
+  MIDTERM // 20 points
+  FINAL // final examination or course project, 30 points
+}
+
+enum AssessmentKind {
+  WRITTEN // the student writes an answer online; the lecturer marks it
+  QUIZ // multiple choice, marked automatically, optionally timed
+  OFFLINE // sat on paper or done in person; the lecturer enters the marks
+}
+
+enum AssessmentStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+model Assessment {
+  id               String             @id @default(cuid())
+  classId          String
+  class            CourseClass        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title            String
+  category         AssessmentCategory
+  kind             AssessmentKind
+  instructions     String
+  maxScore         Int
+  dueAt            DateTime?
+  timeLimitMinutes Int?
+  status           AssessmentStatus   @default(DRAFT)
+  createdAt        DateTime           @default(now())
+  questions        Question[]
+  submissions      Submission[]
+
+  @@index([classId])
+  @@map("assessment")
+}
+
+model Question {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  text         String
+  options      String[]
+  // Never sent to students
+  correctIndex Int
+  points       Int
+  sort         Int        @default(0)
+
+  @@index([assessmentId, sort])
+  @@map("question")
+}
+
+model Submission {
+  id           String     @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  enrolmentId  String
+  enrolment    Enrolment  @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  text         String?
+  link         String?
+  // Quiz answers: question id -> chosen option number
+  answers      Json?
+  startedAt    DateTime   @default(now())
+  submittedAt  DateTime?
+  score        Float?
+  feedback     String?
+  gradedById   String?
+  gradedBy     User?      @relation(fields: [gradedById], references: [id], onDelete: SetNull)
+  gradedAt     DateTime?
+
+  @@unique([assessmentId, enrolmentId])
+  @@index([enrolmentId])
+  @@map("submission")
+}
+
+enum ResultStatus {
+  IN_REVIEW // sent for approval; marks are locked
+  PUBLISHED // the student can see it
+}
+
+// A student's result for a class, fixed at the moment it was sent for approval.
+model Result {
+  enrolmentId String       @id
+  enrolment   Enrolment    @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  continuous  Float
+  assignments Float
+  midterm     Float
+  final       Float
+  total       Float
+  passed      Boolean
+  status      ResultStatus @default(IN_REVIEW)
+  computedAt  DateTime     @default(now())
+  publishedAt DateTime?
+
+  @@map("result")
+}
+
+// ---- Fees: what a student owes (charges) and what they have paid (payments). Amounts are US cents. ----
+
+enum ChargeKind {
+  TUITION
+  REGISTRATION
+  EXAM
+  OTHER
+}
+
+model Charge {
+  id          String     @id @default(cuid())
+  enrolmentId String
+  enrolment   Enrolment  @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  kind        ChargeKind
+  description String
+  amountCents Int
+  createdAt   DateTime   @default(now())
+
+  @@index([enrolmentId])
+  @@map("charge")
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  SUBMITTED // the student reported it; Finance has not checked it yet
+  CONFIRMED // Finance found it on the Mobile Money or bank statement
+  REJECTED
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  enrolmentId   String
+  enrolment     Enrolment     @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  amountCents   Int
+  method        PaymentMethod
+  // The Mobile Money transaction ID or the bank's transfer reference
+  reference     String
+  paidOn        DateTime      @db.Date
+  status        PaymentStatus @default(SUBMITTED)
+  submittedById String?
+  submittedBy   User?         @relation("paymentSubmitter", fields: [submittedById], references: [id], onDelete: SetNull)
+  decidedById   String?
+  decidedBy     User?         @relation("paymentDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt     DateTime?
+  rejectReason  String?
+  // Given when the payment is confirmed, e.g. "R-000123"
+  receiptNumber String?       @unique
+  createdAt     DateTime      @default(now())
+
+  @@index([enrolmentId])
+  @@index([status, createdAt])
+  @@index([method, reference])
+  @@map("payment")
+}
+
+// Small pieces of configuration that staff can change, such as the payment details shown to students.
+model Setting {
+  key   String @id
+  value String
+
+  @@map("setting")
+}
+
+// ---- Certificates. The details are copied onto the certificate when it is issued, so it never changes afterwards. ----
+
+model Certificate {
+  id           String    @id @default(cuid())
+  // Printed on the certificate as "ID NO", e.g. "TC-002"
+  number       String    @unique
+  // A short code printed on the certificate, needed with the ID to check it online
+  code         String
+  enrolmentId  String    @unique
+  enrolment    Enrolment @relation(fields: [enrolmentId], references: [id])
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  holderName   String
+  // e.g. "Teaching Certificate" and "Elementary Education"
+  title        String
+  field        String
+  courseTitle  String
+  // Which wording the certificate carries: TEACHING names the Bureau of Teacher Education
+  wording      String
+  awardedOn    DateTime  @db.Date
+  issuedByName String
+  revokedAt    DateTime?
+  revokeReason String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@map("certificate")
+}
+
+// ---- Notifications shown inside the platform. Email and SMS can be added to the same place later. ----
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  // Where the person goes when they open it, e.g. "/fees"
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notification")
+}
+
+// ---- Class discussion: questions and replies inside one class ----
+
+model Post {
+  id        String      @id @default(cuid())
+  classId   String
+  class     CourseClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?       @relation("postAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  // A reply points at the question it answers. Replies are one level deep.
+  parentId  String?
+  parent    Post?       @relation("replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Post[]      @relation("replies")
+  body      String
+  // Set when a lecturer removes a post. The text is kept for the record but no longer shown.
+  hiddenAt  DateTime?
+  createdAt DateTime    @default(now())
+
+  @@index([classId, createdAt])
+  @@index([parentId])
+  @@map("post")
+}
+
+// ---- Help desk ----
+
+enum SupportCategory {
+  ACCOUNT
+  COURSE
+  FEES
+  TECHNICAL
+  OTHER
+}
+
+enum SupportStatus {
+  OPEN // waiting for TIME staff
+  ANSWERED // staff replied; waiting for the person
+  CLOSED
+}
+
+model SupportTicket {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  category  SupportCategory
+  status    SupportStatus    @default(OPEN)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  messages  SupportMessage[]
+
+  @@index([status, updatedAt])
+  @@index([userId])
+  @@map("support_ticket")
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
+  @@map("support_message")
+}
+
+// ---- Sponsors. A sponsor never signs in; with the student's consent they get a progress summary. ----
+
+model Sponsor {
+  id           String        @id @default(cuid())
+  name         String
+  contact      String?
+  notes        String?
+  createdAt    DateTime      @default(now())
+  sponsorships Sponsorship[]
+
+  @@map("sponsor")
+}
+
+model Sponsorship {
+  id          String    @id @default(cuid())
+  sponsorId   String
+  sponsor     Sponsor   @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+  enrolmentId String    @unique
+  enrolment   Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  // When the student agreed to share a progress summary. Empty means no report may be sent.
+  consentAt   DateTime?
+  // "student" when given on the platform, or the staff member who recorded a signed paper form
+  consentBy   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([sponsorId])
+  @@map("sponsorship")
+}
+
+// ---- Approvals: one inbox for every decision that needs sign-off ----
+
+enum ApprovalType {
+  STAFF_ACCESS // a person asks for a staff role
+  APPLICATION // a student applies to join a class
+  ENROLMENT_CHANGE // an enrolled student asks to withdraw or defer
+  COURSE_PUBLISH // a lecturer asks for new lessons to be published
+  GRADES // a lecturer asks for a class's results to be published
+  GRADE_APPEAL // a student asks for a published result to be looked at again
+  PAYMENT_ARRANGEMENT // a student asks for more time to pay their balance
+  CERTIFICATE_VERIFY // a student requests their certificate; the registrar checks the record
+  CERTIFICATE_ISSUE // the verified request goes to academic leadership, who issue the certificate
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model ApprovalRequest {
+  id            String         @id @default(cuid())
+  type          ApprovalType
+  status        ApprovalStatus @default(PENDING)
+  requestedById String
+  requestedBy   User           @relation("requester", fields: [requestedById], references: [id], onDelete: Cascade)
+  // What is being asked for, e.g. { "role": "LECTURER" }
+  payload       Json
+  note          String?
+  decidedById   String?
+  decidedBy     User?          @relation("decider", fields: [decidedById], references: [id], onDelete: SetNull)
+  decidedAt     DateTime?
+  decisionNote  String?
+  createdAt     DateTime       @default(now())
+
+  @@index([status, createdAt])
+  @@index([requestedById])
+  @@map("approval_request")
+}
+
+// ---- Activity log: who did what, when. Rows are only ever added. ----
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  // Kept even if the account is later removed
+  actorLabel String
+  action     String // e.g. "user.role_changed"
+  entityType String?
+  entityId   String?
+  summary    String
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_log")
+}

@@ -93,3 +93,27 @@ test("an administrator can now change their own password, and every change is in
   assert.ok(!log.includes(NEW) && !log.includes("777 123 456"), "passwords and phone numbers are never written to the log");
   await admin.context().close();
 });
+
+test("the sign-in system's raw web addresses are closed, so its rules cannot be skipped", async () => {
+  // The previous test changed the administrator's password.
+  const page = await as(ctx, { ...ADMIN, password: "admin-password-456" }, DESK);
+  assert.equal(new URL(page.url()).pathname, "/dashboard");
+  const before = await page.context().cookies();
+  const post = (path, data) => page.request.post(`${URL_BASE}/api/auth/${path}`, { data, headers: { Origin: URL_BASE } });
+  // Renaming oneself (names are changed by the Registrar), signing in without the lock, changing a password
+  // without the lock, and signing up without the form's checks are all refused.
+  for (const [path, data] of [
+    ["update-user", { name: "Someone Else" }],
+    ["sign-in/email", { email: ADMIN.email, password: "wrong-password" }],
+    ["change-password", { currentPassword: "x", newPassword: "another-password-1" }],
+    ["sign-up/email", { name: "X", email: "raw@example.test", password: "raw-password-123" }],
+    ["get-session", undefined],
+  ]) assert.equal((await post(path, data)).status(), 404, path);
+  assert.equal((await page.request.get(`${URL_BASE}/api/auth/get-session`)).status(), 404);
+  // The platform's own pages still work with the same sign-in.
+  await page.goto(`${URL_BASE}/admin`);
+  assert.equal(new URL(page.url()).pathname, "/admin");
+  assert.match(await page.locator("header").innerText(), /Test Admin/);
+  assert.deepEqual((await page.context().cookies()).map((c) => c.name).sort(), before.map((c) => c.name).sort());
+  await page.context().close();
+});

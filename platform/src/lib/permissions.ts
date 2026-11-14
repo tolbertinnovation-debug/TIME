@@ -47,6 +47,8 @@ export const CAPABILITIES = {
   "certificates.numbering": ["ADMIN", "REGISTRAR"],
   // Add sponsors, link them to students and produce progress summaries
   "sponsors.manage": ["ADMIN", "REGISTRAR"],
+  // Open any student's transcript, and download enrolment and results reports
+  "records.view": ["ADMIN", "REGISTRAR", "LEADERSHIP"],
   // Read a class's full gradebook to review results before they are published
   "results.review": ["LEADERSHIP", "ADMIN"],
 } as const satisfies Record<string, readonly Role[]>;

@@ -42,7 +42,8 @@ The balance is due **8 weeks after your first payment**. If it is not paid by th
 1. When TIME has ended the class and your result is published, choose **Certificates**. The page shows a checklist of what is needed: a pass, your fees paid in full, and the class ended.
 2. When every item is ticked, choose **Request my certificate**.
 3. The registrar checks your record, then academic leadership approves the certificate.
-4. Open it from **Certificates** to view or print it. Anyone can confirm it is real at **Check a certificate** using its number.
+4. Open it from **Certificates** to view or print it. Anyone can confirm it is real at **Check a certificate** using the number and code printed on it.
+5. **My transcript**, also on the Certificates page, lists every class you have taken with your published results. Print it yourself, or ask the Registrar to sign and stamp it for an official copy.
 
 ## 6. Other things
 

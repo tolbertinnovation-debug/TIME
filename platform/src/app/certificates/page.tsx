@@ -25,6 +25,7 @@ export default async function Certificates({ searchParams }: { searchParams: Pro
         <h1>Certificates</h1>
         <p className="muted">When a class has ended, you have passed and your fees are cleared, you can request your certificate here.</p>
         <Notices params={await searchParams} />
+        {enrolments.length > 0 && <p><Link className="btn ghost" href="/transcript">My transcript</Link></p>}
       </div>
       {standings.length === 0 && <p className="card">You are not enrolled in a class yet. <Link href="/apply">Apply to a class</Link>.</p>}
       {standings.map((s) => {

@@ -122,6 +122,8 @@ Built:
 - **Guides** for students, lecturers and facilitators, the registrar, Finance, academic leadership and administrators, in [`guides/`](guides/README.md).
 - **Going-live checklist** in [GOING-LIVE.md](GOING-LIVE.md), and a health check address (`/api/health`) for monitoring.
 - **One-step deployment.** On the live host the build checks its settings, creates the tables, loads the catalogue and creates the first administrator. Steps for Neon and Vercel are in [DEPLOY.md](DEPLOY.md).
+- **Transcripts.** A student opens and prints their own transcript of published results. The Registrar, leadership and administrators can open any student's, to sign and stamp it.
+- **Reports.** Enrolment and results (Registrar, leadership, administrators) and confirmed payments (Finance, leadership, administrators) download as spreadsheets, for one intake or all. Every download is in the activity log.
 - **Draft terms of use and privacy notice** in [`legal/`](legal/README.md), waiting for TIME's review. Acceptance at sign-up is added once they are approved.
 
 Still to come (each waits on a decision or account from TIME):

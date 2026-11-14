@@ -30,6 +30,10 @@ You work from **Finance** in the menu. Approvals and the help desk are under **A
 
 A student who needs more time sends a request, which arrives in **Approvals**. If you approve it, access continues until the date agreed. If that date passes unpaid, the class is paused.
 
+## Reports
+
+Under **Administration**, **Reports**, download the **Payments** report: every confirmed payment with its receipt number, date, student, amount, method and reference, for one intake or all of them. Use it to reconcile against the Mobile Money and bank statements.
+
 ## Help desk
 
 Requests about fees and payments come to you under **Administration**, **Help desk**.

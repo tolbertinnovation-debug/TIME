@@ -50,7 +50,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
             <tr key={u.id}>
               <td>{u.name}{u.id === me.id && <span className="muted small"> (you)</span>}</td>
               <td>{u.email}</td>
-              <td className="nowrap">{u.studentNumber ?? "—"}</td>
+              <td className="nowrap">{u.studentNumber ?? "—"}{u.role === "STUDENT" && can(me.role, "records.view") && <><br /><Link className="small" href={`/transcript/${u.id}`}>Transcript</Link></>}</td>
               <td className="nowrap">{formatDate(u.createdAt)}</td>
               <td><span className={`pill ${u.status === "ACTIVE" ? "ok" : "bad"}`}>{u.status === "ACTIVE" ? "Active" : "Suspended"}</span></td>
               <td>

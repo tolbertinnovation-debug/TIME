@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {can(user.role, "certificates.view") && <NavLink href="/admin/certificates">Certificates</NavLink>}
         {supportCategoriesFor(user.role).length > 0 && <NavLink href="/admin/support">Help desk</NavLink>}
         {can(user.role, "sponsors.manage") && <NavLink href="/admin/sponsors">Sponsors</NavLink>}
+        {(can(user.role, "records.view") || can(user.role, "finance.view")) && <NavLink href="/admin/reports">Reports</NavLink>}
         {can(user.role, "users.view") && <NavLink href="/admin/users">Accounts</NavLink>}
         {can(user.role, "activity.view") && <NavLink href="/admin/activity">Activity</NavLink>}
       </nav>

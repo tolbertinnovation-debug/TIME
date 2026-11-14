@@ -117,3 +117,21 @@ test("the sign-in system's raw web addresses are closed, so its rules cannot be 
   assert.deepEqual((await page.context().cookies()).map((c) => c.name).sort(), before.map((c) => c.name).sort());
   await page.context().close();
 });
+
+test("every page tells the browser to load nothing from other websites and to use HTTPS", async () => {
+  const page = await person(ctx);
+  const res = await page.goto(`${URL_BASE}/sign-in`);
+  const h = res.headers();
+  assert.match(h["content-security-policy"], /default-src 'self'/);
+  assert.match(h["content-security-policy"], /object-src 'none'/);
+  assert.match(h["content-security-policy"], /frame-ancestors 'none'/);
+  assert.match(h["strict-transport-security"], /max-age=\d+/);
+  assert.match(h["permissions-policy"], /camera=\(\)/);
+  assert.equal(h["x-frame-options"], "DENY");
+  assert.equal(h["x-powered-by"], undefined);
+  // The page still works under those rules. (Ama's password was changed in an earlier test.)
+  await signIn(page, { ...ama, password: NEW });
+  assert.equal(new URL(page.url()).pathname, "/dashboard");
+  assert.deepEqual(page.problems, []);
+  await page.context().close();
+});

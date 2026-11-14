@@ -59,6 +59,8 @@ export async function person(ctx, viewport = { width: 390, height: 844 }) {
   const page = await context.newPage();
   page.problems = [];
   page.on("pageerror", (e) => page.problems.push(String(e)));
+  // Anything the security headers block shows up here, so every test that checks problems catches it.
+  page.on("console", (m) => { if (m.type() === "error" && /Content.Security.Policy|Refused to/i.test(m.text())) page.problems.push(m.text()); });
   return page;
 }
 

@@ -27,14 +27,17 @@ What has to be done, in order, before students use TIME Learning. Items marked *
 
 ## 3. Setting up the live platform
 
-Follow [DEPLOY.md](DEPLOY.md), which gives every click for Neon and Vercel. In short:
+Done on 14 November 2026, following [DEPLOY.md](DEPLOY.md):
 
-- [ ] Create the production database and set `DATABASE_URL` in the host's settings.
-- [ ] Set `BETTER_AUTH_SECRET` to a new random value of 40 or more characters. Store it only in the host's settings.
-- [ ] Set `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` for the first administrator, and deploy. The deployment creates the tables, loads TIME's programs and courses, and creates that administrator.
-- [ ] Sign in, then delete `ADMIN_PASSWORD` from the host's settings. Create a second administrator account for a different person.
-- [ ] Open the address and confirm the padlock (HTTPS) shows. The installable app and offline lessons only work over HTTPS.
-- [ ] Open `/api/health` and confirm it answers `{"ok":true}`.
+- [x] Vercel project `time-learning` (root directory `platform`), with `BETTER_AUTH_SECRET` set.
+- [x] Neon database connected from Vercel's Storage tab.
+- [x] First deployment: tables created, programs and courses loaded; `/api/health` answers `{"ok":true}`.
+- [x] First administrator made through sign-up and `ADMIN_EMAIL`.
+- [ ] Delete `ADMIN_EMAIL` from Vercel.
+- [ ] Create a second administrator account for a different person.
+- [ ] Delete the extra Vercel projects that only publish the website (`time`, `time-z5h1`), and revoke the setup keys.
+- [ ] Turn on two-factor sign-in for the Vercel and GitHub accounts.
+- [ ] Your own web address (DEPLOY.md, step 5).
 
 ## 4. Before the first student
 
@@ -50,7 +53,8 @@ Follow [DEPLOY.md](DEPLOY.md), which gives every click for Neon and Vercel. In s
 - [ ] **Backups:** daily automatic database backups are switched on. One backup has been restored into a separate test database and opened. Repeat this monthly.
 - [ ] **Monitoring:** an uptime monitor checks `/api/health` every few minutes and alerts two people by email or SMS.
 - [ ] **Error alerts:** the host's error log is watched, or an error reporting service is connected.
-- [ ] **Security review:** an independent pass over sign-in, permissions, payments and certificates before real money and real records are entered.
+- [x] **Security review by the developer:** done, see [SECURITY.md](SECURITY.md). Two problems were found and fixed.
+- [ ] **Independent security review:** someone else checks sign-in, permissions, payments and certificates before real money and real records are entered.
 - [ ] **Load test:** 50 students signed in at once, each opening lessons and handing in a quiz, without errors.
 - [ ] **Phones:** the platform has been used from start to finish on a low-cost Android phone on a mobile connection, including saving lessons and reading them with no connection.
 

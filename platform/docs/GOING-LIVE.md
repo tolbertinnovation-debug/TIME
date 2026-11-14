@@ -53,7 +53,8 @@ Done on 14 November 2026, following [DEPLOY.md](DEPLOY.md):
 - [ ] **Backups:** daily automatic database backups are switched on. One backup has been restored into a separate test database and opened. Repeat this monthly.
 - [ ] **Monitoring:** an uptime monitor checks `/api/health` every few minutes and alerts two people by email or SMS.
 - [ ] **Error alerts:** the host's error log is watched, or an error reporting service is connected.
-- [ ] **Security review:** an independent pass over sign-in, permissions, payments and certificates before real money and real records are entered.
+- [x] **Security review by the developer:** done, see [SECURITY.md](SECURITY.md). Two problems were found and fixed.
+- [ ] **Independent security review:** someone else checks sign-in, permissions, payments and certificates before real money and real records are entered.
 - [ ] **Load test:** 50 students signed in at once, each opening lessons and handing in a quiz, without errors.
 - [ ] **Phones:** the platform has been used from start to finish on a low-cost Android phone on a mobile connection, including saving lessons and reading them with no connection.
 

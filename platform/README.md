@@ -3,7 +3,7 @@
 The online learning platform for TIME Inc. It is separate from the public website in the folder above, and it needs its own hosting and database to go live.
 
 - Plan and progress: [`docs/PLAN.md`](docs/PLAN.md). **Steps 1 to 7 are built:** foundation; setup, admissions and enrolment; teaching and learning; assessment; fees; certificates; notifications, discussions, help desk and sponsors. Sending email and SMS waits for providers. Of step 8, the installable app with offline lessons is built.
-- Guides for each role: [`docs/guides/`](docs/guides/README.md). Before launch: [`docs/GOING-LIVE.md`](docs/GOING-LIVE.md). Putting it online: [`docs/DEPLOY.md`](docs/DEPLOY.md). Draft terms and privacy notice: [`docs/legal/`](docs/legal/README.md).
+- Guides for each role: [`docs/guides/`](docs/guides/README.md). Before launch: [`docs/GOING-LIVE.md`](docs/GOING-LIVE.md). Putting it online: [`docs/DEPLOY.md`](docs/DEPLOY.md). Draft terms and privacy notice: [`docs/legal/`](docs/legal/README.md). Security review: [`docs/SECURITY.md`](docs/SECURITY.md).
 - Stack: Next.js (App Router, TypeScript), Prisma, PostgreSQL (Neon in production), Better Auth.
 
 ## Run it on your computer

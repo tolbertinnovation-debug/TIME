@@ -19,6 +19,7 @@ Every decision can be approved or rejected. A rejection needs a short reason, wh
 - **Activity:** everything every person has done, with search and filters by person, kind and date.
 - **Certificates:** every certificate issued. A certificate can be revoked with a reason; the public check then shows it as revoked.
 - **Finance:** balances and payments, to read.
+- **Evaluations:** what students said about each class, with the average for each question and their comments. Answers are anonymous, and a class appears once at least three students have answered.
 - **Reports:** enrolment, results and payments, downloaded as spreadsheets for one intake or all of them.
 - **Transcripts:** any student's transcript, from **Accounts**.
 

@@ -37,6 +37,10 @@ The balance is due **8 weeks after your first payment**. If it is not paid by th
 - Quizzes: choose **Start the quiz**. If the quiz has a time limit, the clock starts then and does not stop. Choose **Hand in quiz** before time runs out: a quiz handed in after the time limit receives no marks. If your connection failed, tell your lecturer, who can let you take it again.
 - Your result appears on the class page once academic leadership has approved it. If you believe it is wrong, open **Appeal this result** and explain why.
 
+### Evaluate the course
+
+When the class has ended or your result is published, your class page asks you to **Evaluate this course**. It takes about two minutes. Your answers are stored without your name, and your lecturer sees only a summary once at least three students have answered. You can hand in one evaluation.
+
 ## 5. Your certificate
 
 1. When TIME has ended the class and your result is published, choose **Certificates**. The page shows a checklist of what is needed: a pass, your fees paid in full, and the class ended.

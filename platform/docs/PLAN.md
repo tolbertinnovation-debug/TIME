@@ -124,6 +124,7 @@ Built:
 - **One-step deployment.** On the live host the build checks its settings, creates the tables, loads the catalogue and creates the first administrator. Steps for Neon and Vercel are in [DEPLOY.md](DEPLOY.md).
 - **Transcripts.** A student opens and prints their own transcript of published results. The Registrar, leadership and administrators can open any student's, to sign and stamp it.
 - **Reports.** Enrolment and results (Registrar, leadership, administrators) and confirmed payments (Finance, leadership, administrators) download as spreadsheets, for one intake or all. Every download is in the activity log.
+- **Course evaluations.** Students rate the teaching, materials, support and the course overall, with optional comments, once the class has ended or their result is published. Answers are stored with no link to the student. The lecturer and academic leadership see a summary once three students have answered.
 - **Draft terms of use and privacy notice** in [`legal/`](legal/README.md), waiting for TIME's review. Acceptance at sign-up is added once they are approved.
 
 Still to come (each waits on a decision or account from TIME):

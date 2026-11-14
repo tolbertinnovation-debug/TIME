@@ -52,6 +52,7 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/lib/certificate.ts`, `certificate-data.ts` | The certificate's wording and numbering, who qualifies, and issuing. To change the wording or address, edit `certificate.ts`. |
 | `src/app/community-actions.ts` | Class discussions, the help desk, sponsors and consent, marking notifications read. |
 | `src/components/transcript.tsx`, `src/app/transcript/` | A student's transcript of published results. |
+| `src/lib/evaluation.ts`, `src/components/evaluation.tsx`, `src/app/evaluate/` | Anonymous course evaluations and their summary. |
 | `src/lib/reports.ts`, `src/app/api/reports/`, `src/app/admin/reports/` | Enrolment, results and payments reports, downloaded as CSV. |
 | `src/lib/notify.ts` | The one place that tells people something happened. Email and SMS will be added here. |
 | `src/lib/grading.ts` | The grading rules: 30 / 20 / 20 / 30, pass mark 70, quiz marking and time limits. |

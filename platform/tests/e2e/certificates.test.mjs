@@ -352,7 +352,7 @@ test("students evaluate the course anonymously; staff see a summary only once th
 
   await leo.reload();
   text = await leo.locator("main").innerText();
-  assert.match(text, /3 of 2 students answered|3 of \d students answered/);
+  assert.match(text, /3 of \d students answered/);
   assert.match(text, /The teaching\s+4\.0\s+1\s+1\s+1\s+0\s+0/);
   assert.match(text, /Support from TIME\s+3\.3/);
   assert.match(text, /What went well[\s\S]*Clear notes\.[\s\S]*The worked examples from a real shop\.[\s\S]*What should be improved[\s\S]*Audio versions of the lessons\.[\s\S]*More practice quizzes\./);

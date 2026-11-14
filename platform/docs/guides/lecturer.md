@@ -36,6 +36,10 @@
 2. The gradebook tells you if anything is missing. When it is complete, send the results for approval.
 3. Academic leadership approves them and students then see their results. Until then you can **Take results back** to correct them.
 
+### Course evaluations
+
+Students can evaluate the course once the class has ended or their result is published. **Evaluations** in your class menu shows the averages and comments once at least three students have answered. Answers are anonymous: nobody at TIME can see who wrote what.
+
 ## Facilitators
 
 - You see the class list, sessions and practical work for your study centre's classes.

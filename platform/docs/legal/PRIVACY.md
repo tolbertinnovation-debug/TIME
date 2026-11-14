@@ -24,6 +24,7 @@ This notice explains what the Technical Institute for Many Empowerment (TIME) In
 | **Fees:** what you were charged, payments you reported with their amount, method and reference, receipts, and any request for more time to pay | You and the Finance Office |
 | **Certificates:** the certificate issued to you, its number and date, and whether it has been revoked | TIME |
 | **Messages:** your posts in class discussions, your requests to the help desk and the replies | You and TIME staff |
+| **Course evaluations:** your ratings and comments about a course. These are stored without your name or any link to you; TIME records only that you handed one in | You |
 | **Sponsorship:** who sponsors you, and whether and when you agreed to share your progress | The Registrar and you |
 | **Activity record:** what you did on the platform and when, for example signing in, handing in work or reporting a payment | Recorded automatically |
 | **Technical:** the internet address and the type of browser used each time you sign in | Recorded automatically |

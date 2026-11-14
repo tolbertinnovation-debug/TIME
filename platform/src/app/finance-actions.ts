@@ -6,8 +6,8 @@ import { back, firstProblem, UserProblem } from "@/lib/action-helpers";
 import { classLabel } from "@/lib/academics";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
-import { CHARGE_LABEL, formatUsd, METHOD_LABEL, normaliseReference, parseAmount, receiptNumber } from "@/lib/fees";
-import { feeStatusOf, SETTING } from "@/lib/fees-data";
+import { CHARGE_LABEL, creditToClear, formatUsd, METHOD_LABEL, normaliseReference, parseAmount, receiptNumber, refundableCents } from "@/lib/fees";
+import { feeStatusOf, refundFigures, refundLockKey, SETTING } from "@/lib/fees-data";
 import { notify } from "@/lib/notify";
 import { can } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
@@ -204,4 +204,81 @@ export async function savePaymentDetailsAction(form: FormData) {
   // The details are kept in the log so a wrong or malicious change can be traced.
   await audit({ actor: user, action: "setting.payment_details", summary: `${user.name} changed the payment details shown to students`, entityType: "setting", meta: parsed.data });
   back("/finance/settings", "ok", "Payment details saved. Students see them on their Fees page.");
+}
+
+// ---- Refunds ----
+
+const refundSchema = z.object({
+  amount: z.string().trim(),
+  cancelBalance: z.boolean(),
+  reason: z.string().trim().min(10, "Say why, in at least a few words. Leadership and the student will read it.").max(500, "Keep the reason under 500 characters."),
+});
+
+// Finance asks to pay money back to a student, or to cancel what is left to pay, or both.
+// Nothing changes until academic leadership approves it in the approvals inbox.
+export async function requestRefundAction(form: FormData) {
+  const enrolmentId = String(form.get("enrolmentId") ?? "");
+  const returnTo = `/finance/students/${enrolmentId}`;
+  const user = await requireFinance(returnTo);
+  const parsed = refundSchema.safeParse({ amount: String(form.get("amount") ?? ""), cancelBalance: form.get("cancelBalance") === "yes", reason: form.get("reason") ?? "" });
+  if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
+  const { cancelBalance, reason } = parsed.data;
+  const blank = parsed.data.amount === "" || /^0+(\.0+)?$/.test(parsed.data.amount);
+  const amountCents = blank ? 0 : parseAmount(parsed.data.amount);
+  if (amountCents === null) back(returnTo, "error", "Enter the amount to refund in US dollars, like 40 or 87.50.");
+  if (amountCents === 0 && !cancelBalance) back(returnTo, "error", "Enter an amount to refund, or tick the box to cancel what is left to pay.");
+  const enrolment = await prisma.enrolment.findUnique({ where: { id: enrolmentId }, include: { user: true, class: { include: { course: true, intake: true } } } });
+  if (!enrolment) back("/finance/students", "error", "That student's enrolment no longer exists.");
+
+  let problem: string | null = null, requestId = "", confirmedCents = 0;
+  try {
+    requestId = await prisma.$transaction(async (tx) => {
+      // One refund request at a time per enrolment, so two cannot both use the same money.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${refundLockKey(enrolmentId)}))`;
+      const f = await refundFigures(tx, enrolmentId);
+      confirmedCents = f.confirmedCents;
+      if (f.pendingRequests > 0) throw new UserProblem("A refund for this student is already waiting for approval. Wait for that decision first.");
+      const most = refundableCents(f);
+      if (amountCents > most) throw new UserProblem(most === 0 ? "Nothing can be refunded: this student has no confirmed payments left to refund." : `At most ${formatUsd(most)} can be refunded: that is what this student has paid and has not had back.`);
+      if (cancelBalance && creditToClear({ chargedCents: f.chargedCents, confirmedCents: f.confirmedCents, refundedCents: f.refundedCents + amountCents }) === 0 && amountCents === 0) {
+        throw new UserProblem("This student owes nothing, so there is no balance to cancel.");
+      }
+      const request = await tx.approvalRequest.create({
+        data: { type: "REFUND", requestedById: user.id, payload: { enrolmentId, classId: enrolment.classId, studentName: enrolment.user.name, amountCents, cancelBalance, reason, confirmedCents: f.confirmedCents } },
+      });
+      return request.id;
+    });
+  } catch (e) {
+    if (!(e instanceof UserProblem)) throw e;
+    problem = e.message;
+  }
+  if (problem) back(returnTo, "error", problem);
+  const what = [amountCents > 0 && `refund ${formatUsd(amountCents)}`, cancelBalance && "cancel the rest of the balance"].filter(Boolean).join(" and ");
+  await audit({ actor: user, action: "approval.requested", summary: `${user.name} asked to ${what} for ${enrolment.user.name} (${classLabel(enrolment.class)}). Reason: ${reason}`, entityType: "approval", entityId: requestId, meta: { type: "REFUND", amountCents, cancelBalance, confirmedCents } });
+  revalidatePath("/admin");
+  back(returnTo, "ok", "Your request has been sent to academic leadership for approval.");
+}
+
+const refundPaidSchema = z.object({
+  method: z.enum(["MOBILE_MONEY", "BANK_TRANSFER"], "Choose Mobile Money or bank transfer."),
+  reference: z.string().trim().min(4, "Enter the transaction ID or bank reference of the money you sent (at least 4 characters).").max(60, "That reference is too long.").transform(normaliseReference),
+  paidOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose the date the money was sent.").transform((v) => new Date(`${v}T00:00:00Z`)),
+});
+
+// After a refund is approved, Finance sends the money and records how it was sent.
+export async function markRefundPaidAction(form: FormData) {
+  const user = await requireFinance("/finance/refunds");
+  const id = String(form.get("refundId") ?? "");
+  const parsed = refundPaidSchema.safeParse({ method: value(form, "method"), reference: value(form, "reference") ?? "", paidOn: value(form, "paidOn") });
+  if (!parsed.success) back("/finance/refunds", "error", firstProblem(parsed.error));
+  const d = parsed.data;
+  if (d.paidOn > new Date()) back("/finance/refunds", "error", "The date cannot be in the future.");
+  const refund = await prisma.refund.findUnique({ where: { id }, include: { enrolment: { include: { user: true } } } });
+  if (!refund) back("/finance/refunds", "error", "That refund no longer exists.");
+  // The status check inside the update means a refund can never be recorded as paid twice.
+  const done = await prisma.refund.updateMany({ where: { id, status: "APPROVED" }, data: { status: "PAID", method: d.method, reference: d.reference, paidOn: d.paidOn, paidById: user.id } });
+  if (!done.count) back("/finance/refunds", "error", "Someone has already recorded that refund as paid.");
+  await audit({ actor: user, action: "fee.refund_paid", summary: `${user.name} paid ${refund.enrolment.user.name} a refund of ${formatUsd(refund.amountCents)} by ${METHOD_LABEL[d.method]} (${d.reference})`, entityType: "refund", entityId: id });
+  await notify(refund.enrolment.userId, { title: `Refund sent: ${formatUsd(refund.amountCents)}`, body: `TIME has sent you ${formatUsd(refund.amountCents)} by ${METHOD_LABEL[d.method]} (reference ${d.reference}). Reason: ${refund.reason}`, href: "/fees" });
+  back("/finance/refunds", "ok", `Refund to ${refund.enrolment.user.name} recorded as paid.`);
 }

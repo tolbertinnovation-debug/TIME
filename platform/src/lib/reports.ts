@@ -6,7 +6,7 @@ import type { Capability } from "@/lib/permissions";
 
 // The reports staff can download. Each says who may download it and builds its rows.
 export type Report = { header: string[]; rows: Cell[][] };
-export const REPORT_KINDS = ["enrolment", "results", "payments"] as const;
+export const REPORT_KINDS = ["enrolment", "results", "payments", "refunds"] as const;
 export type ReportKind = (typeof REPORT_KINDS)[number];
 export const isReportKind = (v: string): v is ReportKind => (REPORT_KINDS as readonly string[]).includes(v);
 
@@ -14,6 +14,7 @@ export const REPORTS: Record<ReportKind, { title: string; about: string; capabil
   enrolment: { title: "Enrolment", about: "Every student in every class: student number, county, course, program, intake, study centre and status.", capability: "records.view" },
   results: { title: "Results", about: "Every published result: points in each part, total, pass or not, and the certificate number if one was issued.", capability: "records.view" },
   payments: { title: "Payments", about: "Every confirmed payment: receipt number, date, student, class, amount, method and reference.", capability: "finance.view" },
+  refunds: { title: "Refunds", about: "Every approved refund: who approved it, the reason, and whether, when and how it was sent.", capability: "finance.view" },
 };
 
 const classInclude = { course: { include: { program: true } }, intake: true, studyCentre: true } as const;
@@ -36,6 +37,13 @@ export async function buildReport(kind: ReportKind, intakeId: string | null): Pr
         const e = r.enrolment, cert = e.certificate && !e.certificate.revokedAt ? e.certificate.number : null;
         return [e.user.studentNumber, e.user.name, e.class.course.title, e.class.course.program.title, e.class.intake.name, r.continuous, r.assignments, r.midterm, r.final, r.total, r.passed, r.publishedAt, cert];
       }),
+    };
+  }
+  if (kind === "refunds") {
+    const list = await prisma.refund.findMany({ where: { enrolment: inIntake }, orderBy: { createdAt: "asc" }, include: { paidBy: true, enrolment: { include: { user: true, class: { include: classInclude } } } } });
+    return {
+      header: ["Approved on", "Approved by", "Student number", "Name", "Course", "Intake", "Amount (USD)", "Reason", "Sent", "Sent on", "Method", "Reference", "Sent by"],
+      rows: list.map((r) => [r.createdAt, r.approvedByName, r.enrolment.user.studentNumber, r.enrolment.user.name, r.enrolment.class.course.title, r.enrolment.class.intake.name, r.amountCents / 100, r.reason, r.status === "PAID", r.paidOn, r.method ? METHOD_LABEL[r.method] : null, r.reference, r.paidBy?.name]),
     };
   }
   const list = await prisma.payment.findMany({ where: { status: "CONFIRMED", enrolment: inIntake }, orderBy: { decidedAt: "asc" }, include: { decidedBy: true, enrolment: { include: { user: true, class: { include: classInclude } } } } });

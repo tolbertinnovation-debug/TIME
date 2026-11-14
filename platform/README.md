@@ -47,7 +47,8 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/app/teaching-actions.ts`, `learning-actions.ts` | Lessons, review, sessions, attendance, practical sign-off, announcements; completing a lesson. |
 | `src/app/assessment-actions.ts` | Setting assessments, quiz questions, marking, results, handing in work, quizzes, appeals. |
 | `src/app/finance-actions.ts` | Reporting, confirming, rejecting and recording payments; charges; payment details; requests for more time. |
-| `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access) and working out what each student owes. |
+| `src/lib/fees.ts`, `fees-data.ts` | The fee rules (8-week balance, access, refund limits) and working out what each student owes. |
+| `src/app/finance/refunds/` | Approved refunds to send, and those sent. Requests start on the student's statement. |
 | `src/app/certificate-actions.ts` | Ending a class, requesting a certificate, revoking, paper numbering, the public check. |
 | `src/lib/certificate.ts`, `certificate-data.ts` | The certificate's wording and numbering, who qualifies, and issuing. To change the wording or address, edit `certificate.ts`. |
 | `src/app/community-actions.ts` | Class discussions, the help desk, sponsors and consent, marking notifications read. |

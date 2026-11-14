@@ -122,6 +122,7 @@ Built:
 - **Guides** for students, lecturers and facilitators, the registrar, Finance, academic leadership and administrators, in [`guides/`](guides/README.md).
 - **Going-live checklist** in [GOING-LIVE.md](GOING-LIVE.md), and a health check address (`/api/health`) for monitoring.
 - **One-step deployment.** On the live host the build checks its settings, creates the tables, loads the catalogue and creates the first administrator. Steps for Neon and Vercel are in [DEPLOY.md](DEPLOY.md).
+- **Refunds and cancelled balances.** Finance asks, academic leadership approves, Finance sends the money and records the reference. A refund can never exceed what the student has paid and not had back. Refunds appear on the student's fees page, the statement and a Refunds report.
 - **Your account.** Everyone can change their own password (other devices are signed out; five wrong current passwords lock changes for ten minutes) and their phone number. Names are corrected by the Registrar because they appear on certificates.
 - **Transcripts.** A student opens and prints their own transcript of published results. The Registrar, leadership and administrators can open any student's, to sign and stamp it.
 - **Reports.** Enrolment and results (Registrar, leadership, administrators) and confirmed payments (Finance, leadership, administrators) download as spreadsheets, for one intake or all. Every download is in the activity log.

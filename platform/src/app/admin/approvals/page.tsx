@@ -25,6 +25,11 @@ function describe(type: ApprovalType, payload: unknown, classes: Map<string, str
   if (type === "CERTIFICATE_VERIFY") return `Requests their certificate for ${cls} (result ${data.total} of 100)`;
   if (type === "CERTIFICATE_ISSUE") return `Certificate for ${cls} (result ${data.total} of 100). Record checked by ${data.verifiedBy ?? "the registrar"}`;
   if (type === "PAYMENT_ARRANGEMENT") return `Asks for until ${data.until} to pay a balance of ${formatUsd(Number(data.balanceCents) || 0)} for ${cls}`;
+  if (type === "REFUND") {
+    const amount = Number(data.amountCents) || 0;
+    const what = [amount > 0 && `refund ${formatUsd(amount)} to ${data.studentName}`, data.cancelBalance === true && `cancel what is left to pay`].filter(Boolean).join(" and ");
+    return `Asks to ${what || "make a refund"} for ${cls}. Paid and confirmed: ${formatUsd(Number(data.confirmedCents) || 0)}. Reason: ${data.reason}`;
+  }
   if (type === "GRADES") return `Asks to publish results for ${data.students} ${data.students === 1 ? "student" : "students"} in ${cls}`;
   if (type === "GRADE_APPEAL") return `Appeals their result of ${data.total} of 100 in ${cls}`;
   if (type === "COURSE_PUBLISH") return `Asks to publish ${data.lessons} ${data.lessons === 1 ? "lesson" : "lessons"} in ${courses.get(String(data.courseId)) ?? "a course that was removed"}`;

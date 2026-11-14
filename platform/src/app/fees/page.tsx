@@ -17,7 +17,7 @@ export default async function Fees({ searchParams }: { searchParams: Promise<Rec
   const params = await searchParams;
   const enrolments = await prisma.enrolment.findMany({
     where: { userId: user.id }, orderBy: { enrolledAt: "desc" },
-    include: { class: { include: { course: true, intake: true } }, charges: { orderBy: { createdAt: "asc" } }, payments: { orderBy: { createdAt: "desc" } } },
+    include: { class: { include: { course: true, intake: true } }, charges: { orderBy: { createdAt: "asc" } }, payments: { orderBy: { createdAt: "desc" } }, refunds: { where: { status: "PAID" }, orderBy: { createdAt: "asc" } } },
   });
   const [statuses, details, pending] = await Promise.all([
     feeStatuses(enrolments.map((e) => e.id)),
@@ -47,7 +47,8 @@ export default async function Fees({ searchParams }: { searchParams: Promise<Rec
               <thead><tr><th>Charged</th><th>Amount</th></tr></thead>
               <tbody>
                 {e.charges.map((c) => <tr key={c.id}><td>{CHARGE_LABEL[c.kind]}<br /><span className="muted small">{c.description}</span></td><td className="nowrap">{formatUsd(c.amountCents)}</td></tr>)}
-                <tr><td><strong>Paid and confirmed</strong></td><td className="nowrap">{formatUsd(status.paidCents)}</td></tr>
+                {e.refunds.map((r) => <tr key={r.id}><td>Refund sent to you{r.paidOn ? ` on ${formatDate(r.paidOn)}` : ""}<br /><span className="muted small">{r.reason}{r.method ? ` · ${METHOD_LABEL[r.method]}, ${r.reference}` : ""}</span></td><td className="nowrap">{formatUsd(r.amountCents)}</td></tr>)}
+                <tr><td><strong>Paid and confirmed{e.refunds.length ? ", less refunds" : ""}</strong></td><td className="nowrap">{formatUsd(status.paidCents)}</td></tr>
                 <tr><td><strong>Balance</strong></td><td className="nowrap"><strong>{formatUsd(status.balanceCents)}</strong></td></tr>
               </tbody>
             </table></div>

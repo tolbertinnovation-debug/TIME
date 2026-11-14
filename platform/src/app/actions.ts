@@ -14,6 +14,8 @@ import { classStudentIds, notify } from "@/lib/notify";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { creditToClear, formatUsd, refundableCents } from "@/lib/fees";
+import { refundFigures, refundLockKey } from "@/lib/fees-data";
 import {
   APPROVAL_LABEL, REQUESTABLE_ROLES, ROLE_LABEL, ROLES, canDecide, isRole, roleChangeProblem, suspendProblem,
   type ApprovalType, type Role,
@@ -149,7 +151,7 @@ export async function decideApprovalAction(form: FormData) {
         data: { status: decision, decidedById: user.id, decidedAt: new Date(), decisionNote: note },
       });
       if (!updated.count) return false;
-      if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload, user.name);
+      if (decision === "APPROVED") effect = await applyApproval(tx, type, request.requestedById, request.payload, user.name, id);
       // Rejected lessons go back to draft so the lecturer can fix them.
       // Rejected results are discarded so the lecturer can correct the marks and send them again.
       if (decision === "REJECTED" && type === "GRADES") {
@@ -173,7 +175,7 @@ export async function decideApprovalAction(form: FormData) {
     summary: `${user.name} ${verb} the ${APPROVAL_LABEL[type].toLowerCase()} request from ${request.requestedBy.name}`,
     entityType: "approval", entityId: id, meta: { type, payload: request.payload as Prisma.InputJsonValue, note: note ?? null },
   });
-  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : type === "CERTIFICATE_VERIFY" ? "certificate.verified" : type === "CERTIFICATE_ISSUE" ? "certificate.issued" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
+  if (effect) await audit({ actor: user, action: type === "COURSE_PUBLISH" ? "content.published" : type === "GRADES" ? "result.published" : type === "GRADE_APPEAL" ? "result.reopened" : type === "PAYMENT_ARRANGEMENT" ? "fee.arrangement_approved" : type === "CERTIFICATE_VERIFY" ? "certificate.verified" : type === "CERTIFICATE_ISSUE" ? "certificate.issued" : type === "REFUND" ? "fee.refund_approved" : "enrolment.changed", summary: effect, entityType: "user", entityId: request.requestedById });
   // Tell the person who asked what was decided.
   await notify(request.requestedById, {
     title: `${APPROVAL_LABEL[type]}: ${verb}`,
@@ -192,12 +194,12 @@ export async function decideApprovalAction(form: FormData) {
 // Where a person goes to see the outcome of each kind of request.
 const REQUEST_PAGE: Record<ApprovalType, string> = {
   STAFF_ACCESS: "/account/staff-access", APPLICATION: "/apply", ENROLMENT_CHANGE: "/my-classes", COURSE_PUBLISH: "/teach", GRADES: "/teach",
-  GRADE_APPEAL: "/my-classes", PAYMENT_ARRANGEMENT: "/fees", CERTIFICATE_VERIFY: "/certificates", CERTIFICATE_ISSUE: "/certificates",
+  GRADE_APPEAL: "/my-classes", PAYMENT_ARRANGEMENT: "/fees", CERTIFICATE_VERIFY: "/certificates", CERTIFICATE_ISSUE: "/certificates", REFUND: "/finance/refunds",
 };
 
 // What an approval does once it is granted. Runs inside the same transaction as the decision,
 // so a request is never marked approved without its effect.
-async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, requesterId: string, payload: Prisma.JsonValue, deciderName: string): Promise<string | null> {
+async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, requesterId: string, payload: Prisma.JsonValue, deciderName: string, requestId: string): Promise<string | null> {
   const data = (payload ?? {}) as Record<string, unknown>;
   if (type === "STAFF_ACCESS") {
     const role = data.role;
@@ -269,6 +271,35 @@ async function applyApproval(tx: Prisma.TransactionClient, type: ApprovalType, r
     if (!changed.count) throw new UserProblem("That enrolment no longer exists.");
     const student = await tx.user.findUniqueOrThrow({ where: { id: requesterId } });
     return `${student.name} was given until ${String(data.until)} to pay their balance`;
+  }
+  if (type === "REFUND") {
+    const enrolmentId = String(data.enrolmentId);
+    const amountCents = Number(data.amountCents) || 0;
+    const reason = String(data.reason ?? "");
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${refundLockKey(enrolmentId)}))`;
+    const enrolment = await tx.enrolment.findUnique({ where: { id: enrolmentId }, include: { user: true } });
+    if (!enrolment) throw new UserProblem("That student's enrolment no longer exists.");
+    // Check again now: a payment may have been changed since Finance asked.
+    // This request is still counted as pending, so its own amount is added back.
+    const f = await refundFigures(tx, enrolmentId);
+    if (amountCents > refundableCents({ ...f, pendingCents: f.pendingCents - amountCents })) {
+      throw new UserProblem(`Only ${formatUsd(refundableCents({ ...f, pendingCents: f.pendingCents - amountCents }))} can still be refunded on this enrolment. Reject this request and ask Finance to send a new one.`);
+    }
+    const done: string[] = [];
+    if (amountCents > 0) {
+      await tx.refund.create({ data: { enrolmentId, requestId, amountCents, reason, approvedByName: deciderName } });
+      done.push(`a refund of ${formatUsd(amountCents)} to ${enrolment.user.name} was approved`);
+    }
+    if (data.cancelBalance === true) {
+      const credit = creditToClear({ chargedCents: f.chargedCents, confirmedCents: f.confirmedCents, refundedCents: f.refundedCents + amountCents });
+      if (credit > 0) {
+        await tx.charge.create({ data: { enrolmentId, kind: "CREDIT", description: reason, amountCents: -credit } });
+        done.push(`${formatUsd(credit)} still owed by ${enrolment.user.name} was cancelled`);
+      }
+    }
+    if (!done.length) throw new UserProblem("There is nothing left to refund or cancel on this enrolment.");
+    const text = done.join(", and ");
+    return text.charAt(0).toUpperCase() + text.slice(1);
   }
   if (type === "GRADE_APPEAL") {
     // An approved appeal withdraws the published result so the lecturer can re-mark and send it again.

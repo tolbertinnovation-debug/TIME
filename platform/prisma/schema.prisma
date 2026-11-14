@@ -48,24 +48,25 @@ model User {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
-  sessions          Session[]
-  accounts          Account[]
-  activity          AuditLog[]
-  approvalsMade     ApprovalRequest[] @relation("requester")
-  approvalsDecided  ApprovalRequest[] @relation("decider")
-  enrolments        Enrolment[]
-  classStaff        ClassStaff[]
-  signOffs          LessonProgress[]
-  marked            Submission[]
-  paymentsSent      Payment[]         @relation("paymentSubmitter")
-  paymentsDecided   Payment[]         @relation("paymentDecider")
-  certificates      Certificate[]
-  notifications     Notification[]
-  posts             Post[]            @relation("postAuthor")
-  tickets           SupportTicket[]
-  supportMessages   SupportMessage[]
-  sessionsCreated   ClassSession[]
-  announcements     Announcement[]
+  sessions         Session[]
+  accounts         Account[]
+  activity         AuditLog[]
+  approvalsMade    ApprovalRequest[] @relation("requester")
+  approvalsDecided ApprovalRequest[] @relation("decider")
+  enrolments       Enrolment[]
+  classStaff       ClassStaff[]
+  signOffs         LessonProgress[]
+  marked           Submission[]
+  paymentsSent     Payment[]         @relation("paymentSubmitter")
+  paymentsDecided  Payment[]         @relation("paymentDecider")
+  refundsPaid      Refund[]          @relation("refundPayer")
+  certificates     Certificate[]
+  notifications    Notification[]
+  posts            Post[]            @relation("postAuthor")
+  tickets          SupportTicket[]
+  supportMessages  SupportMessage[]
+  sessionsCreated  ClassSession[]
+  announcements    Announcement[]
 
   @@map("user")
 }
@@ -146,19 +147,19 @@ enum DeliveryMode {
 }
 
 model Course {
-  id                String       @id // slug
+  id                String        @id // slug
   title             String
   schoolId          String
-  school            School       @relation(fields: [schoolId], references: [id])
+  school            School        @relation(fields: [schoolId], references: [id])
   programId         String
-  program           Program      @relation(fields: [programId], references: [id])
+  program           Program       @relation(fields: [programId], references: [id])
   duration          String?
   tuitionUsd        Int?
-  installments      Int          @default(1)
+  installments      Int           @default(1)
   deliveryMode      DeliveryMode
-  deliveryConfirmed Boolean      @default(false)
-  active            Boolean      @default(true)
-  sort              Int          @default(0)
+  deliveryConfirmed Boolean       @default(false)
+  active            Boolean       @default(true)
+  sort              Int           @default(0)
   classes           CourseClass[]
   modules           Module[]
 
@@ -210,19 +211,19 @@ enum ClassStatus {
 
 // A class is one running of a course: an intake, a schedule and a way of studying.
 model CourseClass {
-  id            String       @id @default(cuid())
+  id            String             @id @default(cuid())
   courseId      String
-  course        Course       @relation(fields: [courseId], references: [id])
+  course        Course             @relation(fields: [courseId], references: [id])
   intakeId      String
-  intake        Intake       @relation(fields: [intakeId], references: [id])
+  intake        Intake             @relation(fields: [intakeId], references: [id])
   track         Track
   mode          DeliveryMode
   studyCentreId String?
-  studyCentre   StudyCentre? @relation(fields: [studyCentreId], references: [id])
+  studyCentre   StudyCentre?       @relation(fields: [studyCentreId], references: [id])
   capacity      Int?
-  status        ClassStatus  @default(OPEN)
+  status        ClassStatus        @default(OPEN)
   endedAt       DateTime?
-  createdAt     DateTime     @default(now())
+  createdAt     DateTime           @default(now())
   staff         ClassStaff[]
   enrolments    Enrolment[]
   sessions      ClassSession[]
@@ -261,22 +262,23 @@ enum EnrolmentStatus {
 }
 
 model Enrolment {
-  id         String          @id @default(cuid())
-  userId     String
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  classId    String
-  class      CourseClass     @relation(fields: [classId], references: [id])
-  status     EnrolmentStatus @default(ACTIVE)
-  enrolledAt DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  progress    LessonProgress[]
-  attendance  Attendance[]
-  submissions Submission[]
-  result      Result?
-  charges     Charge[]
-  payments    Payment[]
-  certificate Certificate?
-  sponsorship Sponsorship?
+  id               String           @id @default(cuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId          String
+  class            CourseClass      @relation(fields: [classId], references: [id])
+  status           EnrolmentStatus  @default(ACTIVE)
+  enrolledAt       DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  progress         LessonProgress[]
+  attendance       Attendance[]
+  submissions      Submission[]
+  result           Result?
+  charges          Charge[]
+  payments         Payment[]
+  refunds          Refund[]
+  certificate      Certificate?
+  sponsorship      Sponsorship?
   // Set when Finance approves more time to pay: access continues until this date
   arrangementUntil DateTime?
   // Set when the student hands in their course evaluation. The evaluation itself is stored without their name.
@@ -502,6 +504,8 @@ enum ChargeKind {
   REGISTRATION
   EXAM
   OTHER
+  // A negative charge that cancels what is left to pay, e.g. after a student withdraws
+  CREDIT
 }
 
 model Charge {
@@ -717,6 +721,7 @@ enum ApprovalType {
   PAYMENT_ARRANGEMENT // a student asks for more time to pay their balance
   CERTIFICATE_VERIFY // a student requests their certificate; the registrar checks the record
   CERTIFICATE_ISSUE // the verified request goes to academic leadership, who issue the certificate
+  REFUND // Finance asks to pay money back to a student, or to cancel the rest of a balance
 }
 
 enum ApprovalStatus {
@@ -783,4 +788,34 @@ model CourseEvaluation {
 
   @@index([classId])
   @@map("course_evaluation")
+}
+
+// ---- Refunds: money paid back to a student. Asked for by Finance, approved by academic leadership,
+// then paid out and recorded by Finance. Only refunds marked paid reduce what the student has paid. ----
+
+enum RefundStatus {
+  APPROVED // approved, waiting for Finance to pay it out
+  PAID // paid out; the reference is recorded
+}
+
+model Refund {
+  id             String         @id @default(cuid())
+  enrolmentId    String
+  enrolment      Enrolment      @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  // The approval that allowed it
+  requestId      String         @unique
+  amountCents    Int
+  reason         String
+  status         RefundStatus   @default(APPROVED)
+  approvedByName String
+  method         PaymentMethod?
+  reference      String?
+  paidOn         DateTime?      @db.Date
+  paidById       String?
+  paidBy         User?          @relation("refundPayer", fields: [paidById], references: [id], onDelete: SetNull)
+  createdAt      DateTime       @default(now())
+
+  @@index([enrolmentId])
+  @@index([status])
+  @@map("refund")
 }

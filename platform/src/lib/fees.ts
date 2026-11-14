@@ -35,7 +35,8 @@ export function feeStatus(input: { chargedCents: number; paidCents: number; firs
   return { chargedCents, paidCents, balanceCents, dueAt, state, hasAccess, daysLeft };
 }
 
-export const formatUsd = (cents: number) => `US$${(cents / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
+// A negative amount (a credit) is shown with a minus sign: "\u2212US$25".
+export const formatUsd = (cents: number) => `${cents < 0 ? "\u2212" : ""}US$${(Math.abs(cents) / 100).toLocaleString("en-US", { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })}`;
 
 // Reads an amount such as "40", "40.5" or "1,250.00" into cents. Returns null if it is not a valid amount.
 export function parseAmount(input: string): number | null {
@@ -51,4 +52,20 @@ export const receiptNumber = (n: number) => `R-${String(n).padStart(6, "0")}`;
 export const normaliseReference = (ref: string) => ref.replace(/\s+/g, "").toUpperCase();
 
 export const METHOD_LABEL = { MOBILE_MONEY: "Mobile Money", BANK_TRANSFER: "Bank transfer" } as const;
-export const CHARGE_LABEL = { TUITION: "Tuition", REGISTRATION: "Registration fee", EXAM: "Examination fee", OTHER: "Other" } as const;
+export const CHARGE_LABEL = { TUITION: "Tuition", REGISTRATION: "Registration fee", EXAM: "Examination fee", OTHER: "Other", CREDIT: "Balance cancelled" } as const;
+// The kinds Finance can add by hand. A credit is only ever added by an approved refund request.
+export const MANUAL_CHARGE_KINDS = ["TUITION", "REGISTRATION", "EXAM", "OTHER"] as const;
+
+// ---- Refunds ----
+
+// The most that can still be refunded: confirmed payments, less refunds already approved or paid,
+// less refunds still waiting for approval.
+export function refundableCents(input: { confirmedCents: number; refundedCents: number; pendingCents: number }): number {
+  return Math.max(0, input.confirmedCents - input.refundedCents - input.pendingCents);
+}
+
+// The credit needed so that nothing is left to pay once refunds are made: what is charged,
+// less what the student will have paid after all refunds. Zero when nothing is owed.
+export function creditToClear(input: { chargedCents: number; confirmedCents: number; refundedCents: number }): number {
+  return Math.max(0, input.chargedCents - (input.confirmedCents - input.refundedCents));
+}

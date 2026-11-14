@@ -21,7 +21,7 @@ This notice explains what the Technical Institute for Many Empowerment (TIME) In
 | **Application and enrolment:** your county, the class you applied to, your student number, and any request to withdraw or defer | You and the Registrar |
 | **Learning:** lessons you completed, practical work signed off and by whom, attendance at sessions | You, your lecturer and your facilitator |
 | **Assessment:** your answers and work handed in, marks, feedback, results and any appeal | You and your lecturer |
-| **Fees:** what you were charged, payments you reported with their amount, method and reference, receipts, and any request for more time to pay | You and the Finance Office |
+| **Fees:** what you were charged, payments you reported with their amount, method and reference, receipts, any request for more time to pay, and any refund with its reason and reference | You and the Finance Office |
 | **Certificates:** the certificate issued to you, its number and date, and whether it has been revoked | TIME |
 | **Messages:** your posts in class discussions, your requests to the help desk and the replies | You and TIME staff |
 | **Course evaluations:** your ratings and comments about a course. These are stored without your name or any link to you; TIME records only that you handed one in | You |

@@ -60,7 +60,7 @@ export function can(role: Role, capability: Capability): boolean {
 }
 
 // Approvals. Each type has its usual approver; a system administrator can always step in.
-export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE"] as const;
+export const APPROVAL_TYPES = ["STAFF_ACCESS", "APPLICATION", "ENROLMENT_CHANGE", "COURSE_PUBLISH", "GRADES", "GRADE_APPEAL", "PAYMENT_ARRANGEMENT", "CERTIFICATE_VERIFY", "CERTIFICATE_ISSUE", "REFUND"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_LABEL: Record<ApprovalType, string> = {
@@ -73,6 +73,7 @@ export const APPROVAL_LABEL: Record<ApprovalType, string> = {
   PAYMENT_ARRANGEMENT: "More time to pay",
   CERTIFICATE_VERIFY: "Certificate: check the record",
   CERTIFICATE_ISSUE: "Certificate: approve and issue",
+  REFUND: "Refund",
 };
 
 const APPROVERS: Record<ApprovalType, readonly Role[]> = {
@@ -85,6 +86,8 @@ const APPROVERS: Record<ApprovalType, readonly Role[]> = {
   PAYMENT_ARRANGEMENT: ["FINANCE"],
   CERTIFICATE_VERIFY: ["REGISTRAR"],
   CERTIFICATE_ISSUE: ["LEADERSHIP"],
+  // Money leaving TIME is asked for by Finance and approved by academic leadership.
+  REFUND: ["LEADERSHIP"],
 };
 
 // What each kind of class staff may do. An administrator may do all of it, to step in when needed.

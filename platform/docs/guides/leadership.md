@@ -9,6 +9,7 @@ For the Dean and the Executive Director. You work from **Administration**, mostl
 | **Lessons to publish** | Read the lessons from the link in the request. | Students see the lessons at once. |
 | **Results** | Open the class results: marks in every part, totals and passes. | Students see their results and can appeal. |
 | **Result appeals** | The student's reason and the marks. | Withdraws that student's published result so the lecturer can re-mark it and send it for approval again. |
+| **Refunds** | The amount, what the student has paid, and Finance's reason. | The refund is approved for Finance to send; any balance Finance asked to cancel is cancelled at once. |
 | **Certificates** | The registrar has already checked the record. Confirm the name and the award. | The certificate is issued with the next number and can be verified by the public. |
 
 Every decision can be approved or rejected. A rejection needs a short reason, which the person who asked can read.

@@ -55,7 +55,7 @@ test("a lesson the student has opened can be read again with no connection", asy
   await ama.goto(`${URL_BASE}/learn/${classId}/l-one`);
   assert.match(await ama.locator(".lesson-body").innerText(), /daily record of money/);
   assert.match(await ama.locator(".offline-bar").innerText(), /no connection/);
-  assert.equal(await ama.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(248, 248, 243)", "the saved page keeps its styles");
+  assert.equal(await ama.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(246, 247, 242)", "the saved page keeps its styles");
 
   // A lesson that was never opened, and pages that are never kept, show the offline page instead.
   await ama.goto(`${URL_BASE}/learn/${classId}/l-two`);

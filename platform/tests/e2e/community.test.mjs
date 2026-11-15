@@ -8,7 +8,7 @@ const finance = { name: "Fiona Finance", email: "fiona@example.test", password: 
 const cy = { name: "Cy Outsider", email: "cy@example.test", password: "student-password-3" };
 const path = (page) => new URL(page.url()).pathname;
 const status = async (page, p) => (await page.goto(URL_BASE + p)).status();
-const unread = async (page) => (await page.locator('nav a[href="/notifications"] .pill').count()) ? Number((await page.locator('nav a[href="/notifications"] .pill').innerText()).match(/\d+/)[0]) : 0;
+const unread = async (page) => (await page.locator('nav a[href="/notifications"] .count').count()) ? Number((await page.locator('nav a[href="/notifications"] .count').innerText()).match(/\d+/)[0]) : 0;
 
 let classId, feesTicket;
 

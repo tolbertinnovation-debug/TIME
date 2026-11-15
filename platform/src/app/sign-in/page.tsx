@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signInAction } from "@/app/actions";
+import { AuthShell } from "@/components/auth-shell";
 import { Notices } from "@/components/notice";
 import { getCurrentUser } from "@/lib/session";
 
@@ -10,6 +11,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<R
   if (await getCurrentUser()) redirect("/dashboard");
   const params = await searchParams;
   return (
+    <AuthShell>
     <div className="card auth-card stack">
       <h1>Sign in</h1>
       <Notices params={params} />
@@ -20,5 +22,6 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<R
       </form>
       <p className="small muted">New to TIME Learning? <Link href="/sign-up">Create an account</Link>.</p>
     </div>
+    </AuthShell>
   );
 }

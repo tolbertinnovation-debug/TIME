@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signUpAction } from "@/app/actions";
+import { AuthShell } from "@/components/auth-shell";
 import { Notices } from "@/components/notice";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { getCurrentUser } from "@/lib/session";
@@ -12,6 +13,7 @@ export default async function SignUp({ searchParams }: { searchParams: Promise<R
   const params = await searchParams;
   const keep = (k: string) => (typeof params[k] === "string" ? (params[k] as string) : "");
   return (
+    <AuthShell>
     <div className="card auth-card stack">
       <h1>Create your account</h1>
       <p className="muted">Every new account starts as a student account. Staff ask for their role after signing in.</p>
@@ -26,5 +28,6 @@ export default async function SignUp({ searchParams }: { searchParams: Promise<R
       </form>
       <p className="small muted">Already registered? <Link href="/sign-in">Sign in</Link>.</p>
     </div>
+    </AuthShell>
   );
 }

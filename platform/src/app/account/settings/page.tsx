@@ -3,6 +3,7 @@ import { changePasswordAction, updatePhoneAction } from "@/app/account-actions";
 import { Notices } from "@/components/notice";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { ROLE_LABEL } from "@/lib/permissions";
+import { realEmail } from "@/lib/phone";
 import { requireUser } from "@/lib/session";
 
 export const metadata = { title: "Your account" };
@@ -20,7 +21,7 @@ export default async function AccountSettings({ searchParams }: { searchParams: 
         <h2 id="details-h">Your details</h2>
         <div className="table-wrap"><table><tbody>
           <tr><th scope="row">Name</th><td>{user.name}</td></tr>
-          <tr><th scope="row">Email</th><td>{user.email}</td></tr>
+          <tr><th scope="row">Email</th><td>{realEmail(user.email) ?? <span className="muted">None. You sign in with your phone number.</span>}</td></tr>
           <tr><th scope="row">Role</th><td>{ROLE_LABEL[user.role]}</td></tr>
         </tbody></table></div>
         <p className="small muted">Your name appears on your certificate, so only the Registrar can change it. To correct your name or email, <Link href="/help">ask through Help</Link>.</p>
@@ -28,7 +29,7 @@ export default async function AccountSettings({ searchParams }: { searchParams: 
           <div className="field">
             <label htmlFor="phone">Phone number</label>
             <input id="phone" name="phone" type="tel" autoComplete="tel" defaultValue={user.phone ?? ""} maxLength={30} />
-            <p className="small muted">So that TIME can reach you about your classes and fees. Leave it empty to remove it.</p>
+            <p className="small muted">So that TIME can reach you about your classes and fees. You can also sign in with it. Leave it empty to remove it.</p>
           </div>
           <div><button className="btn ghost" type="submit">Save phone number</button></div>
         </form>

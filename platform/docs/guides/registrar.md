@@ -33,6 +33,10 @@ When teaching has finished and results are published, open the class and choose 
 - **Transcripts:** under **Accounts**, find the student and choose **Transcript**. Print it, then sign and stamp it to make it official. It shows published results only. Each time you open one, it is recorded in the activity log.
 - **Reports:** download the **Enrolment** report or the **Results** report for one intake or all of them. The files open in Excel and can be sent to the Ministry of Education. They hold personal information: share them only with those who need them.
 
+## Students without email
+
+A student can open an account with a phone number instead of an email. Find them under **Accounts** by typing the number in any form. If they forget their password, an administrator sets a new one; give it to them in person or by phone.
+
 ## Help desk and sponsors
 
 - **Help desk** shows students' requests about accounts, classes and technical problems. Reply there; the student is notified.

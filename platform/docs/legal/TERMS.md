@@ -9,7 +9,7 @@ TIME Learning is the online learning platform of the Technical Institute for Man
 ## 1. Your account
 
 - Give your real, full name. It is printed on your certificate exactly as you enter it.
-- Give an email address you can use. It is how you sign in.
+- Give an email address or a phone number you use. Either can be used to sign in, and one number can belong to only one account.
 - Keep your password secret. Do not share your account or let anyone else study, take a quiz or hand in work in your name.
 - Tell TIME at once if you think someone else has used your account.
 - One person may hold one account.

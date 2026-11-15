@@ -40,6 +40,8 @@ model User {
   emailVerified Boolean    @default(false)
   image         String?
   phone         String?
+  // The phone number in one standard form ("+231777123456"), for signing in with it. One account per number.
+  phoneKey      String?    @unique
   role          Role       @default(STUDENT)
   status        UserStatus @default(ACTIVE)
   // Given once, when the person is first enrolled, e.g. "TIME-2027-0001"

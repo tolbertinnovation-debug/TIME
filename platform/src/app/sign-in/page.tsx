@@ -14,7 +14,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<R
       <h1>Sign in</h1>
       <Notices params={params} />
       <form className="form" action={signInAction}>
-        <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" required defaultValue={typeof params.email === "string" ? params.email : ""} /></div>
+        <div className="field"><label htmlFor="email">Email address or phone number</label><input id="email" name="email" type="text" inputMode="email" autoComplete="username" autoCapitalize="none" spellCheck={false} required defaultValue={typeof params.email === "string" ? params.email : ""} /></div>
         <div className="field"><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="current-password" required /></div>
         <button className="btn" type="submit">Sign in</button>
       </form>

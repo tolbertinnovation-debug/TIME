@@ -15,7 +15,7 @@ Before the platform opens to students, follow the [going-live checklist](../GOIN
 
 ## The same for everyone
 
-- **Sign in** with your email and password. After 5 wrong passwords, sign-in locks for 10 minutes.
+- **Sign in** with your email address or your phone number, and your password. A phone number can be written any way (`0777 123 456`, `+231 777 123 456`). After 5 wrong passwords, sign-in locks for 10 minutes.
 - **Your account:** choose your name at the top of any page to change your password or phone number. Changing your password signs you out on every other phone or computer.
 - **Forgot your password?** Ask an administrator (or use **Help**). They set a new one; sign in with it, then change it under **Your account** to one only you know.
 - **Your name** is printed on certificates, so only the Registrar can correct it. Ask through **Help**.

@@ -14,6 +14,7 @@ import { classStudentIds, notify } from "@/lib/notify";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { formatPhone, normalisePhone, phoneOnlyEmail } from "@/lib/phone";
 import { creditToClear, formatUsd, refundableCents } from "@/lib/fees";
 import { refundFigures, refundLockKey } from "@/lib/fees-data";
 import {
@@ -26,27 +27,41 @@ import { requireUser, type CurrentUser } from "@/lib/session";
 
 const signUpSchema = z.object({
   name: z.string().trim().min(2, "Enter your full name.").max(100, "That name is too long."),
-  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email address, like name@example.com.")),
+  email: z.string().trim().toLowerCase().pipe(z.email("Enter a valid email address, like name@example.com.")).optional(),
   phone: z.string().trim().max(30, "That phone number is too long.").optional(),
   password: z.string().min(MIN_PASSWORD, `Choose a password of at least ${MIN_PASSWORD} characters.`).max(128, "That password is too long."),
 });
 
+// An account can be opened with an email address, a phone number, or both.
+// With a phone number, the number can be used to sign in, so it must belong to no other account.
 export async function signUpAction(form: FormData) {
   const parsed = signUpSchema.safeParse({
-    name: form.get("name"), email: form.get("email"), phone: form.get("phone") || undefined, password: form.get("password"),
+    name: form.get("name"), email: form.get("email") || undefined, phone: form.get("phone") || undefined, password: form.get("password"),
   });
-  const keep = { name: String(form.get("name") ?? ""), email: String(form.get("email") ?? "") };
+  const keep = { name: String(form.get("name") ?? ""), email: String(form.get("email") ?? ""), phone: String(form.get("phone") ?? "") };
   if (!parsed.success) back("/sign-up", "error", firstProblem(parsed.error), keep);
+  const { name, email, phone, password } = parsed.data;
+  if (!email && !phone) back("/sign-up", "error", "Enter your email address or your phone number.", keep);
+  const phoneKey = phone ? normalisePhone(phone) : null;
+  if (phone && !phoneKey) back("/sign-up", "error", "Enter a phone number using digits, for example 0777 123 456.", keep);
+  if (phoneKey && (await prisma.user.findUnique({ where: { phoneKey } }))) {
+    back("/sign-up", "error", "An account with that phone number already exists. Sign in instead.", keep);
+  }
 
   let problem: string | null = null;
   try {
-    await auth.api.signUpEmail({ body: parsed.data });
+    await auth.api.signUpEmail({ body: { name, email: email ?? phoneOnlyEmail(phoneKey!), password, phone: phoneKey ? formatPhone(phoneKey) : undefined } });
   } catch (e) {
     problem = e instanceof APIError && e.status === "UNPROCESSABLE_ENTITY"
-      ? "An account with that email already exists. Sign in instead."
+      ? (email ? "An account with that email already exists. Sign in instead." : "An account with that phone number already exists. Sign in instead.")
       : e instanceof APIError ? e.message : "We couldn't create your account. Please try again.";
   }
   if (problem) back("/sign-up", "error", problem, keep);
+  if (phoneKey) {
+    // Recorded straight after the account is made. If someone else took the number in that moment,
+    // the account stays usable by email (or the Registrar sorts it out); sign-in by phone needs this.
+    await prisma.user.updateMany({ where: { email: email ?? phoneOnlyEmail(phoneKey), phoneKey: null }, data: { phoneKey } }).catch(() => undefined);
+  }
   redirect("/dashboard");
 }
 
@@ -54,29 +69,48 @@ const MAX_FAILED_SIGN_INS = 5;
 const LOCK_MINUTES = 10;
 
 const signInSchema = z.object({
-  email: z.string().trim().toLowerCase().pipe(z.email("Enter the email address you registered with.")),
+  login: z.string().trim().min(1, "Enter your email address or phone number.").max(200, "That is too long."),
   password: z.string().min(1, "Enter your password."),
 });
 
+// Signs in with an email address or a phone number.
 export async function signInAction(form: FormData) {
-  const parsed = signInSchema.safeParse({ email: form.get("email"), password: form.get("password") });
+  const parsed = signInSchema.safeParse({ login: form.get("email"), password: form.get("password") });
   const keep = { email: String(form.get("email") ?? "") };
   if (!parsed.success) back("/sign-in", "error", firstProblem(parsed.error), keep);
+  const { login, password } = parsed.data;
 
-  // Slow down password guessing: after 5 failed tries for one email, wait 10 minutes.
-  const { email } = parsed.data;
+  // Find the account's email address. A phone number is looked up; anything with "@" is an email.
+  let email: string | null;
+  let tried: string;
+  if (login.includes("@")) {
+    email = login.toLowerCase();
+    tried = email;
+  } else {
+    const phoneKey = normalisePhone(login);
+    if (!phoneKey) back("/sign-in", "error", "Enter the email address or phone number you registered with.", keep);
+    const owner = await prisma.user.findUnique({ where: { phoneKey }, select: { email: true } });
+    email = owner?.email ?? null;
+    tried = phoneKey;
+  }
+  // Wrong passwords are counted per account, whichever way the person signs in, so using the email
+  // and the phone number in turn does not give twice as many tries.
+  const lockKey = email ?? tried;
+
+  // Slow down password guessing: after 5 failed tries for one account, wait 10 minutes.
   const recentFailures = await prisma.auditLog.count({
-    where: { action: "auth.sign_in_failed", entityType: "email", entityId: email, createdAt: { gte: new Date(Date.now() - LOCK_MINUTES * 60_000) } },
+    where: { action: "auth.sign_in_failed", entityType: "email", entityId: lockKey, createdAt: { gte: new Date(Date.now() - LOCK_MINUTES * 60_000) } },
   });
   if (recentFailures >= MAX_FAILED_SIGN_INS) back("/sign-in", "error", `Too many failed attempts. Wait ${LOCK_MINUTES} minutes and try again.`, keep);
 
   let problem: string | null = null;
   try {
-    await auth.api.signInEmail({ body: parsed.data });
+    if (!email) throw new Error("No account with that phone number.");
+    await auth.api.signInEmail({ body: { email, password } });
   } catch (e) {
     const suspended = e instanceof APIError && e.status === "FORBIDDEN";
-    problem = suspended ? e.message : "That email or password is not correct.";
-    if (!suspended) await audit({ actor: null, action: "auth.sign_in_failed", summary: `Failed sign-in for ${email}`, entityType: "email", entityId: email });
+    problem = suspended ? e.message : login.includes("@") ? "That email or password is not correct." : "That phone number or password is not correct.";
+    if (!suspended) await audit({ actor: null, action: "auth.sign_in_failed", summary: `Failed sign-in for ${tried}`, entityType: "email", entityId: lockKey });
   }
   if (problem) back("/sign-in", "error", problem, keep);
   redirect("/dashboard");

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contactOf } from "@/lib/phone";
 import { approveSelectedAction, decideApprovalAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
@@ -87,7 +88,7 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
                 {bulk.length >= 2 && bulkIds.has(r.id) && (
                   <input type="checkbox" name="ids" value={r.id} form="bulk-approve" aria-label={`Tick ${r.requestedBy.name}'s application`} style={{ width: 20, height: 20, minHeight: 0, marginRight: 10, verticalAlign: "middle" }} />
                 )}
-                {r.requestedBy.name} <span className="muted small">· {r.requestedBy.email}</span>
+                {r.requestedBy.name} <span className="muted small">· {contactOf(r.requestedBy)}</span>
               </h2>
               <span className={`pill ${cls}`}>{label}</span>
             </div>

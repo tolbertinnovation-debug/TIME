@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contactOf, normalisePhone } from "@/lib/phone";
 import { changeRoleAction, setStatusAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
@@ -17,7 +18,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
   const role = isRole(params.role) ? params.role : null;
   const page = Math.max(1, Number(params.page) || 1);
   const where: Prisma.UserWhereInput = {
-    ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { studentNumber: { contains: q, mode: "insensitive" } }] } : {}),
+    ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { email: { contains: q, mode: "insensitive" } }, { studentNumber: { contains: q, mode: "insensitive" } }, ...(normalisePhone(q) ? [{ phoneKey: normalisePhone(q) }] : [])] } : {}),
     ...(role ? { role } : {}),
   };
   const [users, total] = await Promise.all([
@@ -32,8 +33,8 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
         <h1>Accounts</h1>
         <Notices params={params} />
         <form className="inline-form" method="get" role="search">
-          <label className="skip" htmlFor="q">Search by name or email</label>
-          <input id="q" name="q" type="search" placeholder="Name, email or student no." defaultValue={q} />
+          <label className="skip" htmlFor="q">Search by name, email, phone or student number</label>
+          <input id="q" name="q" type="search" placeholder="Name, email, phone or student no." defaultValue={q} />
           <label className="skip" htmlFor="role-filter">Role</label>
           <select id="role-filter" name="role" defaultValue={role ?? ""}>
             <option value="">All roles</option>
@@ -49,7 +50,7 @@ export default async function Users({ searchParams }: { searchParams: Promise<Re
           {users.map((u) => (
             <tr key={u.id}>
               <td>{u.name}{u.id === me.id && <span className="muted small"> (you)</span>}</td>
-              <td>{u.email}</td>
+              <td>{contactOf(u)}</td>
               <td className="nowrap">{u.studentNumber ?? "—"}{u.role === "STUDENT" && can(me.role, "records.view") && <><br /><Link className="small" href={`/transcript/${u.id}`}>Transcript</Link></>}</td>
               <td className="nowrap">{formatDate(u.createdAt)}</td>
               <td><span className={`pill ${u.status === "ACTIVE" ? "ok" : "bad"}`}>{u.status === "ACTIVE" ? "Active" : "Suspended"}</span></td>

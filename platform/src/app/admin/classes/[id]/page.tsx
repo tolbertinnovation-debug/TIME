@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contactOf } from "@/lib/phone";
 import { notFound } from "next/navigation";
 import { assignStaffAction, removeStaffAction, setClassStatusAction } from "@/app/academic-actions";
 import { endClassAction } from "@/app/certificate-actions";
@@ -54,7 +55,7 @@ export default async function ClassPage({ params, searchParams }: { params: Prom
           <tbody>
             {cls.staff.map((s) => (
               <tr key={s.userId}>
-                <td>{s.user.name}</td><td>{ROLE_LABEL[s.role]}</td><td>{s.user.email}</td>
+                <td>{s.user.name}</td><td>{ROLE_LABEL[s.role]}</td><td>{contactOf(s.user)}</td>
                 {manage && <td><form action={removeStaffAction}><input type="hidden" name="classId" value={cls.id} /><input type="hidden" name="userId" value={s.userId} /><button className="btn ghost sm" type="submit">Remove</button></form></td>}
               </tr>
             ))}

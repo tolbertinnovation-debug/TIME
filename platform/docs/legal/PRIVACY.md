@@ -17,7 +17,7 @@ This notice explains what the Technical Institute for Many Empowerment (TIME) In
 
 | Information | Where it comes from |
 |---|---|
-| **Account:** your name, email address, and your password in a scrambled form that nobody can read | You, when you create an account |
+| **Account:** your name, your email address and/or phone number (either can be used to sign in), and your password in a scrambled form that nobody can read | You, when you create an account |
 | **Application and enrolment:** your county, the class you applied to, your student number, and any request to withdraw or defer | You and the Registrar |
 | **Learning:** lessons you completed, practical work signed off and by whom, attendance at sessions | You, your lecturer and your facilitator |
 | **Assessment:** your answers and work handed in, marks, feedback, results and any appeal | You and your lecturer |

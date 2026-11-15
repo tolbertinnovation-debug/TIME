@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { realEmail } from "@/lib/phone";
 import { notFound } from "next/navigation";
 import { replyTicketAction } from "@/app/community-actions";
 import { Notices } from "@/components/notice";
@@ -23,7 +24,7 @@ export default async function Ticket({ params, searchParams }: { params: Promise
       <div className="stack">
         <p className="small"><Link href={staff ? "/admin/support" : "/help"}>{staff ? "Help desk" : "Help"}</Link></p>
         <div className="row between"><h1>{ticket.subject}</h1><span className={`pill ${STATUS[ticket.status][0]}`}>{STATUS[ticket.status][1]}</span></div>
-        <p className="muted">{SUPPORT_LABEL[ticket.category]}{staff ? ` · from ${ticket.user.name} (${ROLE_LABEL[ticket.user.role]}), ${ticket.user.email}${ticket.user.phone ? `, ${ticket.user.phone}` : ""}` : ""}</p>
+        <p className="muted">{SUPPORT_LABEL[ticket.category]}{staff ? ` · from ${ticket.user.name} (${ROLE_LABEL[ticket.user.role]}), ${[realEmail(ticket.user.email), ticket.user.phone].filter(Boolean).join(", ")}` : ""}</p>
         <Notices params={await searchParams} />
       </div>
       {ticket.messages.map((m) => (

@@ -3,6 +3,7 @@
 ## 1. Start
 
 1. Open the platform and choose **Create account**. Use your real name: it is printed on your certificate.
+   - Give your **email address, your phone number, or both**. You can sign in with either. Without an email, a forgotten password is reset by the TIME office.
 2. Choose **Apply**, pick your class, enter your county and choose **Send application**.
 3. The registrar approves or rejects it. You get a notification either way. On approval you receive a student number (for example TIME-2027-0001).
 

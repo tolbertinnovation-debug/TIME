@@ -255,3 +255,7 @@ details > summary { cursor: pointer; }
   tbody td:first-child { min-width: 7.5em; }
   .card { padding: 18px; }
 }
+.auth-back { margin-top: 18px; font-size: .88rem; position: relative; z-index: 1; }
+.auth-back a { color: #d9e6b8; font-weight: 600; }
+.auth-back a:hover { color: #fff; }
+@media (max-width: 719px) { .auth-back { margin-top: 10px; } }

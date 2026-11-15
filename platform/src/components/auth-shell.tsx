@@ -10,6 +10,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <li><strong>Study with little data.</strong> Save lessons on your phone and read them offline.</li>
           <li><strong>Fees and certificates.</strong> Pay by Mobile Money or bank, then request your certificate when you finish.</li>
         </ul>
+        <p className="auth-back"><a href="https://tolbertinnovation-debug.github.io/TIME/">‹ Back to the TIME Inc. website</a></p>
       </section>
       {children}
     </div>

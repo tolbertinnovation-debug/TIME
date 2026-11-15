@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { contactOf } from "@/lib/phone";
 import { notFound } from "next/navigation";
 import { resetPasswordAction } from "@/app/academic-actions";
 import { Notices } from "@/components/notice";
@@ -18,7 +19,7 @@ export default async function ResetPassword({ params, searchParams }: { params: 
       <div className="stack">
         <p className="small"><Link href="/admin/users">Accounts</Link></p>
         <h1>Set a new password</h1>
-        <p className="muted">For <strong>{target.name}</strong> ({target.email}). Check who you are speaking to first. The person is signed out everywhere, and this is recorded in the activity log.</p>
+        <p className="muted">For <strong>{target.name}</strong> ({contactOf(target)}). Check who you are speaking to first. The person is signed out everywhere, and this is recorded in the activity log.</p>
         <Notices params={await searchParams} />
       </div>
       <form className="card form" action={resetPasswordAction}>

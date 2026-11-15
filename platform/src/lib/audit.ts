@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/db";
+import { contactOf } from "@/lib/phone";
 import type { Prisma } from "@/generated/prisma/client";
 
-type Actor = { id: string; name: string; email: string } | null;
+type Actor = { id: string; name: string; email: string; phone?: string | null } | null;
 
 // Record one line in the activity log. Call this for every sign-in and every change that matters.
 export async function audit(entry: {
@@ -15,7 +16,7 @@ export async function audit(entry: {
   await prisma.auditLog.create({
     data: {
       actorId: entry.actor?.id ?? null,
-      actorLabel: entry.actor ? `${entry.actor.name} <${entry.actor.email}>` : "System",
+      actorLabel: entry.actor ? `${entry.actor.name} <${contactOf(entry.actor)}>` : "System",
       action: entry.action,
       summary: entry.summary,
       entityType: entry.entityType,

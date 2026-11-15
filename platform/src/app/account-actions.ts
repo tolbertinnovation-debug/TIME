@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth";
 import { MIN_PASSWORD } from "@/lib/auth-core";
 import { audit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { formatPhone, isPhoneOnlyEmail, normalisePhone } from "@/lib/phone";
 import { requireUser } from "@/lib/session";
 
 const PAGE = "/account/settings";
@@ -49,17 +50,30 @@ export async function changePasswordAction(form: FormData) {
   back(PAGE, "ok", "Your password has been changed. You were signed out on every other device.");
 }
 
-const phoneSchema = z.string().trim().max(30, "That phone number is too long.")
-  .refine((v) => v === "" || /^\+?[0-9 ()-]{7,}$/.test(v), "Enter a phone number using digits, for example 0777 123 456 or +231 777 123 456.");
-
-// A person updates the phone number TIME can reach them on. Names are changed by the Registrar, because they appear on certificates.
+// A person updates the phone number TIME can reach them on, which is also a way to sign in.
+// Names are changed by the Registrar, because they appear on certificates.
 export async function updatePhoneAction(form: FormData) {
   const user = await requireUser();
-  const parsed = phoneSchema.safeParse(String(form.get("phone") ?? ""));
-  if (!parsed.success) back(PAGE, "error", firstProblem(parsed.error));
-  const phone = parsed.data || null;
-  if (phone === user.phone) back(PAGE, "ok", "Nothing changed.");
-  await prisma.user.update({ where: { id: user.id }, data: { phone } });
-  await audit({ actor: user, action: "user.phone_changed", summary: `${user.name} ${phone ? "updated their phone number" : "removed their phone number"}`, entityType: "user", entityId: user.id });
-  back(PAGE, "ok", phone ? "Your phone number has been saved." : "Your phone number has been removed.");
+  const input = String(form.get("phone") ?? "").trim().slice(0, 30);
+  const me = await prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { email: true, phoneKey: true } });
+  if (!input) {
+    // An account opened with a phone number signs in with it, so the number cannot be removed.
+    if (isPhoneOnlyEmail(me.email)) back(PAGE, "error", "You sign in with your phone number, so it cannot be removed. You can change it to a new number.");
+    if (!me.phoneKey && !user.phone) back(PAGE, "ok", "Nothing changed.");
+    await prisma.user.update({ where: { id: user.id }, data: { phone: null, phoneKey: null } });
+    await audit({ actor: user, action: "user.phone_changed", summary: `${user.name} removed their phone number`, entityType: "user", entityId: user.id });
+    back(PAGE, "ok", "Your phone number has been removed.");
+  }
+  const phoneKey = normalisePhone(input);
+  if (!phoneKey) back(PAGE, "error", "Enter a phone number using digits, for example 0777 123 456 or +231 777 123 456.");
+  if (phoneKey === me.phoneKey) back(PAGE, "ok", "Nothing changed.");
+  const taken = await prisma.user.findUnique({ where: { phoneKey }, select: { id: true } });
+  if (taken && taken.id !== user.id) back(PAGE, "error", "That phone number belongs to another account. Ask through Help if it is yours.");
+  try {
+    await prisma.user.update({ where: { id: user.id }, data: { phone: formatPhone(phoneKey), phoneKey } });
+  } catch {
+    back(PAGE, "error", "That phone number belongs to another account. Ask through Help if it is yours.");
+  }
+  await audit({ actor: user, action: "user.phone_changed", summary: `${user.name} updated their phone number`, entityType: "user", entityId: user.id });
+  back(PAGE, "ok", "Your phone number has been saved. You can also sign in with it.");
 }

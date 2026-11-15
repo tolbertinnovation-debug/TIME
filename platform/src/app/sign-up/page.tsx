@@ -18,8 +18,9 @@ export default async function SignUp({ searchParams }: { searchParams: Promise<R
       <Notices params={params} />
       <form className="form" action={signUpAction}>
         <div className="field"><label htmlFor="name">Full name</label><input id="name" name="name" type="text" autoComplete="name" required maxLength={100} defaultValue={keep("name")} /></div>
-        <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" required defaultValue={keep("email")} /></div>
-        <div className="field"><label htmlFor="phone">Phone or WhatsApp <span className="muted">(optional)</span></label><input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={30} placeholder="+231 …" /></div>
+        <p className="small">Give your email address, your phone number, or both. You can sign in with either.</p>
+        <div className="field"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" defaultValue={keep("email")} /></div>
+        <div className="field"><label htmlFor="phone">Phone number</label><input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={30} placeholder="0777 123 456" defaultValue={keep("phone")} aria-describedby="phone-hint" /><span className="hint" id="phone-hint">Without an email, a forgotten password is reset by the TIME office, not by email.</span></div>
         <div className="field"><label htmlFor="password">Password</label><input id="password" name="password" type="password" autoComplete="new-password" required minLength={MIN_PASSWORD} maxLength={128} aria-describedby="password-hint" /><span className="hint" id="password-hint">At least {MIN_PASSWORD} characters.</span></div>
         <button className="btn" type="submit">Create account</button>
       </form>

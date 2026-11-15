@@ -812,3 +812,29 @@ input:focus-visible,textarea:focus-visible,select:focus-visible {outline:3px sol
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after {scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+
+/* Links to TIME Learning, the online platform */
+.topbar-portal { display: inline-flex; align-items: center; gap: 14px; }
+.topbar-portal a { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.topbar-portal a:first-child { color: #c9d65a; }
+@media (max-width: 560px) { .topbar-portal .hide-sm { display: none; } }
+.nav .btn-portal { margin-left: 10px; padding: 10px 16px; background: transparent; color: var(--olive-deep); border: 1.5px solid var(--olive); }
+.nav .btn-portal:hover { background: var(--olive-soft); color: var(--olive-deep); }
+@media (max-width: 1180px) { .nav .btn-portal { margin: 16px 0 0; justify-content: center; } .nav .btn-portal + .btn { margin-top: 10px; } }
+@media (min-width: 1181px) and (max-width: 1320px) {
+  .brand-sub { display: none; }
+  .site-header .wrap { gap: 12px; }
+  .nav a { padding-inline: 8px; font-size: .92rem; }
+  .nav .btn { padding-inline: 13px; margin-left: 4px; }
+}
+/* The figures below pull up by 56px, so the band leaves room for them. */
+.portal-band { background: linear-gradient(135deg, var(--olive-deep) 0%, #3d4510 100%); color: #f1f2e8; padding: clamp(28px, 5vw, 48px) 0 calc(clamp(28px, 5vw, 48px) + 56px); }
+.portal-inner { display: grid; gap: 22px 40px; align-items: center; }
+@media (min-width: 860px) { .portal-inner { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+.portal-band h2 { color: #fff; font-size: clamp(1.45rem, 3vw, 2rem); margin: 8px 0 12px; }
+.portal-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.portal-points li { position: relative; padding-left: 26px; color: #e6e9d4; }
+.portal-points li::before { content: "\2713"; position: absolute; left: 0; top: 1px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .16); color: #fff; font-size: .7rem; font-weight: 800; }
+.portal-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.portal-actions .btn { flex: 1 1 200px; justify-content: center; }
+.portal-note { flex-basis: 100%; font-size: .88rem; color: #d7dcbc; margin: 2px 0 0; }

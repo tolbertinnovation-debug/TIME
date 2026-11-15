@@ -6,6 +6,10 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
+// The address of TIME Learning, the online platform. Every link marked data-portal="<page>" on the
+// site points to <PORTAL_URL>/<page>. To move the platform (for example to TIME's own domain), change
+// this line and run `npm run layout`.
+export const PORTAL_URL = 'https://time-learning.vercel.app';
 // Pages that should highlight a different main-menu item than their own.
 export const MENU_PAGE = {};
 
@@ -34,7 +38,8 @@ export function render(page, html) {
     if (j < 0) throw new Error(`${page}: ${name} is not closed (${end})`);
     html = html.slice(0, i) + partial(name, page) + html.slice(j + end.length);
   }
-  return html;
+  // Links to the learning platform, wherever they appear on the page.
+  return html.replace(/href="[^"]*" data-portal="([a-z-]+)"/g, (_, to) => `href="${PORTAL_URL}/${to}" data-portal="${to}"`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

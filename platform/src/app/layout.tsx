@@ -22,6 +22,9 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { themeColor: "#435e25", width: "device-width", initialScale: 1 };
 
+// TIME's public website, linked from the footer so students can find their way back.
+const WEBSITE = "https://tolbertinnovation-debug.github.io/TIME/";
+
 // "Ama Kollie" -> "AK", for the round badge beside a person's name.
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -86,6 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <p>Mid-Liberia Christian School System, Ben&apos;s Town Community, Marshall Education District, Margibi County, Liberia</p>
             </div>
             <nav className="footer-links" aria-label="Footer">
+              <a href={WEBSITE}>TIME Inc. website</a>
               <Link href="/verify">Check a certificate</Link>
               {user && <Link href="/help">Help</Link>}
             </nav>

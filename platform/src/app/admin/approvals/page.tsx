@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { decideApprovalAction } from "@/app/actions";
+import { approveSelectedAction, decideApprovalAction } from "@/app/actions";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 import { classLabel } from "@/lib/academics";
 import { formatUsd } from "@/lib/fees";
-import { APPROVAL_LABEL, canDecide, isRole, ROLE_LABEL, visibleApprovalTypes, type ApprovalType } from "@/lib/permissions";
+import { APPROVAL_LABEL, BULK_APPROVAL_LIMIT, BULK_APPROVAL_TYPES, canDecide, isRole, ROLE_LABEL, visibleApprovalTypes, type ApprovalType } from "@/lib/permissions";
 import { requireApprovalsAccess } from "@/lib/session";
 
 export const metadata = { title: "Approvals" };
@@ -50,6 +50,9 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
   const classes = new Map((await prisma.courseClass.findMany({ where: { id: { in: classIds } }, include: { course: true, intake: true } })).map((c) => [c.id, classLabel(c)]));
   const courseIds = [...new Set(requests.filter((r) => r.type === "COURSE_PUBLISH").map((r) => String((r.payload as { courseId?: unknown }).courseId)))];
   const courses = new Map((await prisma.course.findMany({ where: { id: { in: courseIds } } })).map((c) => [c.id, c.title]));
+  // Applications this person can approve together (never their own).
+  const bulk = decided ? [] : requests.filter((r) => (BULK_APPROVAL_TYPES as readonly string[]).includes(r.type) && canDecide(me.role, r.type as ApprovalType) && r.requestedById !== me.id).slice(0, BULK_APPROVAL_LIMIT);
+  const bulkIds = new Set(bulk.map((r) => r.id));
   return (
     <div className="stack lg">
       <div className="stack">
@@ -61,6 +64,17 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
           <Link href="/admin/approvals?show=decided" aria-current={decided ? "page" : undefined}>Decided</Link>
         </nav>
       </div>
+      {bulk.length >= 2 && (
+        <form id="bulk-approve" className="card stack" action={approveSelectedAction} style={{ background: "var(--olive-soft)" }}>
+          <h2>Approve applications together</h2>
+          <p className="small">Tick the applications below, or approve all {bulk.length} at once. Each is still checked on its own: one whose class is full is not approved, and you are told. To reject one, use its own Reject button with a reason.</p>
+          {bulk.map((r) => <input key={r.id} type="hidden" name="allIds" value={r.id} />)}
+          <div className="row">
+            <button className="btn" type="submit" name="mode" value="ticked">Approve ticked applications</button>
+            <button className="btn ghost" type="submit" name="mode" value="all">Approve all {bulk.length} applications</button>
+          </div>
+        </form>
+      )}
       {requests.length === 0 && <p className="card">{decided ? "No decisions yet." : "Nothing is waiting for a decision."}</p>}
       {requests.map((r) => {
         const type = r.type as ApprovalType;
@@ -69,7 +83,12 @@ export default async function Approvals({ searchParams }: { searchParams: Promis
         return (
           <article className="card stack" key={r.id}>
             <div className="row between">
-              <h2>{r.requestedBy.name} <span className="muted small">· {r.requestedBy.email}</span></h2>
+              <h2>
+                {bulk.length >= 2 && bulkIds.has(r.id) && (
+                  <input type="checkbox" name="ids" value={r.id} form="bulk-approve" aria-label={`Tick ${r.requestedBy.name}'s application`} style={{ width: 20, height: 20, minHeight: 0, marginRight: 10, verticalAlign: "middle" }} />
+                )}
+                {r.requestedBy.name} <span className="muted small">· {r.requestedBy.email}</span>
+              </h2>
               <span className={`pill ${cls}`}>{label}</span>
             </div>
             <p><span className="pill plain">{APPROVAL_LABEL[type]}</span> {describe(type, r.payload, classes, courses)} <span className="muted small">· sent {formatDateTime(r.createdAt)}</span></p>

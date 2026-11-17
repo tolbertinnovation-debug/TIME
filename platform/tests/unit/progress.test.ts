@@ -25,3 +25,30 @@ describe("attendance", () => {
     expect(attendancePercent(["EXCUSED"])).toBeNull();
   });
 });
+
+import { dayDistance, neighbours } from "../../src/lib/progress";
+
+describe("moving between lessons", () => {
+  const lessons = [{ id: "a" }, { id: "b" }, { id: "c" }];
+  it("finds the lessons before and after", () => {
+    expect(neighbours(lessons, "b")).toEqual({ previous: { id: "a" }, next: { id: "c" } });
+  });
+  it("has nothing before the first or after the last", () => {
+    expect(neighbours(lessons, "a")).toEqual({ previous: null, next: { id: "b" } });
+    expect(neighbours(lessons, "c")).toEqual({ previous: { id: "b" }, next: null });
+  });
+  it("gives nothing for a lesson that is not in the course", () => {
+    expect(neighbours(lessons, "x")).toEqual({ previous: null, next: null });
+  });
+});
+
+describe("how far away a date is", () => {
+  const now = new Date("2027-03-10T15:00:00Z");
+  it("counts whole days, whatever the time of day", () => {
+    expect(dayDistance(new Date("2027-03-10T23:30:00Z"), now)).toBe("today");
+    expect(dayDistance(new Date("2027-03-11T00:10:00Z"), now)).toBe("tomorrow");
+    expect(dayDistance(new Date("2027-03-13T09:00:00Z"), now)).toBe("in 3 days");
+    expect(dayDistance(new Date("2027-03-09T08:00:00Z"), now)).toBe("yesterday");
+    expect(dayDistance(new Date("2027-03-05T08:00:00Z"), now)).toBe("5 days ago");
+  });
+});

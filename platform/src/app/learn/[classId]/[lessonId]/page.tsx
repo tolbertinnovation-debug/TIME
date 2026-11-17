@@ -6,6 +6,7 @@ import { Notices } from "@/components/notice";
 import { requireEnrolment } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/format";
+import { neighbours } from "@/lib/progress";
 
 export const metadata = { title: "Lesson" };
 
@@ -16,6 +17,11 @@ export default async function LessonPage({ params, searchParams }: { params: Pro
   const lesson = await prisma.lesson.findFirst({ where: { id: lessonId, status: "PUBLISHED", module: { courseId: cls.courseId } }, include: { module: true } });
   if (!lesson) notFound();
   const progress = await prisma.lessonProgress.findUnique({ where: { enrolmentId_lessonId: { enrolmentId: enrolment.id, lessonId } }, include: { signedOffBy: true } });
+  // The lessons before and after this one, in the order of the course.
+  const modules = await prisma.module.findMany({ where: { courseId: cls.courseId }, orderBy: { sort: "asc" }, select: { lessons: { where: { status: "PUBLISHED" }, orderBy: { sort: "asc" }, select: { id: true, title: true } } } });
+  const all = modules.flatMap((m) => m.lessons);
+  const { previous, next } = neighbours(all, lessonId);
+  const position = all.findIndex((l) => l.id === lessonId) + 1;
   return (
     <article className="stack lg">
       <div className="stack">
@@ -39,6 +45,11 @@ export default async function LessonPage({ params, searchParams }: { params: Pro
         ) : null}
         <p className="small"><Link href={`/learn/${classId}`}>Back to all lessons</Link></p>
       </div>
+      <nav className="lesson-nav" aria-label="Lessons">
+        {previous ? <Link className="lesson-step" href={`/learn/${classId}/${previous.id}`}><span className="small muted">‹ Previous lesson</span><strong>{previous.title}</strong></Link> : <span />}
+        <span className="small muted lesson-count">Lesson {position} of {all.length}</span>
+        {next ? <Link className="lesson-step next" href={`/learn/${classId}/${next.id}`}><span className="small muted">Next lesson ›</span><strong>{next.title}</strong></Link> : <span />}
+      </nav>
     </article>
   );
 }

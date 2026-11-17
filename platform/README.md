@@ -55,6 +55,7 @@ The browser tests empty and refill a database named `time_test` on your own comp
 | `src/lib/phone.ts` | Phone numbers: one standard form for signing in, and the hidden address used by accounts without email. |
 | `src/app/account-actions.ts`, `src/app/account/settings/` | A person's own account: change password, phone number. |
 | `src/components/transcript.tsx`, `src/app/transcript/` | A student's transcript of published results. |
+| `src/lib/home.ts`, `src/components/home.tsx` | The home page: what a student or lecturer should do next in each class. |
 | `src/lib/evaluation.ts`, `src/components/evaluation.tsx`, `src/app/evaluate/` | Anonymous course evaluations and their summary. |
 | `src/lib/reports.ts`, `src/app/api/reports/`, `src/app/admin/reports/` | Enrolment, results and payments reports, downloaded as CSV. |
 | `src/lib/notify.ts` | The one place that tells people something happened. Email and SMS will be added here. |

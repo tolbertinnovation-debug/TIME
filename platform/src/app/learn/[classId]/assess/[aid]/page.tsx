@@ -15,7 +15,7 @@ export default async function TakeAssessment({ params, searchParams }: { params:
   // Drafts are invisible to students. The correct answers are never selected here.
   const a = await prisma.assessment.findFirst({
     where: { id: aid, classId, status: { not: "DRAFT" } },
-    include: { questions: { orderBy: { sort: "asc" }, select: { id: true, text: true, options: true, points: true } } },
+    include: { questions: { orderBy: { sort: "asc" }, select: { id: true, type: true, text: true, options: true, points: true } } },
   });
   if (!a) notFound();
   const sub = await prisma.submission.findUnique({ where: { assessmentId_enrolmentId: { assessmentId: aid, enrolmentId: enrolment.id } } });
@@ -67,7 +67,12 @@ export default async function TakeAssessment({ params, searchParams }: { params:
           {a.questions.map((q, i) => (
             <fieldset className="card stack" key={q.id} style={{ gap: 8 }}>
               <legend className="label">{i + 1}. {q.text} <span className="muted small">({q.points} {q.points === 1 ? "mark" : "marks"})</span></legend>
-              {q.options.map((o, n) => (
+              {q.type === "SHORT" ? (
+                <>
+                  <label className="skip" htmlFor={`q-${q.id}`}>Your answer to question {i + 1}</label>
+                  <input id={`q-${q.id}`} name={`q-${q.id}`} type="text" maxLength={200} autoComplete="off" placeholder="Type your answer" />
+                </>
+              ) : q.options.map((o, n) => (
                 <label key={n} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}><input type="radio" name={`q-${q.id}`} value={n} /> <span>{o}</span></label>
               ))}
             </fieldset>

@@ -16,9 +16,27 @@
 3. When the drafts are ready, send them for review. Academic leadership reads them and approves or rejects them with a reason. Lessons are locked while in review; **Take back from review** unlocks them.
 4. Approved lessons are published to students at once. To change a published lesson, choose **Take back to draft**: it disappears for students until it is approved again.
 
+**Writing a lesson so it reads well on a phone:**
+
+| Type this | To get |
+|---|---|
+| `# Heading` at the start of a line | a heading (`##` for a smaller one) |
+| `- item` | a bullet point |
+| `1. step` | a numbered step |
+| `**words**` | **bold** words |
+| a blank line | a new paragraph |
+
+**Videos:** paste a YouTube link in **YouTube video**. It plays inside the lesson, and only when the student presses play, so the lesson itself stays light on data. To use your own recording, upload it to YouTube as **Unlisted** (only people with the link can find it) and paste that link.
+
+**Notes, slides or audio:** paste a link in **Link to notes, slides or audio**, for example a Google Drive or Google Slides file shared as "Anyone with the link can view".
+
+**Assignments, quizzes, the midterm and the final** are set under **Assessments**; see below.
+
 ### Sessions, attendance and announcements
 
-- **Sessions and attendance:** add each live or in-person session with its date, time and meeting link. After the session choose **Take attendance**.
+- **Live classes on Google Meet, Zoom or Teams:** create the meeting in that service as usual, then under **Sessions and attendance** add the session with its date, time and the meeting link. Every student is notified at once, and the class page shows **Join on Google Meet** (or Zoom, or Teams).
+- **Recordings:** if you record the class, paste the recording's link next to the session afterwards (YouTube as Unlisted, or Google Drive). Students are notified, and it appears under **Recordings of past classes**.
+- **Attendance:** after each session choose **Take attendance**.
 - **Announcements:** post from the class page. Every student in the class is notified.
 - **Class discussion:** answer students' questions. You can remove a post that breaks the rules.
 
@@ -26,7 +44,10 @@
 
 1. Open **Assessments** and choose **Create assessment**. Pick its part of the mark (continuous assessment, assignment and practical, midterm or final) and its kind:
    - **Written:** students type an answer; you mark it.
-   - **Quiz:** you add questions with the correct answers; the platform marks it. A time limit is optional.
+   - **Quiz:** you add questions and the platform marks them. A time limit is optional. Three kinds of question:
+     - **Multiple choice:** two to six answers, one correct.
+     - **True or false:** a statement that is true or false.
+     - **Short answer:** the student types a word, name or number. List every answer you accept, one per line; capitals, extra spaces and punctuation are ignored. For a long written answer, set **Written work** instead.
    - **Offline:** work done on paper or in person; you enter the marks.
 2. Choose **Open to students** when it is ready, and **Close** when it is over. Students are notified when it opens.
 3. Mark written work from **Students' work**. **Let them take it again** resets one student's attempt.
@@ -47,6 +68,16 @@ Students can evaluate the course once the class has ended or their result is pub
 - **Practical work to sign off:** choose **Sign off students**, tick the students who have done the work and choose **Save sign-off**. The student sees who signed it and when.
 - Take attendance for the sessions held at your centre.
 - You cannot write lessons, set assessments or enter marks.
+
+### Students who need attention
+
+The **Students** list on your class page has a **Needs attention** column. A student is flagged when:
+
+- their attendance is below 75%, once at least two sessions have been marked;
+- they have done fewer than half of the online lessons published more than a week ago;
+- they did not hand in work whose due date has passed.
+
+Nobody is flagged in the first week of a class. Contact a flagged student early: a phone call in week two is worth more than a warning in week ten.
 
 ## Good practice
 

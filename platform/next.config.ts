@@ -9,6 +9,8 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "connect-src 'self'",
+  // The only outside content a page may show: a lesson's YouTube video, in YouTube's privacy mode.
+  "frame-src https://www.youtube-nocookie.com",
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",

@@ -56,3 +56,32 @@ describe("quizzes", () => {
     expect(isLate(start, null, new Date("2030-01-01T00:00:00Z"))).toBe(false);
   });
 });
+
+import { isCorrect, normaliseAnswer } from "../../src/lib/grading";
+
+describe("short-answer questions", () => {
+  const q = { id: "q", type: "SHORT" as const, correctIndex: -1, accepted: ["LRD 500", "500 Liberian dollars"], points: 2 };
+  it("accepts any listed answer, whatever the capitals, spaces and punctuation", () => {
+    for (const typed of ["LRD 500", "lrd 500", "  Lrd   500. ", "LRD-500", "500 liberian dollars!"]) expect(isCorrect(q, typed), typed).toBe(true);
+  });
+  it("refuses other answers and blanks", () => {
+    for (const typed of ["LRD 5000", "500", "", "   ", "?!", null, 3]) expect(isCorrect(q, typed), String(typed)).toBe(false);
+    // Dots between letters separate them: a dotted abbreviation must be listed as its own accepted answer.
+    expect(isCorrect(q, "L.R.D 500")).toBe(false);
+  });
+  it("keeps decimal points and ignores accents", () => {
+    expect(normaliseAnswer("2.5")).toBe("2.5");
+    expect(normaliseAnswer("25")).not.toBe(normaliseAnswer("2.5"));
+    expect(normaliseAnswer("1,000")).toBe("1.000");
+    expect(normaliseAnswer("Café")).toBe("cafe");
+  });
+  it("is scored together with choice and true/false questions", () => {
+    const questions = [
+      { id: "a", type: "CHOICE" as const, correctIndex: 2, points: 1 },
+      { id: "b", type: "TRUE_FALSE" as const, correctIndex: 1, points: 1 },
+      q,
+    ];
+    expect(scoreQuiz(questions, { a: "2", b: "1", q: "lrd 500" })).toBe(4);
+    expect(scoreQuiz(questions, { a: "2", b: "0", q: "LRD 5000" })).toBe(1);
+  });
+});

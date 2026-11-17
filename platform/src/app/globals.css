@@ -184,6 +184,20 @@ details > summary { cursor: pointer; }
 .pill.practical { background: #e3e7fb; color: #23307c; }
 .lesson-body { max-width: 68ch; font-size: 1.05rem; line-height: 1.75; display: flex; flex-direction: column; gap: 14px; }
 .lesson-body p { white-space: pre-line; }
+.lesson-body h2 { font-size: 1.3rem; margin-top: 10px; }
+.lesson-body h3 { font-size: 1.08rem; margin-top: 6px; }
+.lesson-body ul, .lesson-body ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.lesson-body strong { font-weight: 700; }
+/* A lesson's video: a 16:9 box that loads YouTube only when play is pressed */
+.video { max-width: 68ch; display: grid; gap: 8px; }
+.video iframe, .video-start { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius); display: block; }
+.video iframe { background: #000; }
+.video-start { cursor: pointer; color: #fff; font: inherit; background: linear-gradient(140deg, #1d2a14 0%, #0f160b 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px; text-align: center; box-shadow: var(--shadow-2); }
+.video-start:hover .video-play { transform: scale(1.06); background: var(--red-deep); }
+.video-play { width: 68px; height: 68px; border-radius: 50%; background: var(--red); display: grid; place-items: center; transition: transform .15s, background-color .15s; }
+.video-play::after { content: ""; margin-left: 5px; border-style: solid; border-width: 12px 0 12px 20px; border-color: transparent transparent transparent #fff; }
+.video-start .small { color: #cfd8c4; }
+@media print { .video { display: none; } }
 .lesson-list { list-style: none; margin: 0; padding: 0; }
 .card.lesson-list { padding: 6px 18px; }
 .lesson-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--line); }
@@ -211,6 +225,15 @@ details > summary { cursor: pointer; }
 .lesson-count { align-self: center; white-space: nowrap; }
 @media (max-width: 520px) { .lesson-nav { grid-template-columns: 1fr 1fr; } .lesson-count { grid-column: 1 / -1; grid-row: 1; text-align: center; } }
 @media print { .lesson-nav { display: none; } }
+
+/* Adding a quiz question: show only the fields for the chosen kind. Older browsers show them all. */
+.q-for { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); padding: 12px 14px; margin: 0; display: grid; gap: 12px; }
+.q-for legend { padding: 0 6px; }
+form:has(#q-type option[value="CHOICE"]:checked) .q-for:not(.q-choice),
+form:has(#q-type option[value="TRUE_FALSE"]:checked) .q-for:not(.q-truth),
+form:has(#q-type option[value="SHORT"]:checked) .q-for:not(.q-short) { display: none; }
+form:has(#q-type) .q-for { border-style: solid; }
+form:has(#q-type) .q-for legend { display: none; }
 
 /* Certificate: follows TIME's printed certificate. Sizes are in container units so it scales to any screen. */
 .cert-frame { container-type: inline-size; width: 100%; max-width: 1000px; margin: 0 auto; }

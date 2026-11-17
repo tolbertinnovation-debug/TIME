@@ -1,6 +1,6 @@
 import { saveLessonAction } from "@/app/teaching-actions";
 
-type Values = { id?: string; moduleId?: string; title?: string; kind?: "ONLINE" | "PRACTICAL"; body?: string; minutes?: number | null; resourceUrl?: string | null };
+type Values = { id?: string; moduleId?: string; title?: string; kind?: "ONLINE" | "PRACTICAL"; body?: string; minutes?: number | null; resourceUrl?: string | null; videoUrl?: string | null };
 
 export function LessonForm({ classId, modules, lesson = {} }: { classId: string; modules: { id: string; title: string }[]; lesson?: Values }) {
   return (
@@ -26,11 +26,16 @@ export function LessonForm({ classId, modules, lesson = {} }: { classId: string;
       <div className="field">
         <label htmlFor="body">Lesson</label>
         <textarea id="body" name="body" required minLength={20} maxLength={20000} rows={14} defaultValue={lesson.body ?? ""} aria-describedby="body-hint" />
-        <span className="hint" id="body-hint">Plain text. Leave a blank line between paragraphs. Keep it short enough to read on a phone.</span>
+        <span className="hint" id="body-hint">Leave a blank line between paragraphs. Start a line with <code>#</code> for a heading, <code>-</code> for a bullet point or <code>1.</code> for a numbered step, and put <code>**</code> around words to make them <strong>bold</strong>. Keep it short enough to read on a phone.</span>
+      </div>
+      <div className="field">
+        <label htmlFor="videoUrl">YouTube video <span className="muted">(optional)</span></label>
+        <input id="videoUrl" name="videoUrl" type="text" inputMode="url" maxLength={300} placeholder="https://www.youtube.com/watch?v=…" defaultValue={lesson.videoUrl ?? ""} aria-describedby="video-hint" />
+        <span className="hint" id="video-hint">Paste the link of a YouTube video. It plays inside the lesson, and only when the student presses play. To use your own recording, upload it to YouTube as &ldquo;Unlisted&rdquo; and paste its link.</span>
       </div>
       <div className="grid">
         <div className="field"><label htmlFor="minutes">Minutes to study <span className="muted">(optional)</span></label><input id="minutes" name="minutes" type="text" inputMode="numeric" maxLength={3} defaultValue={lesson.minutes ?? ""} /></div>
-        <div className="field"><label htmlFor="resourceUrl">Link to notes or audio <span className="muted">(optional)</span></label><input id="resourceUrl" name="resourceUrl" type="text" inputMode="url" maxLength={500} placeholder="https://" defaultValue={lesson.resourceUrl ?? ""} /></div>
+        <div className="field"><label htmlFor="resourceUrl">Link to notes, slides or audio <span className="muted">(optional)</span></label><input id="resourceUrl" name="resourceUrl" type="text" inputMode="url" maxLength={500} placeholder="https://" defaultValue={lesson.resourceUrl ?? ""} /></div>
       </div>
       <div><button className="btn" type="submit">Save draft</button></div>
     </form>

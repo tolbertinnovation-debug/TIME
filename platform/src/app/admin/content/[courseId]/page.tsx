@@ -30,6 +30,7 @@ export default async function ReviewContent({ params }: { params: Promise<{ cour
               <details className="school" key={l.id} open={l.status === "IN_REVIEW"}>
                 <summary>{l.title} <span className={`pill ${cls}`}>{label}</span> <KindPill kind={l.kind} /></summary>
                 <div style={{ marginTop: 12 }}><LessonBody text={l.body} /></div>
+                {l.videoUrl && <p className="small" style={{ marginTop: 10 }}>Video: <a href={l.videoUrl} target="_blank" rel="noopener noreferrer">{l.videoUrl}</a></p>}
                 {l.resourceUrl && <p className="small" style={{ marginTop: 10 }}>Linked resource: <a href={l.resourceUrl} target="_blank" rel="noopener noreferrer">{l.resourceUrl}</a></p>}
               </details>
             );

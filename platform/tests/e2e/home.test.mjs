@@ -77,3 +77,29 @@ test("a lecturer's home page shows work waiting to be marked and the coming sess
   assert.equal(await leo.locator("#learning-h").count(), 0);
   await leo.context().close();
 });
+
+test("the lecturer's class list flags students who need attention, and says why", async () => {
+  const leo = await as(ctx, lecturer, DESK);
+  await leo.goto(`${URL_BASE}/teach/${classId}`);
+  // Lessons published today and work not yet due: nobody is flagged in the first week.
+  assert.match(await leo.locator("section:has(#roster-h)").innerText(), /No student is flagged/);
+
+  // Ten days on: the lessons were due, the work's date has passed, and Ama missed two sessions.
+  await testDb(`UPDATE lesson SET "publishedAt" = now() - interval '10 days' WHERE "moduleId" = 'm-home'`);
+  await testDb(`UPDATE assessment SET "dueAt" = now() - interval '1 day' WHERE id = 'a-home'`);
+  await testDb(`INSERT INTO class_session (id, "classId", title, kind, "startsAt") VALUES ('s-old1', $1, 'Week 0a', 'ONLINE', now() - interval '8 days'), ('s-old2', $1, 'Week 0b', 'ONLINE', now() - interval '6 days')`, [classId]);
+  await testDb(`INSERT INTO attendance ("sessionId", "enrolmentId", status) SELECT s.id, e.id, 'ABSENT' FROM class_session s, enrolment e JOIN "user" u ON u.id = e."userId" WHERE s.id IN ('s-old1', 's-old2') AND u.email = $1`, [ama.email]);
+
+  await leo.reload();
+  const section = leo.locator("section:has(#roster-h)");
+  assert.match(await section.locator(".notice.info").innerText(), /2 students need your attention/);
+  const amaRow = await section.locator('tr:has-text("Ama Kollie")').innerText();
+  // Ama did one of three lessons, missed both sessions and did not hand in the work.
+  assert.match(amaRow, /Attendance 0%[\s\S]*Behind on lessons: 1 of 3[\s\S]*Missed 1 piece of work/);
+  const benRow = await section.locator('tr:has-text("Ben Dolo")').innerText();
+  // Ben handed the work in and has no attendance marked, but has done no lessons.
+  assert.match(benRow, /Behind on lessons: 0 of 3/);
+  assert.ok(!/Missed|Attendance \d/.test(benRow));
+  assert.deepEqual(leo.problems, []);
+  await leo.context().close();
+});

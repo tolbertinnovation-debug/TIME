@@ -10,13 +10,14 @@ import { formatDateTime } from "@/lib/format";
 import { canEvaluate } from "@/lib/evaluation";
 import { CATEGORY_LABEL, PASS_MARK, WEIGHTS } from "@/lib/grading";
 import { attendancePercent, summarise } from "@/lib/progress";
+import { meetingService } from "@/lib/video";
 
 export const metadata = { title: "Class" };
 
 export default async function LearnClass({ params, searchParams }: { params: Promise<{ classId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { classId } = await params;
   const { enrolment, cls } = await requireEnrolment(classId);
-  const [modules, progress, sessions, attendance, announcements, assessments, result, appeal] = await Promise.all([
+  const [modules, progress, sessions, attendance, announcements, assessments, result, appeal, recordings] = await Promise.all([
     // Students only ever see published lessons.
     prisma.module.findMany({ where: { courseId: cls.courseId }, orderBy: { sort: "asc" }, include: { lessons: { where: { status: "PUBLISHED" }, orderBy: { sort: "asc" } } } }),
     prisma.lessonProgress.findMany({ where: { enrolmentId: enrolment.id } }),
@@ -27,6 +28,7 @@ export default async function LearnClass({ params, searchParams }: { params: Pro
     // A result is shown to the student only once it is published.
     prisma.result.findFirst({ where: { enrolmentId: enrolment.id, status: "PUBLISHED" } }),
     prisma.approvalRequest.findFirst({ where: { type: "GRADE_APPEAL", status: "PENDING", payload: { path: ["enrolmentId"], equals: enrolment.id } } }),
+    prisma.classSession.findMany({ where: { classId, recordingUrl: { not: null } }, orderBy: { startsAt: "desc" }, take: 20 }),
   ]);
   const done = new Set(progress.map((p) => p.lessonId));
   const lessons = modules.flatMap((m) => m.lessons);
@@ -123,7 +125,21 @@ export default async function LearnClass({ params, searchParams }: { params: Pro
             {sessions.map((s) => (
               <li key={s.id}>
                 <span><strong>{s.title}</strong><br /><span className="muted small">{formatDateTime(s.startsAt)} (Liberia time)</span></span>
-                <span className="row"><KindPill kind={s.kind} />{s.meetingUrl && <a className="btn ghost sm" href={s.meetingUrl} target="_blank" rel="noopener noreferrer">Join</a>}</span>
+                <span className="row"><KindPill kind={s.kind} />{s.meetingUrl && <a className="btn ghost sm" href={s.meetingUrl} target="_blank" rel="noopener noreferrer">Join{meetingService(s.meetingUrl) ? ` on ${meetingService(s.meetingUrl)}` : ""}</a>}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {recordings.length > 0 && (
+        <section className="stack" aria-labelledby="rec-h">
+          <h2 id="rec-h">Recordings of past classes</h2>
+          <ul className="card lesson-list">
+            {recordings.map((s) => (
+              <li key={s.id}>
+                <span><strong>{s.title}</strong><br /><span className="muted small">{formatDateTime(s.startsAt)}</span></span>
+                <a className="btn ghost sm" href={s.recordingUrl!} target="_blank" rel="noopener noreferrer">Watch the recording</a>
               </li>
             ))}
           </ul>

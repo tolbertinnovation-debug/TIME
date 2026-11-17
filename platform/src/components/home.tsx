@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/format";
 import { CATEGORY_LABEL } from "@/lib/grading";
 import type { studentAgenda, teachingAgenda } from "@/lib/home";
 import { dayDistance } from "@/lib/progress";
+import { meetingService } from "@/lib/video";
 
 type StudentClass = Awaited<ReturnType<typeof studentAgenda>>[number];
 type TeachingClass = Awaited<ReturnType<typeof teachingAgenda>>[number];
@@ -18,7 +19,7 @@ function Sessions({ sessions, now }: { sessions: Session[]; now: Date }) {
         {sessions.map((s) => (
           <li key={s.id}>
             <span><strong>{s.title}</strong><br /><span className="small muted">{formatDateTime(s.startsAt)} · {dayDistance(s.startsAt, now)}</span></span>
-            <span className="row"><KindPill kind={s.kind} />{s.meetingUrl && <a className="btn ghost sm" href={s.meetingUrl} target="_blank" rel="noopener noreferrer">Join</a>}</span>
+            <span className="row"><KindPill kind={s.kind} />{s.meetingUrl && <a className="btn ghost sm" href={s.meetingUrl} target="_blank" rel="noopener noreferrer">Join{meetingService(s.meetingUrl) ? ` on ${meetingService(s.meetingUrl)}` : ""}</a>}</span>
           </li>
         ))}
       </ul>

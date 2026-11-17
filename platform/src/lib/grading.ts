@@ -35,11 +35,36 @@ export function missingParts(assessments: { category: Category }[]): Category[] 
   return CATEGORIES.filter((c) => !assessments.some((a) => a.category === c));
 }
 
-// Marks a quiz: the points of every question answered correctly.
-export function scoreQuiz(questions: { id: string; correctIndex: number; points: number }[], answers: Record<string, unknown>): number {
+// How a typed answer is compared: capitals, accents, extra spaces and punctuation do not count,
+// so "Lrd 500." matches "LRD 500". A decimal point or comma between digits is kept ("2.5" is not "25").
+export function normaliseAnswer(text: string): string {
+  return text
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/(\d)[.,](\d)/g, "$1\u0000$2")
+    .replace(/[^\p{L}\p{N}\u0000]+/gu, " ")
+    .replace(/\u0000/g, ".")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+type QuizQuestion = { id: string; type?: "CHOICE" | "TRUE_FALSE" | "SHORT"; correctIndex: number; accepted?: string[]; points: number };
+
+// Is one answer right? Choice questions compare the option chosen; short answers compare the text.
+export function isCorrect(q: QuizQuestion, answer: unknown): boolean {
+  if (q.type === "SHORT") {
+    if (typeof answer !== "string") return false;
+    const given = normaliseAnswer(answer);
+    return given !== "" && (q.accepted ?? []).some((a) => normaliseAnswer(a) === given);
+  }
   // Only a real choice counts. A blank or malformed answer must never match option 0.
-  const chosen = (v: unknown) => (typeof v === "number" && Number.isInteger(v) ? v : typeof v === "string" && /^\d+$/.test(v) ? Number(v) : -1);
-  return questions.reduce((n, q) => n + (chosen(answers[q.id]) === q.correctIndex ? q.points : 0), 0);
+  const chosen = typeof answer === "number" && Number.isInteger(answer) ? answer : typeof answer === "string" && /^\d+$/.test(answer) ? Number(answer) : -1;
+  return chosen === q.correctIndex;
+}
+
+// Marks a quiz: the points of every question answered correctly.
+export function scoreQuiz(questions: QuizQuestion[], answers: Record<string, unknown>): number {
+  return questions.reduce((n, q) => n + (isCorrect(q, answers[q.id]) ? q.points : 0), 0);
 }
 
 // A timed quiz must be handed in within its limit, plus a short allowance for a slow connection.

@@ -48,6 +48,16 @@ Students can evaluate the course once the class has ended or their result is pub
 - Take attendance for the sessions held at your centre.
 - You cannot write lessons, set assessments or enter marks.
 
+### Students who need attention
+
+The **Students** list on your class page has a **Needs attention** column. A student is flagged when:
+
+- their attendance is below 75%, once at least two sessions have been marked;
+- they have done fewer than half of the online lessons published more than a week ago;
+- they did not hand in work whose due date has passed.
+
+Nobody is flagged in the first week of a class. Contact a flagged student early: a phone call in week two is worth more than a warning in week ten.
+
 ## Good practice
 
 - Sign off practical work and take attendance on the day. Both count towards a sponsor's report and the student's standing.

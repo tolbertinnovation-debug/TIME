@@ -6,6 +6,7 @@ import { MODE_LABEL, TRACK_LABEL } from "@/lib/academics";
 import { requireClassStaff } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
+import { attentionReasons, LESSON_GRACE_DAYS } from "@/lib/attention";
 import { classCan } from "@/lib/permissions";
 import { attendancePercent, summarise } from "@/lib/progress";
 
@@ -14,11 +15,23 @@ export const metadata = { title: "Class" };
 export default async function TeachClass({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const { id } = await params;
   const { access, cls } = await requireClassStaff(id);
-  const [enrolments, lessons, announcements] = await Promise.all([
+  const [enrolments, lessons, announcements, overdue] = await Promise.all([
     prisma.enrolment.findMany({ where: { classId: id, status: "ACTIVE" }, include: { user: true, progress: true, attendance: true }, orderBy: { user: { name: "asc" } } }),
     prisma.lesson.findMany({ where: { status: "PUBLISHED", module: { courseId: cls.courseId } }, orderBy: [{ module: { sort: "asc" } }, { sort: "asc" }] }),
     prisma.announcement.findMany({ where: { classId: id }, orderBy: { createdAt: "desc" }, take: 10, include: { author: true } }),
+    // Work students hand in themselves whose due date has passed (not paper exams the lecturer enters).
+    prisma.assessment.findMany({ where: { classId: id, status: { not: "DRAFT" }, kind: { not: "OFFLINE" }, dueAt: { lt: new Date() } }, select: { submissions: { where: { OR: [{ submittedAt: { not: null } }, { score: { not: null } }] }, select: { enrolmentId: true } } } }),
   ]);
+  // Lessons published at least a week ago are the ones a student should have done by now.
+  const cutoff = new Date(Date.now() - LESSON_GRACE_DAYS * 24 * 60 * 60 * 1000);
+  const expected = new Set(lessons.filter((l) => l.kind === "ONLINE" && l.publishedAt && l.publishedAt <= cutoff).map((l) => l.id));
+  const reasons = new Map(enrolments.map((e) => [e.id, attentionReasons({
+    attendance: e.attendance.map((a) => a.status),
+    lessonsExpected: expected.size,
+    lessonsDone: e.progress.filter((x) => expected.has(x.lessonId)).length,
+    missedWork: overdue.filter((a) => !a.submissions.some((s) => s.enrolmentId === e.id)).length,
+  })]));
+  const flagged = enrolments.filter((e) => reasons.get(e.id)!.length > 0).length;
   const practicals = lessons.filter((l) => l.kind === "PRACTICAL");
   return (
     <div className="stack lg">
@@ -32,8 +45,11 @@ export default async function TeachClass({ params, searchParams }: { params: Pro
 
       <section className="stack" aria-labelledby="roster-h">
         <h2 id="roster-h">Students ({enrolments.length})</h2>
+        {enrolments.length > 0 && (flagged > 0
+          ? <p className="notice info" role="status">{flagged} {flagged === 1 ? "student needs" : "students need"} your attention. The last column says why.</p>
+          : <p className="small muted">No student is flagged for low attendance, falling behind on lessons or missed work.</p>)}
         <div className="table-wrap"><table>
-          <thead><tr><th>Student</th><th>Student number</th><th>Phone</th><th>Online lessons</th><th>Practical</th><th>Attendance</th></tr></thead>
+          <thead><tr><th>Student</th><th>Student number</th><th>Phone</th><th>Online lessons</th><th>Practical</th><th>Attendance</th><th>Needs attention</th></tr></thead>
           <tbody>
             {enrolments.map((e) => {
               const p = summarise(lessons, new Set(e.progress.map((x) => x.lessonId)));
@@ -46,10 +62,11 @@ export default async function TeachClass({ params, searchParams }: { params: Pro
                   <td className="nowrap">{p.onlineDone} of {p.onlineTotal}</td>
                   <td className="nowrap">{p.practicalDone} of {p.practicalTotal}</td>
                   <td className="nowrap">{att === null ? "—" : `${att}%`}</td>
+                  <td>{reasons.get(e.id)!.length ? <span className="stack" style={{ gap: 4, alignItems: "flex-start" }}>{reasons.get(e.id)!.map((r) => <span className="pill bad" key={r}>{r}</span>)}</span> : <span className="muted">—</span>}</td>
                 </tr>
               );
             })}
-            {enrolments.length === 0 && <tr><td colSpan={6}>No students are enrolled yet.</td></tr>}
+            {enrolments.length === 0 && <tr><td colSpan={7}>No students are enrolled yet.</td></tr>}
           </tbody>
         </table></div>
       </section>

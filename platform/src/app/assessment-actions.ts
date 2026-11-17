@@ -8,7 +8,7 @@ import { audit } from "@/lib/audit";
 import { classAccess } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { accessProblem, feeStatusOf } from "@/lib/fees-data";
-import { CATEGORY_LABEL, computeMarks, isLate, missingParts, scoreQuiz } from "@/lib/grading";
+import { CATEGORY_LABEL, computeMarks, isLate, missingParts, normaliseAnswer, scoreQuiz } from "@/lib/grading";
 import { classStudentIds, notify } from "@/lib/notify";
 import { classCan } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
@@ -83,12 +83,23 @@ export async function setAssessmentStatusAction(form: FormData) {
   back(returnTo, "ok", status.data === "OPEN" ? "Students can now see and take this assessment." : "This assessment is closed to new work.");
 }
 
-const questionSchema = z.object({
+const lines = (v: string) => v.split("\n").map((o) => o.trim()).filter(Boolean);
+const questionBase = {
   text: text(1000, "Write the question."),
-  options: z.string().transform((v) => v.split("\n").map((o) => o.trim()).filter(Boolean)).pipe(z.array(z.string().max(300, "Keep each answer under 300 characters.")).min(2, "Give at least two answers, one per line.").max(6, "Give at most six answers.")),
-  correct: z.coerce.number().int().min(1, "Say which answer is correct."),
   points: z.coerce.number().int("Marks must be a whole number.").min(1, "A question is worth at least 1 mark.").max(100, "That is too many marks for one question."),
-});
+};
+const questionSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("CHOICE"), ...questionBase,
+    options: z.string().transform(lines).pipe(z.array(z.string().max(300, "Keep each answer under 300 characters.")).min(2, "Give at least two answers, one per line.").max(6, "Give at most six answers.")),
+    correct: z.coerce.number({ error: "Say which answer is correct." }).int().min(1, "Say which answer is correct."),
+  }),
+  z.object({ type: z.literal("TRUE_FALSE"), ...questionBase, truth: z.enum(["TRUE", "FALSE"], "Say whether the statement is true or false.") }),
+  z.object({
+    type: z.literal("SHORT"), ...questionBase,
+    accepted: z.string().transform(lines).pipe(z.array(z.string().max(200, "Keep each accepted answer under 200 characters.")).min(1, "Give at least one accepted answer.").max(10, "Give at most ten accepted answers.")),
+  }),
+], { error: "Choose the kind of question." });
 
 export async function addQuestionAction(form: FormData) {
   const classId = String(form.get("classId") ?? "");
@@ -97,13 +108,27 @@ export async function addQuestionAction(form: FormData) {
   const { user } = await requireMarker(classId);
   const a = await prisma.assessment.findFirst({ where: { id, classId, kind: "QUIZ", status: "DRAFT" } });
   if (!a) back(returnTo, "error", "Questions can be changed only while the quiz is a draft.");
-  const parsed = questionSchema.safeParse({ text: value(form, "text"), options: form.get("options") ?? "", correct: value(form, "correct"), points: value(form, "points") });
+  const parsed = questionSchema.safeParse({
+    type: value(form, "type") ?? "CHOICE", text: value(form, "text"), points: value(form, "points"),
+    options: form.get("options") ?? "", correct: value(form, "correct"), truth: value(form, "truth"), accepted: form.get("accepted") ?? "",
+  });
   if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
   const d = parsed.data;
-  if (d.correct > d.options.length) back(returnTo, "error", `The correct answer must be a number from 1 to ${d.options.length}.`);
+  let data: { type: "CHOICE" | "TRUE_FALSE" | "SHORT"; options: string[]; correctIndex: number; accepted: string[] };
+  if (d.type === "CHOICE") {
+    if (d.correct > d.options.length) back(returnTo, "error", `The correct answer must be a number from 1 to ${d.options.length}.`);
+    data = { type: "CHOICE", options: d.options, correctIndex: d.correct - 1, accepted: [] };
+  } else if (d.type === "TRUE_FALSE") {
+    data = { type: "TRUE_FALSE", options: ["True", "False"], correctIndex: d.truth === "TRUE" ? 0 : 1, accepted: [] };
+  } else {
+    // Two accepted answers that read the same once capitals and punctuation are ignored are one answer.
+    const accepted = d.accepted.filter((x, i, all) => all.findIndex((y) => normaliseAnswer(y) === normaliseAnswer(x)) === i);
+    if (accepted.some((x) => normaliseAnswer(x) === "")) back(returnTo, "error", "Each accepted answer needs at least one letter or number.");
+    data = { type: "SHORT", options: [], correctIndex: -1, accepted };
+  }
   await prisma.$transaction(async (tx) => {
     const sort = await tx.question.count({ where: { assessmentId: id } });
-    await tx.question.create({ data: { assessmentId: id, text: d.text, options: d.options, correctIndex: d.correct - 1, points: d.points, sort } });
+    await tx.question.create({ data: { assessmentId: id, text: d.text, points: d.points, sort, ...data } });
     await tx.assessment.update({ where: { id }, data: { maxScore: { increment: d.points } } });
   });
   await audit({ actor: user, action: "assessment.question_added", summary: `${user.name} added a question to "${a.title}"`, entityType: "assessment", entityId: id });

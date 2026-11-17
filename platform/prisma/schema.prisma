@@ -443,16 +443,26 @@ model Assessment {
   @@map("assessment")
 }
 
+enum QuestionType {
+  CHOICE // pick one of several answers
+  TRUE_FALSE // pick True or False
+  SHORT // type a word, name or number, compared with the accepted answers
+}
+
 model Question {
-  id           String     @id @default(cuid())
+  id           String       @id @default(cuid())
   assessmentId String
-  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessment   Assessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  type         QuestionType @default(CHOICE)
   text         String
+  // Choices for CHOICE and TRUE_FALSE; empty for SHORT
   options      String[]
-  // Never sent to students
+  // Never sent to students. For SHORT questions it is not used (-1).
   correctIndex Int
+  // SHORT questions: every answer that is accepted. Never sent to students.
+  accepted     String[]     @default([])
   points       Int
-  sort         Int        @default(0)
+  sort         Int          @default(0)
 
   @@index([assessmentId, sort])
   @@map("question")

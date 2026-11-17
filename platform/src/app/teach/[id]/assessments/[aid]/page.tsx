@@ -7,6 +7,8 @@ import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/format";
 import { CATEGORY_LABEL } from "@/lib/grading";
 
+const QUESTION_TYPE = { CHOICE: "Multiple choice", TRUE_FALSE: "True or false", SHORT: "Short answer" } as const;
+
 export const metadata = { title: "Assessment" };
 
 const STATUS = { DRAFT: ["plain", "Draft"], OPEN: ["ok", "Open"], CLOSED: ["bad", "Closed"] } as const;
@@ -39,7 +41,12 @@ export default async function AssessmentPage({ params, searchParams }: { params:
           {a.questions.map((q, i) => (
             <div className="card stack" key={q.id} style={{ gap: 6 }}>
               <div className="row between"><h3>{i + 1}. {q.text}</h3><span className="muted small">{q.points} {q.points === 1 ? "mark" : "marks"}</span></div>
-              <ol style={{ margin: 0, paddingLeft: 22 }}>{q.options.map((o, n) => <li key={n}>{o}{n === q.correctIndex && <span className="pill ok" style={{ marginLeft: 8 }}>Correct</span>}</li>)}</ol>
+              <p className="small muted">{QUESTION_TYPE[q.type]}</p>
+              {q.type === "SHORT" ? (
+                <p>Accepted: {q.accepted.map((x, n) => <span className="pill ok" key={n} style={{ marginRight: 6 }}>{x}</span>)}</p>
+              ) : (
+                <ol style={{ margin: 0, paddingLeft: 22 }}>{q.options.map((o, n) => <li key={n}>{o}{n === q.correctIndex && <span className="pill ok" style={{ marginLeft: 8 }}>Correct</span>}</li>)}</ol>
+              )}
               {a.status === "DRAFT" && <form action={deleteQuestionAction}>{hidden}<input type="hidden" name="questionId" value={q.id} /><button className="btn ghost sm" type="submit">Remove question</button></form>}
             </div>
           ))}
@@ -47,12 +54,30 @@ export default async function AssessmentPage({ params, searchParams }: { params:
             <form className="card form" action={addQuestionAction}>
               <h3>Add a question</h3>
               {hidden}
-              <div className="field"><label htmlFor="q-text">Question</label><textarea id="q-text" name="text" required maxLength={1000} style={{ minHeight: 60 }} /></div>
-              <div className="field"><label htmlFor="q-options">Answers, one per line</label><textarea id="q-options" name="options" required rows={4} aria-describedby="q-options-hint" /><span className="hint" id="q-options-hint">Between two and six answers.</span></div>
               <div className="grid">
-                <div className="field"><label htmlFor="q-correct">Number of the correct answer</label><input id="q-correct" name="correct" type="text" inputMode="numeric" required maxLength={1} placeholder="1" /></div>
+                <div className="field"><label htmlFor="q-type">Kind of question</label>
+                  <select id="q-type" name="type" defaultValue="CHOICE">
+                    <option value="CHOICE">Multiple choice</option>
+                    <option value="TRUE_FALSE">True or false</option>
+                    <option value="SHORT">Short answer (the student types it)</option>
+                  </select>
+                </div>
                 <div className="field"><label htmlFor="q-points">Marks</label><input id="q-points" name="points" type="text" inputMode="numeric" required maxLength={3} defaultValue="1" /></div>
               </div>
+              <div className="field"><label htmlFor="q-text">Question</label><textarea id="q-text" name="text" required maxLength={1000} style={{ minHeight: 60 }} /></div>
+              <fieldset className="q-for q-choice">
+                <legend className="label">For multiple choice</legend>
+                <div className="field"><label htmlFor="q-options">Answers, one per line</label><textarea id="q-options" name="options" rows={4} aria-describedby="q-options-hint" /><span className="hint" id="q-options-hint">Between two and six answers.</span></div>
+                <div className="field"><label htmlFor="q-correct">Number of the correct answer</label><input id="q-correct" name="correct" type="text" inputMode="numeric" maxLength={1} placeholder="1" /></div>
+              </fieldset>
+              <fieldset className="q-for q-truth">
+                <legend className="label">For true or false</legend>
+                <div className="field"><label htmlFor="q-truth">The statement is</label><select id="q-truth" name="truth" defaultValue=""><option value="" disabled>Choose…</option><option value="TRUE">True</option><option value="FALSE">False</option></select></div>
+              </fieldset>
+              <fieldset className="q-for q-short">
+                <legend className="label">For short answer</legend>
+                <div className="field"><label htmlFor="q-accepted">Accepted answers, one per line</label><textarea id="q-accepted" name="accepted" rows={3} aria-describedby="q-accepted-hint" /><span className="hint" id="q-accepted-hint">List every answer you accept, for example &ldquo;LRD 500&rdquo; and &ldquo;500 Liberian dollars&rdquo;. Capitals, extra spaces and punctuation are ignored when marking.</span></div>
+              </fieldset>
               <div><button className="btn ghost" type="submit">Add question</button></div>
             </form>
           ) : <p className="muted small">Questions cannot be changed once the quiz has been opened.</p>}

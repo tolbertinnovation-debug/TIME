@@ -226,6 +226,15 @@ details > summary { cursor: pointer; }
 @media (max-width: 520px) { .lesson-nav { grid-template-columns: 1fr 1fr; } .lesson-count { grid-column: 1 / -1; grid-row: 1; text-align: center; } }
 @media print { .lesson-nav { display: none; } }
 
+/* Adding a quiz question: show only the fields for the chosen kind. Older browsers show them all. */
+.q-for { border: 1px dashed var(--line-2); border-radius: var(--radius-sm); padding: 12px 14px; margin: 0; display: grid; gap: 12px; }
+.q-for legend { padding: 0 6px; }
+form:has(#q-type option[value="CHOICE"]:checked) .q-for:not(.q-choice),
+form:has(#q-type option[value="TRUE_FALSE"]:checked) .q-for:not(.q-truth),
+form:has(#q-type option[value="SHORT"]:checked) .q-for:not(.q-short) { display: none; }
+form:has(#q-type) .q-for { border-style: solid; }
+form:has(#q-type) .q-for legend { display: none; }
+
 /* Certificate: follows TIME's printed certificate. Sizes are in container units so it scales to any screen. */
 .cert-frame { container-type: inline-size; width: 100%; max-width: 1000px; margin: 0 auto; }
 .cert { aspect-ratio: 297 / 210; background: #fff; color: #111; position: relative; font-family: Georgia, "Times New Roman", serif;

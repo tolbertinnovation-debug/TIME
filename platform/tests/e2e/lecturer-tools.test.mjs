@@ -114,3 +114,54 @@ test("a live class on Google Meet: students are told, join by name of the servic
   assert.deepEqual(page.problems, []);
   await page.context().close();
 });
+
+test("a quiz mixes multiple choice, true or false and short answer, and marks them all", async () => {
+  const leo = await as(ctx, lecturer, DESK);
+  await leo.goto(`${URL_BASE}/teach/${classId}/assessments`);
+  await leo.fill("#a-title", "Week 1 quiz");
+  await leo.selectOption("#a-category", "CONTINUOUS");
+  await leo.selectOption("#a-kind", "QUIZ");
+  await leo.fill("#a-instructions", "Answer every question.");
+  await submit(leo, 'button:has-text("Create assessment")');
+  await leo.waitForURL(/\/assessments\/[^/?]+\?/);
+  const add = async (type, fields) => {
+    await leo.selectOption("#q-type", type);
+    for (const [sel, val] of Object.entries(fields)) {
+      if (sel === "#q-truth") await leo.selectOption(sel, val); else await leo.fill(sel, val);
+    }
+    await submit(leo, 'button:has-text("Add question")');
+  };
+  // Only the fields for the chosen kind are shown.
+  await leo.selectOption("#q-type", "SHORT");
+  assert.ok(await leo.locator("#q-accepted").isVisible());
+  assert.ok(!(await leo.locator("#q-options").isVisible()));
+
+  await add("SHORT", { "#q-text": "What does a cash book record?", "#q-points": "1" });
+  await notice(leo, "error", "Give at least one accepted answer");
+  await add("CHOICE", { "#q-text": "Which is money coming in?", "#q-options": "Rent paid\nA sale\nWages paid", "#q-correct": "2", "#q-points": "1" });
+  await notice(leo, "ok", "Question added");
+  await add("TRUE_FALSE", { "#q-text": "A receipt should be kept for every sale.", "#q-truth": "TRUE", "#q-points": "1" });
+  await notice(leo, "ok", "Question added");
+  await add("SHORT", { "#q-text": "A shop sells rice for how much?", "#q-accepted": "LRD 500\n500 Liberian dollars\nlrd 500", "#q-points": "2" });
+  await notice(leo, "ok", "Question added");
+  const text = await leo.locator("section:has(#questions-h)").innerText();
+  assert.match(text, /Questions \(3\)/);
+  assert.match(text, /True or false[\s\S]*True\s*Correct/);
+  assert.match(text, /Short answer\s+Accepted: LRD 500\s*500 Liberian dollars/);
+  assert.ok(!/lrd 500\s*$/m.test(text.split("Accepted:")[1]), "a duplicate accepted answer is kept once");
+  await submit(leo, 'button:has-text("Open to students")');
+  await leo.context().close();
+
+  const page = await as(ctx, ama);
+  await page.goto(`${URL_BASE}/learn/${classId}`);
+  await page.click('a:has-text("Week 1 quiz")');
+  await submit(page, 'button:has-text("Start the quiz")');
+  const html = await page.content();
+  assert.ok(!html.includes("500 Liberian dollars"), "accepted answers are never sent to the student");
+  await page.locator('fieldset:has-text("money coming in") label:has-text("A sale") input').check();
+  await page.locator('fieldset:has-text("receipt") label:has-text("True") input').check();
+  await page.locator('fieldset:has-text("rice") input[type="text"]').fill("  Lrd 500. ");
+  await submit(page, 'button:has-text("Hand in quiz")');
+  await notice(page, "ok", "You scored 4 of 4");
+  await page.context().close();
+});

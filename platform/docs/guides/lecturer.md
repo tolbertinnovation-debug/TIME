@@ -44,7 +44,10 @@
 
 1. Open **Assessments** and choose **Create assessment**. Pick its part of the mark (continuous assessment, assignment and practical, midterm or final) and its kind:
    - **Written:** students type an answer; you mark it.
-   - **Quiz:** you add questions with the correct answers; the platform marks it. A time limit is optional.
+   - **Quiz:** you add questions and the platform marks them. A time limit is optional. Three kinds of question:
+     - **Multiple choice:** two to six answers, one correct.
+     - **True or false:** a statement that is true or false.
+     - **Short answer:** the student types a word, name or number. List every answer you accept, one per line; capitals, extra spaces and punctuation are ignored. For a long written answer, set **Written work** instead.
    - **Offline:** work done on paper or in person; you enter the marks.
 2. Choose **Open to students** when it is ready, and **Close** when it is over. Students are notified when it opens.
 3. Mark written work from **Students' work**. **Let them take it again** resets one student's attempt.

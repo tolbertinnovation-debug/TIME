@@ -71,6 +71,8 @@ This means your information is stored on computers outside Liberia.
 ## 5. Cookies and your phone
 
 - The platform uses one cookie, to keep you signed in. It is not used to track you elsewhere.
+- **Lesson videos** are played from YouTube in its privacy mode. Nothing is loaded from YouTube until you press play; once you do, YouTube (Google) receives your internet address and what is watched, as with any YouTube video.
+- **Live classes** take place on the service your lecturer chooses (for example Google Meet or Zoom). Joining one is governed by that service's own privacy terms.
 - If you install the platform on your phone, or use **Save lessons for offline**, copies of your class and lesson pages are kept on that phone so you can read them with no connection. They are removed when you sign out. On a shared phone, always sign out.
 
 ## 6. How we protect it

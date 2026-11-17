@@ -7,6 +7,8 @@ import { classLabel } from "@/lib/academics";
 import { audit } from "@/lib/audit";
 import { classAccess } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
+import { youtubeId } from "@/lib/video";
+import { formatDateTime } from "@/lib/format";
 import { classStudentIds, notify } from "@/lib/notify";
 import { classCan, type ClassTask } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
@@ -45,6 +47,7 @@ const lessonSchema = z.object({
   body: z.string().trim().min(20, "Write the lesson (at least 20 characters).").max(20000, "Keep the lesson under 20,000 characters. Split longer lessons in two."),
   minutes: z.coerce.number().int("Minutes must be a whole number.").min(1, "Minutes must be at least 1.").max(600, "That is too long for one lesson.").optional(),
   resourceUrl: link.optional(),
+  videoUrl: z.string().trim().max(300, "That link is too long.").refine((v) => youtubeId(v) !== null, "Paste a YouTube link, like https://www.youtube.com/watch?v=… or https://youtu.be/…").optional(),
 });
 
 export async function saveLessonAction(form: FormData) {
@@ -54,7 +57,7 @@ export async function saveLessonAction(form: FormData) {
   const { user, cls } = await requireStaff(classId, "content.edit");
   const parsed = lessonSchema.safeParse({
     moduleId: value(form, "moduleId"), title: value(form, "title"), kind: value(form, "kind"), body: form.get("body"),
-    minutes: value(form, "minutes"), resourceUrl: value(form, "resourceUrl"),
+    minutes: value(form, "minutes"), resourceUrl: value(form, "resourceUrl"), videoUrl: value(form, "videoUrl"),
   });
   if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
   const d = parsed.data;
@@ -62,7 +65,7 @@ export async function saveLessonAction(form: FormData) {
   const mod = await prisma.module.findFirst({ where: { id: d.moduleId, courseId: cls.courseId } });
   if (!mod) back(returnTo, "error", "That module is not part of this course.");
 
-  const data = { moduleId: mod.id, title: d.title, kind: d.kind, body: d.body, minutes: d.minutes ?? null, resourceUrl: d.resourceUrl ?? null };
+  const data = { moduleId: mod.id, title: d.title, kind: d.kind, body: d.body, minutes: d.minutes ?? null, resourceUrl: d.resourceUrl ?? null, videoUrl: d.videoUrl ?? null };
   if (lessonId) {
     // Only a draft can be changed. Published lessons are taken back to draft first.
     const changed = await prisma.lesson.updateMany({ where: { id: lessonId, status: "DRAFT", module: { courseId: cls.courseId } }, data });
@@ -151,7 +154,31 @@ export async function createSessionAction(form: FormData) {
   if (d.kind === "ONLINE" && !d.meetingUrl) back(returnTo, "error", "An online session needs its meeting link.");
   const session = await prisma.classSession.create({ data: { classId, title: d.title, kind: d.kind, startsAt: d.startsAt, meetingUrl: d.meetingUrl ?? null, createdById: user.id } });
   await audit({ actor: user, action: "session.created", summary: `${user.name} scheduled "${d.title}" for ${classLabel(cls)}`, entityType: "session", entityId: session.id });
-  back(returnTo, "ok", "Session added. Students can see it on their class page.");
+  await notify(await classStudentIds(classId), {
+    title: `${d.kind === "ONLINE" ? "Live class" : "Practical session"}: ${d.title}`,
+    body: `${cls.course.title}, ${formatDateTime(d.startsAt)} (Liberia time).${d.meetingUrl ? " The link to join is on your class page." : ""}`,
+    href: `/learn/${classId}`,
+  });
+  back(returnTo, "ok", "Session added. Your students have been told.");
+}
+
+// After a live class, the lecturer adds the link to its recording for students who missed it.
+export async function saveRecordingAction(form: FormData) {
+  const classId = String(form.get("classId") ?? "");
+  const sessionId = String(form.get("sessionId") ?? "");
+  const returnTo = `/teach/${classId}/sessions`;
+  const { user, cls } = await requireStaff(classId, "sessions.manage");
+  const session = await prisma.classSession.findFirst({ where: { id: sessionId, classId } });
+  if (!session) back(returnTo, "error", "That session no longer exists.");
+  const raw = value(form, "recordingUrl");
+  const parsed = link.optional().safeParse(raw);
+  if (!parsed.success) back(returnTo, "error", firstProblem(parsed.error));
+  const recordingUrl = parsed.data ?? null;
+  if (recordingUrl === session.recordingUrl) back(returnTo, "ok", "Nothing changed.");
+  await prisma.classSession.update({ where: { id: sessionId }, data: { recordingUrl } });
+  await audit({ actor: user, action: "session.recording", summary: `${user.name} ${recordingUrl ? "added the recording of" : "removed the recording of"} "${session.title}" (${classLabel(cls)})`, entityType: "session", entityId: sessionId });
+  if (recordingUrl) await notify(await classStudentIds(classId), { title: `Recording available: ${session.title}`, body: `${cls.course.title}. If you missed the class, watch it from your class page.`, href: `/learn/${classId}` });
+  back(returnTo, "ok", recordingUrl ? "Recording added. Your students have been told." : "Recording removed.");
 }
 
 export async function saveAttendanceAction(form: FormData) {

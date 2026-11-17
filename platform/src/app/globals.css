@@ -184,6 +184,20 @@ details > summary { cursor: pointer; }
 .pill.practical { background: #e3e7fb; color: #23307c; }
 .lesson-body { max-width: 68ch; font-size: 1.05rem; line-height: 1.75; display: flex; flex-direction: column; gap: 14px; }
 .lesson-body p { white-space: pre-line; }
+.lesson-body h2 { font-size: 1.3rem; margin-top: 10px; }
+.lesson-body h3 { font-size: 1.08rem; margin-top: 6px; }
+.lesson-body ul, .lesson-body ol { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.lesson-body strong { font-weight: 700; }
+/* A lesson's video: a 16:9 box that loads YouTube only when play is pressed */
+.video { max-width: 68ch; display: grid; gap: 8px; }
+.video iframe, .video-start { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius); display: block; }
+.video iframe { background: #000; }
+.video-start { cursor: pointer; color: #fff; font: inherit; background: linear-gradient(140deg, #1d2a14 0%, #0f160b 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px; text-align: center; box-shadow: var(--shadow-2); }
+.video-start:hover .video-play { transform: scale(1.06); background: var(--red-deep); }
+.video-play { width: 68px; height: 68px; border-radius: 50%; background: var(--red); display: grid; place-items: center; transition: transform .15s, background-color .15s; }
+.video-play::after { content: ""; margin-left: 5px; border-style: solid; border-width: 12px 0 12px 20px; border-color: transparent transparent transparent #fff; }
+.video-start .small { color: #cfd8c4; }
+@media print { .video { display: none; } }
 .lesson-list { list-style: none; margin: 0; padding: 0; }
 .card.lesson-list { padding: 6px 18px; }
 .lesson-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--line); }

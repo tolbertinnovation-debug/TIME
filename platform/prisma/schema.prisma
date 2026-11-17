@@ -325,6 +325,8 @@ model Lesson {
   body        String
   minutes     Int?
   resourceUrl String?
+  // A YouTube link: the video plays inside the lesson
+  videoUrl    String?
   status      LessonStatus     @default(DRAFT)
   sort        Int              @default(0)
   publishedAt DateTime?
@@ -352,16 +354,18 @@ model LessonProgress {
 // ---- Class sessions (live online classes and in-person practicals) and attendance ----
 
 model ClassSession {
-  id          String       @id @default(cuid())
-  classId     String
-  class       CourseClass  @relation(fields: [classId], references: [id], onDelete: Cascade)
-  title       String
-  kind        LessonKind
-  startsAt    DateTime
-  meetingUrl  String?
-  createdById String?
-  createdBy   User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
-  attendance  Attendance[]
+  id           String       @id @default(cuid())
+  classId      String
+  class        CourseClass  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title        String
+  kind         LessonKind
+  startsAt     DateTime
+  meetingUrl   String?
+  // Added after a live class, for students who missed it
+  recordingUrl String?
+  createdById  String?
+  createdBy    User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  attendance   Attendance[]
 
   @@index([classId, startsAt])
   @@map("class_session")

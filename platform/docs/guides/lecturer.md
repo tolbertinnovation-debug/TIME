@@ -16,9 +16,27 @@
 3. When the drafts are ready, send them for review. Academic leadership reads them and approves or rejects them with a reason. Lessons are locked while in review; **Take back from review** unlocks them.
 4. Approved lessons are published to students at once. To change a published lesson, choose **Take back to draft**: it disappears for students until it is approved again.
 
+**Writing a lesson so it reads well on a phone:**
+
+| Type this | To get |
+|---|---|
+| `# Heading` at the start of a line | a heading (`##` for a smaller one) |
+| `- item` | a bullet point |
+| `1. step` | a numbered step |
+| `**words**` | **bold** words |
+| a blank line | a new paragraph |
+
+**Videos:** paste a YouTube link in **YouTube video**. It plays inside the lesson, and only when the student presses play, so the lesson itself stays light on data. To use your own recording, upload it to YouTube as **Unlisted** (only people with the link can find it) and paste that link.
+
+**Notes, slides or audio:** paste a link in **Link to notes, slides or audio**, for example a Google Drive or Google Slides file shared as "Anyone with the link can view".
+
+**Assignments, quizzes, the midterm and the final** are set under **Assessments**; see below.
+
 ### Sessions, attendance and announcements
 
-- **Sessions and attendance:** add each live or in-person session with its date, time and meeting link. After the session choose **Take attendance**.
+- **Live classes on Google Meet, Zoom or Teams:** create the meeting in that service as usual, then under **Sessions and attendance** add the session with its date, time and the meeting link. Every student is notified at once, and the class page shows **Join on Google Meet** (or Zoom, or Teams).
+- **Recordings:** if you record the class, paste the recording's link next to the session afterwards (YouTube as Unlisted, or Google Drive). Students are notified, and it appears under **Recordings of past classes**.
+- **Attendance:** after each session choose **Take attendance**.
 - **Announcements:** post from the class page. Every student in the class is notified.
 - **Class discussion:** answer students' questions. You can remove a post that breaks the rules.
 

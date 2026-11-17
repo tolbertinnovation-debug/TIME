@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { completeLessonAction } from "@/app/learning-actions";
 import { KindPill, LessonBody } from "@/components/learning";
 import { Notices } from "@/components/notice";
+import { LessonVideo } from "@/components/video";
 import { requireEnrolment } from "@/lib/class-access";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 import { neighbours } from "@/lib/progress";
+import { youtubeEmbedUrl, youtubeId } from "@/lib/video";
 
 export const metadata = { title: "Lesson" };
 
@@ -22,6 +24,7 @@ export default async function LessonPage({ params, searchParams }: { params: Pro
   const all = modules.flatMap((m) => m.lessons);
   const { previous, next } = neighbours(all, lessonId);
   const position = all.findIndex((l) => l.id === lessonId) + 1;
+  const video = lesson.videoUrl ? youtubeId(lesson.videoUrl) : null;
   return (
     <article className="stack lg">
       <div className="stack">
@@ -30,8 +33,9 @@ export default async function LessonPage({ params, searchParams }: { params: Pro
         <p className="row"><KindPill kind={lesson.kind} />{lesson.minutes ? <span className="muted small">{lesson.minutes} min</span> : null}</p>
         <Notices params={await searchParams} />
       </div>
+      {video && <LessonVideo embedUrl={youtubeEmbedUrl(video)} watchUrl={lesson.videoUrl!} title={lesson.title} />}
       <LessonBody text={lesson.body} />
-      {lesson.resourceUrl && <p><a className="btn ghost" href={lesson.resourceUrl} target="_blank" rel="noopener noreferrer">Open the notes or audio for this lesson</a></p>}
+      {lesson.resourceUrl && <p><a className="btn ghost" href={lesson.resourceUrl} target="_blank" rel="noopener noreferrer">Open the notes, slides or audio for this lesson</a></p>}
       <div className="card stack" style={{ maxWidth: 520 }}>
         {progress ? (
           <p className="notice ok">{lesson.kind === "PRACTICAL" ? `Signed off by ${progress.signedOffBy?.name ?? "TIME staff"} on ${formatDate(progress.completedAt)}.` : `You completed this lesson on ${formatDate(progress.completedAt)}.`}</p>

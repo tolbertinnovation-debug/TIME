@@ -22,7 +22,8 @@ The balance is due **8 weeks after your first payment**. If it is not paid by th
 - **Home** shows, for each class, your next lesson with a **Continue** button, work you still have to hand in with its due date, and the live sessions coming in the next two weeks.
 - Inside a lesson, **Previous lesson** and **Next lesson** take you through the course in order.
 - **My classes**, then **Open class**, shows your progress, lessons, assessments, announcements and coming sessions.
-- Open a lesson, study it, then choose **Mark lesson complete**.
+- Open a lesson, study it, then choose **Mark lesson complete**. If it has a video, press **Play the video**; videos use mobile data and need a connection.
+- **Live classes:** your class page lists coming sessions with a **Join** button for Google Meet, Zoom or Teams. You are notified when one is scheduled. If you miss one, look under **Recordings of past classes**.
 - **Practical work** is signed off by your lecturer or study centre facilitator, not by you.
 - **Class discussion** is for questions about the class. Your lecturer and classmates can reply.
 

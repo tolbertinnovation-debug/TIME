@@ -19,6 +19,8 @@ The balance is due **8 weeks after your first payment**. If it is not paid by th
 
 ## 3. Study
 
+- **Home** shows, for each class, your next lesson with a **Continue** button, work you still have to hand in with its due date, and the live sessions coming in the next two weeks.
+- Inside a lesson, **Previous lesson** and **Next lesson** take you through the course in order.
 - **My classes**, then **Open class**, shows your progress, lessons, assessments, announcements and coming sessions.
 - Open a lesson, study it, then choose **Mark lesson complete**.
 - **Practical work** is signed off by your lecturer or study centre facilitator, not by you.

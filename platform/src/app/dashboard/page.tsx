@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { realEmail } from "@/lib/phone";
+import { StudentHome, TeachingHome } from "@/components/home";
 import { Notices } from "@/components/notice";
 import { prisma } from "@/lib/db";
 import { formatUsd, WARN_DAYS } from "@/lib/fees";
 import { feeStatuses } from "@/lib/fees-data";
+import { studentAgenda, teachingAgenda } from "@/lib/home";
 import { can, ROLE_LABEL, visibleApprovalTypes } from "@/lib/permissions";
 import { requireUser } from "@/lib/session";
 
@@ -25,6 +27,10 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   // Warn a student whose balance is due soon, or whose access is paused.
   const mine = can(user.role, "classes.apply") ? await prisma.enrolment.findMany({ where: { userId: user.id, status: "ACTIVE" }, select: { id: true } }) : [];
   const fees = [...(await feeStatuses(mine.map((e) => e.id))).values()];
+  const [learning, teaching] = await Promise.all([
+    can(user.role, "classes.apply") ? studentAgenda(user.id) : Promise.resolve([]),
+    user.role === "LECTURER" || user.role === "FACILITATOR" ? teachingAgenda(user.id, user.role) : Promise.resolve([]),
+  ]);
   const paused = fees.filter((f) => !f.hasAccess);
   const dueSoon = fees.filter((f) => f.state === "OWING" && f.daysLeft !== null && f.daysLeft <= WARN_DAYS);
   return (
@@ -39,6 +45,8 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
         {unread > 0 && <p className="notice info" role="status">You have {unread} unread {unread === 1 ? "notification" : "notifications"}. <Link href="/notifications">Read {unread === 1 ? "it" : "them"}</Link>.</p>}
         {myRequest && <p className="notice info" role="status">Your staff access request is waiting for an administrator's decision.</p>}
       </div>
+      {learning.length > 0 && <StudentHome classes={learning} />}
+      {teaching.length > 0 && <TeachingHome classes={teaching} marks={user.role === "LECTURER"} />}
       <div className="grid">
         {can(user.role, "classes.apply") && (myEnrolments > 0
           ? <Link className="tile" href="/my-classes"><b>{myEnrolments}</b><span>{myEnrolments === 1 ? "class" : "classes"} you are enrolled in</span></Link>

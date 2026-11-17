@@ -5,6 +5,7 @@
 1. Create an account, then on your home page choose **Ask for staff access** and pick Lecturer or Study centre facilitator.
 2. An administrator approves it. The registrar then assigns you to your classes.
 3. **My classes** in the menu lists the classes you are assigned to. You cannot open other classes.
+4. **Home** shows each of your classes with the work waiting to be marked and the sessions coming in the next two weeks.
 
 ## Lecturers
 

@@ -138,14 +138,16 @@ test("a quiz mixes multiple choice, true or false and short answer, and marks th
 
   await add("SHORT", { "#q-text": "What does a cash book record?", "#q-points": "1" });
   await notice(leo, "error", "Give at least one accepted answer");
+  await leo.locator("#questions-h", { hasText: "Questions (0)" }).waitFor({ timeout: 10000 });
+  // Each saved question is waited for, so the next one is added on the refreshed page.
+  const saved = (n) => leo.locator("#questions-h", { hasText: `Questions (${n})` }).waitFor({ timeout: 10000 });
   await add("CHOICE", { "#q-text": "Which is money coming in?", "#q-options": "Rent paid\nA sale\nWages paid", "#q-correct": "2", "#q-points": "1" });
-  await notice(leo, "ok", "Question added");
+  await saved(1);
   await add("TRUE_FALSE", { "#q-text": "A receipt should be kept for every sale.", "#q-truth": "TRUE", "#q-points": "1" });
-  await notice(leo, "ok", "Question added");
+  await saved(2);
   await add("SHORT", { "#q-text": "A shop sells rice for how much?", "#q-accepted": "LRD 500\n500 Liberian dollars\nlrd 500", "#q-points": "2" });
-  await notice(leo, "ok", "Question added");
+  await saved(3);
   const text = await leo.locator("section:has(#questions-h)").innerText();
-  assert.match(text, /Questions \(3\)/);
   assert.match(text, /True or false[\s\S]*True\s*Correct/);
   assert.match(text, /Short answer\s+Accepted: LRD 500\s*500 Liberian dollars/);
   assert.ok(!/lrd 500\s*$/m.test(text.split("Accepted:")[1]), "a duplicate accepted answer is kept once");
